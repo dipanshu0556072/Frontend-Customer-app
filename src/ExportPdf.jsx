@@ -1,15 +1,19 @@
+import react,{useEffect} from 'react';
 import { Alert } from 'react-native';
 import RNHTMLtoPDF from 'react-native-html-to-pdf';
 import { useColorScheme, ScrollView, SafeAreaView, StatusBar, StyleSheet, Text, View, TouchableOpacity, Dimensions, Platform } from 'react-native';
 import { Colors } from 'react-native/Libraries/NewAppScreen';
 import kpmg from './PlpScreen/images/kpmg.png'
 import { useCartContext } from './Context/WomenContext';
+import { useLoginContext } from './Login/LoginCartProvider';
 
 const imagePath = kpmg;
 
 
 
-export default function ExportPdf() {
+export default function ExportPdf({navigation}) {
+
+  const {OrderDate}=useLoginContext();
   const isDarkMode = useColorScheme() === 'dark';
   const {receiptData,setReceiptData}=useCartContext();
 
@@ -27,13 +31,13 @@ export default function ExportPdf() {
         <td>${index + 1}</td>
         <td>${item.product.title}</td>
         <td>${item.size || "N/A"}</td>
-        <td>₹${item.price.toFixed(2)}</td>
+        <td>₹${item.product.discountedPrice.toFixed(2)}</td>
         <td>${item.quantity}</td>
-        <td>₹${(item.price * item.quantity).toFixed(2)}</td>
+        <td>₹${(item.discountedPrice).toFixed(2)}</td>
         <td>${item.product.taxRate || "18%"}</td>
         <td>${item.product.taxType || "N/A"}</td>
         <td>₹${(item.product.taxAmount || 0).toFixed(2)}</td>
-        <td>₹${(item.price * item.quantity + (item.product.taxAmount || 0)).toFixed(2)}</td>
+        <td>₹${(item.discountedPrice  + (item.product.taxAmount || 0)).toFixed(2)}</td>
       </tr>
     `).join('');
     const shippingAddressRow = `
@@ -43,7 +47,7 @@ export default function ExportPdf() {
       </td>
     </tr>
   `;
-
+  const timestamp = new Date().getTime(); // Get current timestamp
     let PDFOptions = {
 
 
@@ -129,15 +133,15 @@ export default function ExportPdf() {
               <p><strong>GST Registration No:</strong> 29AACFV3325K1ZY</p>
               <p><strong>Order Number:</strong> 403-3225714-7676307</p>
               <p><strong>Invoice Number:</strong> IN-761</p>
-              <p><strong>Order Date:</strong> 31.01.2024</p>
+              <p><strong>Order Date:</strong> ${OrderDate}</p>
               <p><strong>Invoice Details:</strong> KA-310565025-1920</p>
-              <p><strong>Invoice Date:</strong> 31.01.2024</p>
+              <p><strong>Invoice Date:</strong>  ${OrderDate}</p>
             </div>
       
             <div class="right-details">
-              <p><strong>Billing Address:</strong> Madhu B, Eurofins IT Solutions India Pvt Ltd, 1st Floor, Maruti Platinum, Lakshminarayana Pura, AECS Layout, BENGALURU, KARNATAKA, 560037, IN</p>
+              <p><strong>Billing Address:</strong> ${receiptData.shippingAddress.firstName} ${receiptData.shippingAddress.lastName} ${receiptData.shippingAddress.streetAddress} ${receiptData.shippingAddress.city}  ${receiptData.shippingAddress.state},${receiptData.shippingAddress.zipCode},${receiptData.shippingAddress.mobile}, IN</p>
               <p><strong>State/UT Code:</strong> 29</p>
-              <p><strong>Shipping Address:</strong> Madhu B, Eurofins IT Solutions India Pvt Ltd, 1st Floor, Maruti Platinum, Lakshminarayana Pura, AECS Layout, BENGALURU, KARNATAKA, 560037, IN</p>
+              <p><strong>Shipping Address:</strong> 8th Floor, Building, 10 B, DLF Tower 10th Rd, DLF Cyber City, DLF Phase 2, Sector 25, Gurugram, Haryana 122002, IN</p>
               <p><strong>State/UT Code:</strong> 29</p>
               <p><strong>Place of supply:</strong> GURUGRAM</p>
               <p><strong>Place of delivery:</strong> GURUGRAM</p>
@@ -166,12 +170,11 @@ export default function ExportPdf() {
           </table>
       
           <div class="total-section">
-            <p>Total: ₹56.88 ₹1,195.00</p>
-            <p>Amount in Words: One Thousand One Hundred And Ninety-five only</p>
+
           </div>
       
           <div class="footer">
-            * ASSPL-Amazon Seller Services Pvt. Ltd., ARIPL-Amazon Retail India Pvt. Ltd. (only where Amazon Retail India Pvt. Ltd. fulfillment center is co-located) Customers desirous of availing input GST credit are requested to create a Business account and purchase on Amazon.in/business from Business eligible offers. Please note that this invoice is not a demand for payment. Page 1 of 2
+            * ASSPL-KPMG  Services Pvt. Ltd., KPMG Retail India Pvt. Ltd. (only where KPMG Retail India Pvt. Ltd. fulfillment center is co-located) Customers desirous of availing input GST credit are requested to create a Business account and purchase on KPMG.in/business from Business eligible offers. Please note that this invoice is not a demand for payment. Page 1 of 2
           </div>
         </div>
       
@@ -179,7 +182,7 @@ export default function ExportPdf() {
       </html>
       
       `,     
-             fileName: 'file',
+      fileName: `file_${timestamp}`,
       directory: Platform.OS === 'android' ? 'Downloads' : 'Documents',
     };
     let file = await RNHTMLtoPDF.convert(PDFOptions);
@@ -192,30 +195,40 @@ export default function ExportPdf() {
   }
 };
 
+useEffect(()=>{
+  createPDF();
+  setTimeout(()=>{
+    navigation.navigate('orderStatus');
+  },100)
+},[]);
 
   return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
-      />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <View
-          style={[
-            {
-              backgroundColor: isDarkMode ? Colors.black : Colors.white,
-            },
-            styles.container1,
-          ]}>
-          <TouchableOpacity style={styles.button} onPress={createPDF}>
-            <Text>Create PDF</Text>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+  <>
+  </>
   );
+  // return (
+  //   <SafeAreaView style={backgroundStyle}>
+  //     <StatusBar
+  //       barStyle={isDarkMode ? 'light-content' : 'dark-content'}
+  //       backgroundColor={backgroundStyle.backgroundColor}
+  //     />
+  //     <ScrollView
+  //       contentInsetAdjustmentBehavior="automatic"
+  //       style={backgroundStyle}>
+  //       <View
+  //         style={[
+  //           {
+  //             backgroundColor: isDarkMode ? Colors.black : Colors.white,
+  //           },
+  //           styles.container1,
+  //         ]}>
+  //         <TouchableOpacity style={styles.button} onPress={createPDF}>
+  //           <Text>Create PDF</Text>
+  //         </TouchableOpacity>
+  //       </View>
+  //     </ScrollView>
+  //   </SafeAreaView>
+  // );
 }
 
 const styles = StyleSheet.create({

@@ -94,7 +94,7 @@ export default function TopBar1({ navigation }) {
   return (
 
     <TouchableWithoutFeedback >
-      <View style={{}}>
+      <View style={{backgroundColor:'white'}}>
         <View style={{ padding: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginRight: '3%' }}>
         <TouchableOpacity onPress={() => forNavigate('mainHome')}>
             <Image source={kpmg} style={{ width: 160, height: 90, }} />

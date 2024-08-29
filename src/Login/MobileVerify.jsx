@@ -5,7 +5,7 @@ import checked from './images/checked.png';
 const MobileVerify = ({navigation}) => {
   useEffect(()=>{
     setTimeout(()=>{
-      navigation.navigate('Login3');
+      navigation.navigate('mainHome');
     },1000);
   });
   return (

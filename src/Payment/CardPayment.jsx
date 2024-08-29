@@ -23,6 +23,15 @@ export default function CardPayment({ navigation }) {
   const [cardHolderNameError, setCardHolderNameError] = useState(false);
   const [expiryError, setExpiryError] = useState(false);
   const [cvvError, setCvvError] = useState(false);
+  const [visaImage,setVisaImage]=useState(false);
+
+  useEffect(()=>{
+    if(cardNumber && cardNumber.length>4){
+      setVisaImage(true);
+    }else{
+      setVisaImage(false);
+    }
+  },[visaImage,cardNumber]);
 
   const {cartItem,setCartItem,selectedAddress,
     setSelectedAddress,orderItemPrice,
@@ -32,7 +41,7 @@ export default function CardPayment({ navigation }) {
     city, setCity,
     state, setState,
     pinCode, setPinCode,
-    mobile, setMobile,
+    mobile, setMobile,disableAction,setDisableAction,
     allSavedAddress,setAllSavedAddress,
     placedOrder,setPlacedOrder,
     trackCurrentOrderId,setTrackCurrentOrderId}=useCartContext();
@@ -92,7 +101,8 @@ useEffect(() => {
     setPinCode(selectedAddressData.zipCode);
     setMobile(selectedAddressData.mobile);
   }
-}, [selectedAddress, allSavedAddress, setUserName, setStreetAddress1, setCity, setState, setPinCode, setMobile]);
+  setDisableAction(true);
+}, [disableAction,selectedAddress, allSavedAddress, setUserName, setStreetAddress1, setCity, setState, setPinCode, setMobile]);
 
        const userNameArray = userName.split(' ');
         const dataAdd={
@@ -242,16 +252,21 @@ useEffect(() => {
     placeholderTextColor='#999'
     onChangeText={(text) => setCardNumber(text)}
   />
-  <Image
-    source={visa} // Replace 'yourImageSource' with the actual source for your image
-    style={{
-      position: 'absolute',
-      top: 8, // Adjust the top value to position the image vertically
-      right: 8, // Adjust the right value to position the image horizontally
-      width: 37, // Adjust the width of the image
-      height: 12, // Adjust the height of the image
-    }}
-  />
+  {
+    visaImage && (
+      <Image
+      source={visa} // Replace 'yourImageSource' with the actual source for your image
+      style={{
+        position: 'absolute',
+        top: 8, // Adjust the top value to position the image vertically
+        right: 8, // Adjust the right value to position the image horizontally
+        width: 37, // Adjust the width of the image
+        height: 12, // Adjust the height of the image
+      }}
+    />
+    )
+  }
+
 </View>
 
         <TextInput
@@ -271,7 +286,7 @@ useEffect(() => {
     styles.inputField,
     { borderColor: expiryFocus ? '#00338D' : expiryError ? 'red' : '#D3D3D3' },
   ]}
-  placeholder='Expiry'
+  placeholder='MM-YY'  
   inputMode='numeric'
   onFocus={() => handleFocus('expiry')}
   placeholderTextColor='#999'

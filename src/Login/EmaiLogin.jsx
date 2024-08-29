@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View ,TextInput,Image, TouchableOpacity} from 'react-native'
+import {Alert, StyleSheet, Text, View ,TextInput,Image, TouchableOpacity,ActivityIndicator} from 'react-native'
 import React,{useEffect, useState} from 'react';
 import LoginTop1 from './LoginTop1';
 import eye1 from './images/view1.png';
@@ -7,6 +7,7 @@ import fb from './images/fb.png';
 import google from './images/google.png';
 import arrow from './images/arrow.png';
 import { useLoginContext } from './LoginCartProvider';
+import axios from 'axios';
 
 const EmaiLogin = ({navigation}) => {
 
@@ -15,14 +16,56 @@ const EmaiLogin = ({navigation}) => {
   const [seePassword,setSeePassword]=useState(true);
   const [seePassword1,setSeePassword1]=useState(true);
   const [btnColor,setBtnColor]=useState(false);
+  const [showActivityIndicator, setShowActivityIndicator] = useState(false);
 
   
-  const {checkEmail,setCheckEmail,password,setPassword,
+  const {ip,checkEmail,setCheckEmail,password,setPassword,
     confirmPassword,setConfirmPassword}=useLoginContext();
   const [inputEmail, setInputEmail] = useState('');  
+  const [error1,setError1]=useState(false);
 
  
+  const createUser = {
+    email: inputEmail, 
+    password: confirmPassword,
+  };
+  async function userCreate1() {
+    // Alert.alert("HI");
+    setShowActivityIndicator(true);
+    try {
+      const response = await axios.post(`http://${ip}:5454/auth/signup?referralCode=${enteredReferralCode}`, createUser);
+      console.log(response.data);
+      navigation.navigate('EmailLoginValid');
+    } catch (error) {
+      console.log("Error occurred while creating user:", error);
+      // Handle error here, e.g., set an error state
+      setError1(true);
+      useEffect(()=>{
+        setTimeout(()=>{
+         setError1(false); 
+        },2000);
+      });
+    }
+  }
 
+  async function userCreate2() {
+    // Alert.alert("BY");
+    setShowActivityIndicator(true);
+    try {
+      const response = await axios.post(`http://${ip}:5454/auth/signup`, createUser);
+      console.log(response.data);
+      navigation.navigate('EmailLoginValid');
+    } catch (error) {
+      console.log("Error occurred while creating user:", error);
+      // Handle error here, e.g., set an error state
+      setError1(true);
+      useEffect(()=>{
+        setTimeout(()=>{
+         setError1(false); 
+        },2000);
+      });
+    }
+  }
    useEffect(()=>{
     if(inputEmail!=="" && password!=="" && password===confirmPassword){
       setBtnColor(true);
@@ -51,25 +94,63 @@ const EmaiLogin = ({navigation}) => {
     setSeePassword1((prevState) => !prevState);
   }
 
+  const[EmailNullValidation,setEmailNullValidation]=useState(false);
+  const[PasswordNullValidation,setPasswordNullValidation]=useState(false);
+  const[confirmPasswordNullValidation,setConfirmPasswordNullValidation]=useState(false);
+  const[EmailValidation,setEmailValidation]=useState(false);
+  const[activityIndicator,setActivityIndicator]=useState(false);
+  const [enteredReferralCode,setEnteredReferralCode]=useState('');
+  useEffect(()=>{
+ 
+   setTimeout(()=>{
+    setEmailValidation(false);
+   },4000);
+  },[EmailNullValidation,PasswordNullValidation,confirmPasswordNullValidation],EmailValidation);
+  
+  
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
 
   function SignInBtn(){
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-    
     const isPasswordValid = validatePassword(password);
 
- 
+    if(inputEmail.length===0||PasswordNullValidation.length===0||confirmPasswordNullValidation.length===0){
+      if(!inputEmail){
+        setEmailNullValidation(true);
+      }
+      if(!PasswordNullValidation){
+       setPasswordNullValidation(true);
+      }
+      if(!confirmPasswordNullValidation){
+       setConfirmPasswordNullValidation(true);
+      }
 
-    if(inputEmail.length>0){
-      setCheckEmail(inputEmail);
+    }else{
+      if(inputEmail.length>0 && !validateEmail(inputEmail)){
+        setEmailValidation(true);
+      }
+      else{
+        if(password===confirmPassword && password!="" ){
+          console.log(password+" "+confirmPassword);
+          setCheckEmail(inputEmail);
+          if(enteredReferralCode && enteredReferralCode.length>0){
+            userCreate1(); 
+          }else{
+            userCreate2();
+          }
+          //navigation.navigate('EmailLoginValid');
+        }
+        console.log("Data "+checkEmail+" "+password+" "+confirmPassword);
+  
+      }
+      
+  
     }
-    
-      if(password===confirmPassword && password!="" ){
-      console.log(password+" "+confirmPassword);
-      navigation.navigate('EmailLoginValid');
-    }
-    console.log("Data "+checkEmail+" "+password+" "+confirmPassword);
+
   }
   const handleChangeText1=(text)=>{
     console.log(text);
@@ -93,6 +174,14 @@ const validatePassword = (password) => {
   return passwordRegex.test(password);
 };
 
+useEffect(()=>{
+ if(error1){
+   setTimeout(()=>{
+    setShowActivityIndicator(false);
+   },3000);
+ }
+},[error1]);
+
   return (
   <View style={styles.container}>
     <LoginTop1/>
@@ -104,24 +193,29 @@ const validatePassword = (password) => {
                width:'86%',
                marginTop:'4%',
                marginLeft:'5%',
-               borderColor:''
+               borderColor:EmailNullValidation?'red':'grey'
             }}
             placeholder='Email Id*'
             value={inputEmail}
-            onChangeText={(text)=>{setInputEmail(text)}}/>
+            onChangeText={(text)=>{setInputEmail(text)}}
+            
+            
+            />
 
           <View style={{flexDirection:'row',alignItems:'center'}}>
-          <TextInput style={{
-               borderBottomWidth:0.5,
-               width:'86%',
-               marginTop:'4%',
-               marginLeft:'5%',
-               borderColor:''
-             }}
+          <TextInput
+  style={{
+    borderBottomWidth: 0.5,
+    width: '86%',
+    marginTop: '4%',
+    marginLeft: '5%',
+    borderColor: PasswordNullValidation ? 'red' : 'grey',
+  }}
+  secureTextEntry={seePassword}
+  placeholder='Set Password*'
+  onChangeText={(text) => handleChangeText1(text)}
+/>
 
-              secureTextEntry={seePassword}
-              placeholder='Set Password*'
-              onChangeText={(text)=>handleChangeText1(text)}/>
            {
             seePassword ?
           (
@@ -136,6 +230,7 @@ const validatePassword = (password) => {
          )
           }  
           </View>  
+          
 
        
           <View style={{flexDirection:'row',alignItems:'center'}}>
@@ -144,7 +239,7 @@ const validatePassword = (password) => {
                width:'86%',
                marginTop:'4%',
                marginLeft:'5%',
-               borderColor:''
+               borderBottomColor: EmailNullValidation ? 'red' : 'grey',
              }}
                 secureTextEntry={seePassword1}
                 onChangeText={(text)=>handleChangeText2(text)}
@@ -162,7 +257,18 @@ const validatePassword = (password) => {
               </TouchableOpacity>
               )
            }  
-        </View>                 
+        </View>    
+        <TextInput
+        style={{
+         borderBottomWidth: 0.5,
+         width: '86%',
+         marginTop: '4%',
+         marginLeft: '5%',
+         borderColor:'grey'
+        }}
+        placeholder='Referral Code'
+        onChangeText={(text) => setEnteredReferralCode(text)}
+     />             
     </View>
    
     <TouchableOpacity style={{backgroundColor:btnColor?'#00338D':'grey',width:'90%',padding:10,
@@ -171,7 +277,16 @@ const validatePassword = (password) => {
                  >
                   <Text style={{color:'white',fontWeight:'700',fontSize:15}}>Submit</Text>
       </TouchableOpacity>
-    
+      {
+              error1?
+              <Text style={{textAlign:'center',marginTop:'2%',color:'red'}}>user already exist!</Text>:
+              <Text></Text>
+       }
+    {
+      EmailValidation?
+      <Text style={{color:'red',marginLeft:'34%',margin:'3%',fontSize:12}}>Please enter a valid email Id</Text>:
+      <Text></Text>
+    }
     <View style={styles.row3}>
       <Text style={{color:'black',fontSize:15}}>Already account</Text>
       <View>
@@ -189,6 +304,11 @@ const validatePassword = (password) => {
     <View style={styles.row4}>
            <Text style={{padding:1}}>By signing up your agree to our <Text style={{color:'#00338D',fontWeight:'500',textDecorationLine:'underline'}}>Terms of services &{'\n'} Privacy Policy</Text></Text>
         </View>
+        {showActivityIndicator && (
+        <View style={styles.activityIndicatorContainer}>
+          <ActivityIndicator size="large" color="#00338D" />
+        </View>
+      )}
 </View>
   )
 }
@@ -218,6 +338,16 @@ const styles = StyleSheet.create({
       },   
       row4:{
         marginLeft:'8%',
-        marginTop:'20%'
-      }
+        marginTop:'35%'
+      },
+      activityIndicatorContainer: {
+        position: 'absolute',
+        top: 0,
+        bottom: 0,
+        left: 0,
+        right: 0,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(255,255,255,0.7)', // Semi-transparent background
+      },
 })

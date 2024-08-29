@@ -3,11 +3,14 @@ import React,{useEffect, useState} from 'react';
 import LoginTop1 from './LoginTop1';
 import { useLoginContext } from './LoginCartProvider';
 import RnOtpTimer from 'react-native-otp-timer';
+import axios from 'axios';
 const EmailLoginValidation = ({navigation}) => {
 
   const {checkEmail,setCheckEmail,
          emailverify,setEmailVerify,
-         emailId, setEmailId}=useLoginContext();
+         }=useLoginContext();
+  const {ip,emailId, setEmailId,password,setPassword,userLogin,setUserLogin,token,setToken,loginUserId,setLoginUserId,} = useLoginContext()
+
   const[otp,setOtp]=useState('');
   const[error1,setError1]=useState(false);
   const[error2,setError2]=useState(false);
@@ -16,38 +19,79 @@ const EmailLoginValidation = ({navigation}) => {
   const [showActivityIndicator, setShowActivityIndicator] = useState(false);
   const [resendCountDown,setResendCountDown]=useState(false);
 
+  // useEffect(()=>{
+  //  if(!resendCountDown)
+  //   setResendCountDown(true);
+  //  }
+  // },[resendCountDown]);
+  const createUser = {
+    email: checkEmail, 
+    password: password,
+  };
+  
+  async function userCreate() {
+    try {
+      const response = await axios.post(`http://${ip}:5454/auth/signup`, createUser);
+      console.log(response.data);
+    } catch (error) {
+      console.log("Error occurred while creating user:", error);
+      // Handle error here, e.g., set an error state
+    }
+  }
+  async function sendEmailOtp(){
+    try {
+      const response = await axios.post(`http://${ip}:5454/auth/verify-otp?email=${checkEmail}&otp=${otp}`);
+      console.log(response.data);
+      submitEmailOtp();
+    } catch (error) {
+      console.log("Error occurred while creating user:", error);
+      setError2(true);
+      // Handle error here, e.g., set an error state
+    }  
+  }
+
 
   useEffect(() => {
     setBtnColor(otp.length === 6);
+
   }, [otp]);
 
   const handleChangeText=(text)=>{
    setOtp(text);
    console.log(text);
   }
+ 
+
+  function submitEmailOtp(){
+    // if(otp==="000000"){
+      if(!error2){
+        
+        // userCreate();
+        setEmailId(checkEmail);
+        setEmailVerify(true);
+        setOtp("");
+       // Show Activity Indicator
+     
+       setShowActivityIndicator(true);
+       setTimeout(() => {
+         setShowActivityIndicator(false);
+        navigation.reset({
+         index: 0,
+         routes: [{ name: 'EmailVerify' }],
+       });  
+     }, 5000);
+   
+       }
+       
+  }
   function handleBtn(){
+  
     if(otp===""){
         setError1(true);
+    }else{
+      sendEmailOtp();
     }
-    if(otp==="000000"){
-     setEmailId(checkEmail);
-     setEmailVerify(true);
-     setOtp("");
-    // Show Activity Indicator
-    setShowActivityIndicator(true);
-    
-    setTimeout(() => {
-      setShowActivityIndicator(false);
-     navigation.reset({
-      index: 0,
-      routes: [{ name: 'EmailVerify' }],
-    });  
-  }, 5000);
 
-    }
-    else if(otp!=="000000" && otp.length>0){ 
-        setError2(true);      
-    }
 }
 if(error1){
     setTimeout(()=>{
@@ -59,11 +103,16 @@ if(error2){
       setError2(false);
     },2500);
   }
+  async function applyCoupon(){
 
+  }
+ async function memberShipStatus(){
+    
+  }
   return (
     <View style={styles.container}>
         <LoginTop1/>
-        <Text></Text>
+        {/* <Text>{checkEmail}{password}</Text> */}
         <View style={styles.row2}>
              <Text style={{fontSize:28,fontWeight:'bold',textAlign:'center',marginTop:'10%',color:'#00338D'}}>Verify Email</Text>
              <Text style={{textAlign:'center'}}>Enter the 6-digit OTP sent to your email id{'\n'}******
@@ -131,12 +180,12 @@ if(error2){
 
              {
               error1?
-              <Text style={{color:'red',textAlign:'center',marginTop:'3%'}}>please enter otp</Text>:
+              <Text style={{color:'red',textAlign:'center',marginTop:'3%',fontSize:12}}>Please enter OTP</Text>:
               <Text></Text>
             }
             {
               error2?
-              <Text style={{color:'red',textAlign:'center',marginTop:'3%'}}>otp is not valid</Text>:
+              <Text style={{color:'red',textAlign:'center',marginTop:'3%',fontSize:12}}>Invalid OTP</Text>:
               <Text></Text>
             }
         </View>

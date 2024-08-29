@@ -12,12 +12,18 @@ const LoginCartProvider = ({children}) => {
   const [currentPage, setCurrentPage] = useState(['mainHome']);
   const [currentPageIndex,setCurrentPageIndex]=useState(1);
   const [currentPageIndexCategory,setCurrentPageIndexCategory]=useState("");
+  const [currentPageIndexCategory1,setCurrentPageIndexCategory1]=useState("");
   const [selectedItemIndex, setSelectedItemIndex] = useState(1);
   const [changeOrderStatus,setChangeOrderStatus]=useState("CONFIRMED"); 
   const [OrderDate,setOrderDate]=useState("");  
+  const [profileData,setProfileData]=useState([]);
+  const[otp,setOtp]=useState('');
+  //get all user list 
+  const [userList,setUserList]=useState([]);
+  
 
 
-  const [ip,setIp]=useState("192.168.1.106");
+  const [ip,setIp]=useState("192.168.0.119");
   const [userName,setUserName]=useState("");
   const [mobileNumber, setMobileNumber] = useState('');  
   const [checkMobile,setCheckMobile]=useState('');
@@ -29,6 +35,8 @@ const LoginCartProvider = ({children}) => {
   const [userLogin,setUserLogin]=useState(false);
   const [token,setToken]=useState("");
   const [womenFormalData,setWomenFormalData]=useState([]);
+
+  //current Login userId in dataBase
   const [loginUserId,setLoginUserId]=useState([]);
 
   const [homeIcon, setHomeIcon] = useState(true);
@@ -40,20 +48,25 @@ const LoginCartProvider = ({children}) => {
   const [confirmPassword,setConfirmPassword]=useState(""); 
 
   const [targetParentCategory,setTargetParentCategory]=useState("");
-  
+
+  //isMobileVerified
+    
 
 
   const [gender,setGender]=useState("");
     //update userName
-    const [updateUserName,setUpdateUserName]=useState(userName);
+    const [updateUserName, setUpdateUserName] = useState(userName === null ? '' : userName);
+
     //update mobileNumber
     const [updateMobileName,setUpdateMobileName]=useState(mobileNumber);
+    const [AlternativeMobileNumber,setAlternativeMobileNumber]=useState("");
     //update emailId 
     const [updateEmail,setUpdateEmail]=useState(emailId);
     //update gender
     const [updateGender,setUpdateGender]=useState(gender);
-    //update Password
     const [updatePassword,setUpdatePassword]=useState("");
+    const [DOB,setDOB]=useState("");
+    const [DateOfAnniversary,setDateOfAnniversary]=useState("");
     
 
 
@@ -139,12 +152,19 @@ const LoginCartProvider = ({children}) => {
     
       updateUserName,setUpdateUserName,
       updateMobileName,setUpdateMobileName,
+      AlternativeMobileNumber,setAlternativeMobileNumber,
       updateEmail,setUpdateEmail,updateGender,setUpdateGender,
       updatePassword,setUpdatePassword,
+      DOB,setDOB,
       selectedItemIndex, setSelectedItemIndex,
       changeOrderStatus,setChangeOrderStatus,
       OrderDate,setOrderDate,
-      targetParentCategory,setTargetParentCategory
+      targetParentCategory,setTargetParentCategory,
+      currentPageIndexCategory1,setCurrentPageIndexCategory1,
+      profileData,setProfileData,
+      otp,setOtp,
+      userList,setUserList,
+      DateOfAnniversary,setDateOfAnniversary
       
   }  
   return (

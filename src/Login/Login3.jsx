@@ -97,7 +97,7 @@ const Login3 = ({navigation}) => {
         setInputEmail(emailId);
         setEmailVerify(true);
       }  
-    },30000);
+    },10000);
   },[inputEmail]);
 
   function getOtp(){

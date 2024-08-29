@@ -3,28 +3,50 @@ import React from 'react';
 import TopBar from '../PlpScreen/TopBar';
 import back from '../PlpScreen/images/back.png';
 import frame1 from '../PlpScreen/images/frame1.png';
-import frame2 from '../PlpScreen/images/frame2.png';
+import frame2 from './Images/frame2.png';
 
-import frame5 from '../Groceries/Images/frame5.png';
-import frame6 from '../Groceries/Images/frame6.png';
-import frame7 from '../Groceries/Images/frame7.png';
-import frame8 from '../Groceries/Images/frame8.png';
-import frame9 from '../Groceries/Images/frame9.png';
-import frame10 from '../Groceries/Images/frame10.png';
-import frame11 from '../Groceries/Images/frame11.png';
-import frame12 from '../Groceries/Images/frame12.png';
-import frame13 from '../Groceries/Images/frame13.png';
-import frame14 from '../Groceries/Images/frame14.png';
-import frame15 from '../Groceries/Images/frame15.png';
-import frame16 from '../Groceries/Images/frame16.png';
-import frame17 from '../Groceries/Images/frame17.png';
-import frame18 from '../Groceries/Images/frame18.png';
+import frame5 from '../Grocery/Images/frame5.png';
+import frame6 from '../Grocery/Images/frame6.png';
+import frame7 from '../Grocery/Images/frame7.png';
+import frame8 from '../Grocery/Images/frame8.png';
+import frame9 from '../Grocery/Images/frame9.png';
+import frame10 from '../Grocery/Images/frame10.png';
+import frame11 from '../Grocery/Images/frame11.png';
+import frame12 from '../Grocery/Images/frame12.png';
+import frame13 from '../Grocery/Images/frame13.png';
+import frame14 from '../Grocery/Images/frame14.png';
+import frame15 from '../Grocery/Images/frame15.png';
+import frame16 from '../Grocery/Images/frame16.png';
+import frame17 from '../Grocery/Images/frame17.png';
+import frame18 from '../Grocery/Images/frame18.png';
 
-
+import { useLoginContext } from '../Login/LoginCartProvider';
 
 
 const GroceryHome = ({navigation}) => {
 
+  const {ip,token,popFromStack,pushToStack,
+    currentPage, setCurrentPage,
+    currentPageIndex,setCurrentPageIndex,
+    currentPageIndexCategory,setCurrentPageIndexCategory,
+    currentPageIndexCategory1,setCurrentPageIndexCategory1}=useLoginContext();  
+
+
+    const forNavigate=(page)=>{
+      if(page==='mainHome'){
+       setCurrentPage('mainHome');
+       navigation.navigate('mainHome');
+      }else{
+        console.log(page+" "+currentPage[currentPage.length-1]);
+        if(currentPage && currentPage[currentPage.length-1]!==page){
+          pushToStack(page);
+          navigation.navigate(page)
+        }else{
+          popFromStack(navigation);
+        }  
+      }
+    }
+    
 const data1 = [
     { id: '1', source: frame6,heading:'Veggies'},
     { id: '2', source: frame7,heading:'Fresh Fruits'},
@@ -53,24 +75,22 @@ const data1 = [
 
   return (
    <>
+  <View style={{flex:1,backgroundColor:'white'}}>
     <TopBar navigation={navigation}/> 
-     <View style={{flexDirection:'row',alignItems:'center',alignItems:'center'}}>
-            <View>
-               <TouchableOpacity
-                onPress={()=>{navigation.navigate('Home')}}>
-                 <Image source={back}  
-                   style={{marginLeft:12}}/>
-               </TouchableOpacity>
-            </View>
-            <View>
-              <Text style={{paddingLeft:10,color:'black',textAlign:'center'}}>Grocery</Text>              
-            </View>
-    </View>
+    <View style={styles.backBtn}>
+        <TouchableOpacity onPress={() => popFromStack(navigation)}>
+          <View style={styles.backBtn}>
+               <Image source={back}/>
+              <Text style={{ color: 'black',fontSize:13}}>Grocery</Text>
+          </View>          
+        </TouchableOpacity>
+       </View>
     
 
    <ScrollView>
-    <View style={{paddingTop:30,padding:10,}}>
-         <Text style={{color:'#00338D',fontSize:14}}>DEALS ON TOP BRANDS</Text>
+    <View style={{padding:10,}}>
+         <Image source={frame1} style={{width:385,}}/>
+         <Text style={{color:'#00338D',fontSize:14,marginTop:'3%'}}>DEALS ON TOP BRANDS</Text>
        <View style={{flexDirection:'row'}}> 
          <View>
            <FlatList
@@ -122,7 +142,7 @@ const data1 = [
             renderItem={({ item }) => (
             <View style={{padding:8}}>  
              <TouchableOpacity
-               onPress={()=>navigation.navigate('DairyProduct')}
+               onPress={()=>forNavigate('dairyProduct')}
                >
                <Image source={item.source} style={{}} />
              </TouchableOpacity> 
@@ -160,6 +180,7 @@ const data1 = [
         </View>   
       </View>
       </ScrollView>
+      </View>
 
    </>
   )
@@ -167,4 +188,11 @@ const data1 = [
 
 export default GroceryHome
 
-const styles = StyleSheet.create({})
+const styles = StyleSheet.create({
+  backBtn:{
+    marginLeft:'3%',
+    flexDirection:'row',
+    justifyContent:'space-between',
+    alignItems:'center',
+  },
+})

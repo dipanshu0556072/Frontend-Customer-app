@@ -1,9 +1,20 @@
-import { StyleSheet, Text, View,TextInput,TouchableOpacity } from 'react-native'
+import { Alert,StyleSheet, Text, View,TextInput,TouchableOpacity } from 'react-native'
 import React,{useEffect, useState} from 'react';
 import LoginTop from './LoginTop1';
 import { useLoginContext } from './LoginCartProvider';
-const Login2 = ({navigation}) => {
-    const{mobileNumber, setMobileNumber,checkMobile,setCheckMobile}=useLoginContext();
+import axios from 'axios';
+const Login2 = ({navigation,route}) => {
+  const { mob } = route.params;
+    const{mobileNumber, setMobileNumber,checkMobile,setCheckMobile,loginUserId}=useLoginContext();
+    const {ip,token,popFromStack,pushToStack,
+      currentPage, setCurrentPage,
+      currentPageIndex,setCurrentPageIndex,
+      currentPageIndexCategory,setCurrentPageIndexCategory,
+      updateUserName,setUpdateUserName,
+updateMobileName,setUpdateMobileName,AlternativeMobileNumber,
+updateEmail,setUpdateEmail,updateGender,setUpdateGender,
+updatePassword,setUpdatePassword,profileData}=useLoginContext();  
+
     const[otp,setOtp]=useState('');
     const[btnColor,setBtnColor]=useState(false);
     const[error1,setError1]=useState(false);
@@ -15,14 +26,14 @@ const Login2 = ({navigation}) => {
       setOtp(text);
     };    
 
-    useEffect(()=>{
-      if(otp.length===6){
+    useEffect(() => {
+      if (otp.length === 6) {
         setBtnColor(true);
-        setTxtInpt(false);
-      }else{
+      } else {
         setBtnColor(false);
       }
-    });
+    }, [otp]);
+    
     
     
     if(txtInpt){
@@ -34,8 +45,10 @@ const Login2 = ({navigation}) => {
     function handleBtn()
     {
       if(otp==="000000"){
+        storeMobileNumber();
         setMobileNumber(checkMobile);
         setOtp("");
+        setCheckMobile("");
         navigation.navigate('mobileVerify');
       }else{
         setError2(true);
@@ -56,9 +69,36 @@ const Login2 = ({navigation}) => {
       }
     }
 
+    async function storeMobileNumber()
+    {
+       const dataAdd={
+         mobile:updateMobileName,
+         firstName:profileData.firstName?profileData.firstName:'',
+         lastName:profileData.lastName?profileData.lastName:'',
+         gender:profileData.gender?profileData.gender:'',
+         dateOfBirth:profileData.dateOfBirth?profileData.dateOfBirth:'',
+         alternativeMobileNumber:AlternativeMobileNumber
+       }
+       const header = {
+        'Authorization': `Bearer ${token}`,         
+      }
+      try{
+        const response = await axios.put(`http://${ip}:5454/api/users/update/${loginUserId}`, dataAdd, { headers: header });
+        console.log("Profile updated successfully: UserProfile.jsx", response.data);
+       }catch(error){
+       console.log("Error in updating Profile: UserProfile.jsx",error);
+      }
+    }
+
+    useEffect(() => {
+      if (mob) {
+        setCheckMobile(mob);
+      }
+    }, [mob]);
     return (
     <View style={styles.container}>
       <LoginTop />
+    
       <View style={styles.row2}>
              <Text style={{fontSize:28,fontWeight:'bold',textAlign:'center',marginTop:'10%',color:'#00338D'}}>Verify Mobile</Text>
              <Text style={{textAlign:'center'}}>Enter the 6-digit OTP sent to ******{checkMobile[checkMobile.length-4]}{checkMobile[checkMobile.length-3]}{checkMobile[checkMobile.length-2]}{checkMobile[checkMobile.length-1]}</Text>

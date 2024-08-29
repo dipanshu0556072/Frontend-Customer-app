@@ -37,13 +37,22 @@ import men from './PlpScreen/images/Men2.png';
 import kid from './PlpScreen/images/kid2.png';
 import { useLoginContext } from './Login/LoginCartProvider';
 import axios from 'axios';
+import Women from './PlpScreen/images/Womne.png'
+import fashionBanner from './PlpScreen/images/fashionBanner.png';
+import menFashion from './PlpScreen/images/menFashion.png'
+import menFashion1 from './PlpScreen/images/menFashion1.png'
+
 
 export default function Home({navigation}){
  
-  const {setProducts}=useCartContext();
-  const {ip,token,setLoginUserId,pushToStack, setCurrentPage,currentPage,
-    popFromStack,setCurrentPageIndex} = useLoginContext();
-
+  const {products,setProducts}=useCartContext();
+  const {ip,token,setLoginUserId,setCurrentPage} = useLoginContext();
+    const {selectedItemIndex, setSelectedItemIndex, 
+      currentPageIndex,currentPageIndexCategory, 
+      setCurrentPageIndexCategory,pushToStack,popFromStack,
+      currentPage,
+      setCurrentPageIndex,
+      } = useLoginContext();
   // Ref for flatlist
   const flatlistRef = useRef();
   
@@ -77,6 +86,7 @@ export default function Home({navigation}){
     getData();
   }, [token]);
 
+  console.log("\n\n\nProducts"+JSON.stringify(products));
   // Auto Scroll
   useEffect(() => {
     let interval = setInterval(() => {
@@ -92,7 +102,7 @@ export default function Home({navigation}){
           animated: true,
         });
       }
-    }, 2000);
+    }, 2100);
     
     // Cleanup the interval on component unmount
     return () => clearInterval(interval);
@@ -107,11 +117,11 @@ export default function Home({navigation}){
 
   // Data for the carousel
   const carouselData = [
-    { id: 1, image: add1 },
-    { id: 2, image: add2 },
-    { id: 3, image: add3 },
+    { id: 1, image: fashionBanner },
+    { id: 2, image: menFashion },
+    { id: 3, image: menFashion1 },
     { id: 4, image: add4 },
-    { id: 5, image: add5 },
+    { id: 5, image: add1 },
   ];
 
   // Display Images
@@ -215,28 +225,29 @@ export default function Home({navigation}){
       const navigateToMainPlp = (page,itemId) => {
         if(currentPage && currentPage.length>0 && currentPage[currentPage.length-1]!==page){
           setCurrentPageIndex(itemId);
-          pushToStack('mainPlp');
-          navigation.navigate('mainPlp');
+          pushToStack(page);
+          navigation.navigate(page);
           }        
       };
 
   return (
         <>
           <View style={{ flex: 1, backgroundColor: 'white' }}>
-           {/* <Text>{currentPage}</Text> */}
-           <ScrollView>         
-           <View style={{ flexDirection: 'column',backgroundColor:'white' }}>
             <TopBar navigation={navigation}/>
+           <ScrollView>  
+     
+           <View style={{ flexDirection: 'column',backgroundColor:'white' }}>
+           {/* <Text>{currentPage}</Text> */}
              <View style={{flexDirection:'row',alignItems:'center',alignItems:'center',marginBottom:'3%'}}>
                <View>
                   <TouchableOpacity
-                   onPress={() => popFromStack(navigation)}>
+                   onPress={() => popFromStack(navigation)} style={{flexDirection:'row',alignItems:'center',padding:'4%'}}>
                     <Image source={back}  
                       style={{marginLeft:12}}/>
-                  </TouchableOpacity>
-               </View>
-               <View style={{}}>
+
                  <Text style={{paddingLeft:10,color:'black',textAlign:'center'}}>Fashion</Text>              
+
+                 </TouchableOpacity>
                </View>
        </View>
         <View style={styles.horizontalLine1}></View>
@@ -244,33 +255,93 @@ export default function Home({navigation}){
 
 
 
-        <View style={{flexDirection:'row',padding:'2%',justifyContent:'space-around',marginLeft:'3%',}}>
-        <TouchableOpacity
-          onPress={() => {navigateToMainPlp('mainPlp',1)}}  
+
+<View>
+<View style={{flexDirection:'row',margin:'3%'}}>
+
+<View style={{width:120,height:110,    
+    shadowColor: 'grey',
+    shadowOffset: { width: 60, height: 25 },
+    shadowOpacity: 0.25,
+    shadowRadius: 35.84,
+    elevation: 10}}>
+      <TouchableOpacity
+          onPress={() => {navigateToMainPlp('categoryPage',1)}} 
+           style={{}}
          >
-              <Image source={men} style={{width:68,height:75,borderRadius:12,borderColor:'#00338D',borderWidth:0.4,marginLeft:'24%',}}/>
+              <Image source={men} style={{width:105,height:105,borderRadius:12,borderColor:'#00338D',borderWidth:0.4,marginLeft:'4%',}}/>
+              <Text style={{textAlign:'center',fontWeight:'bold',fontSize:12,marginRight:'8%',padding:'2%',color:'#00338D'}}>MEN</Text>
+
+</TouchableOpacity>
+</View>  
+<View style={{width:120,height:110,    
+    shadowColor: 'grey',
+    shadowOffset: { width: 60, height: 25 },
+    shadowOpacity: 0.25,
+    shadowRadius: 35.84,
+    marginLeft:'4%',
+    elevation: 10}}>
+      <TouchableOpacity
+          onPress={() => {navigateToMainPlp('categoryPage',2)}} 
+           style={{}}
+         >
+              <Image source={Women} style={{width:105,height:105,borderRadius:12,borderColor:'#00338D',borderWidth:0.4,}}/>
+              <Text style={{textAlign:'center',fontWeight:'bold',fontSize:12,marginRight:'8%',padding:'2%',color:'#00338D'}}>WOMEN</Text>
+
+</TouchableOpacity>
+</View>  
+<View style={{width:120,height:110,
+    shadowOffset: { width: 60, height: 25 },
+    shadowOpacity: 0.25,
+    shadowRadius: 35.84,
+    marginLeft:'2.5%',
+    elevation: 10}}>
+      <TouchableOpacity
+         
+           style={{}}
+         >
+              <Image source={kid} style={{width:105,height:105,borderRadius:12,borderColor:'#00338D',borderWidth:0.4,}}/>
+              <Text style={{textAlign:'center',fontWeight:'bold',fontSize:12,marginRight:'8%',padding:'2%',color:'#00338D'}}>KIDS</Text>
+
+</TouchableOpacity>
+</View>  
+{/* 
+<TouchableOpacity
+          onPress={() => {navigateToMainPlp('categoryPage',1)}} 
+           style={{}}
+         >
+              <Image source={men} style={{width:110,height:110,borderRadius:12,borderColor:'#00338D',borderWidth:0.4,marginLeft:'4%',}}/>
               <Text style={{textAlign:'center',fontWeight:'bold',fontSize:12,marginRight:'8%',padding:'2%',color:'#00338D'}}>MEN</Text>
            </TouchableOpacity>
            <TouchableOpacity 
-              // onPress={() => {navigateToMainPlp(2)}}
+              onPress={() => {navigateToMainPlp('categoryPage',2)}}  
 
               >
-              <Image source={{uri:'http://surl.li/nrpee'}} style={{width:70,height:75,borderRadius:12,borderColor:'#00338D',borderWidth:0.4,marginLeft:'24%',}}/>
+              <Image source={Women} style={{width:110,height:110,borderRadius:12,borderColor:'#00338D',borderWidth:0.4,marginLeft:'11%'}}/>
               <Text style={{textAlign:'center',fontWeight:'bold',fontSize:12,marginRight:'8%',padding:'2%',color:'#00338D'}}>WOMEN</Text>
            </TouchableOpacity>
            <TouchableOpacity>
-              <Image source={kid} style={{width:68,height:75,borderRadius:12,borderColor:'#00338D',borderWidth:0.4,marginLeft:'25%',}}/>
+              <Image source={kid} style={{width:110,height:110,borderRadius:12,borderColor:'#00338D',borderWidth:0.4,marginLeft:'2%'}}/>
               <Text style={{textAlign:'center',fontWeight:'bold',fontSize:12,marginRight:'8%',padding:'2%',color:'#00338D'}}>KIDS</Text>
-           </TouchableOpacity>
-           <TouchableOpacity>
-              <Image source={beauty} style={{width:68,height:75,borderRadius:12,borderColor:'#00338D',borderWidth:0.4,marginLeft:'24%',}}/>
-              <Text style={{textAlign:'center',fontWeight:'bold',fontSize:12,marginRight:'8%',padding:'2%',color:'#00338D'}}>BEAUTY</Text>
-           </TouchableOpacity>
-           <TouchableOpacity>
-              <Image source={gift} style={{width:68,height:75,borderRadius:12,borderColor:'#00338D',borderWidth:0.4,marginLeft:'24%',}}/>
-              <Text style={{textAlign:'center',fontWeight:'bold',fontSize:12,marginRight:'8%',padding:'2%',color:'#00338D'}}>& MORE</Text>
-           </TouchableOpacity>
-        </View>
+           </TouchableOpacity> */}
+</View>
+<View style={{flexDirection:'row',padding:'2%',marginTop:'3%'}}>
+ 
+ <TouchableOpacity style={{width:120,height:110,
+    shadowOffset: { width: 60, height: 25 },
+    shadowOpacity: 0.25,
+    shadowRadius: 35.84,
+    elevation: 10}}>
+    <Image source={beauty} style={{width:110,height:110,borderRadius:12,borderColor:'#00338D',borderWidth:0.4,marginLeft:'4%',}}/>
+    <Text style={{textAlign:'center',fontWeight:'bold',fontSize:12,marginRight:'8%',padding:'2%',color:'#00338D'}}>BEAUTY</Text>
+ </TouchableOpacity>
+ <TouchableOpacity>
+    <Image source={gift} style={{width:110,height:110,borderRadius:12,borderColor:'#00338D',borderWidth:0.4,marginLeft:'11%',}}/>
+    <Text style={{textAlign:'center',fontWeight:'bold',fontSize:12,marginRight:'8%',padding:'2%',color:'#00338D'}}>& MORE</Text>
+ </TouchableOpacity>
+</View>
+
+</View>
         <View style={styles.horizontalLine1}></View>
 
 
@@ -476,8 +547,6 @@ const styles = StyleSheet.create({
   },
   
 });
-
-
 
 
 

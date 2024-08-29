@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState, useRef } from 'react';
-import {  FlatList,TextInput,StyleSheet, View, Text, TouchableOpacity, Image, ScrollView, RefreshControl } from 'react-native';
+import { Alert, FlatList,TextInput,StyleSheet, View, Text, TouchableOpacity, Image, ScrollView, RefreshControl } from 'react-native';
 import { useCartContext } from '../Context/WomenContext';
 import back from '../PlpScreen/images/back.png';
 import { RadioButton,  } from 'react-native-paper';
@@ -8,18 +8,35 @@ import axios, { all } from 'axios';
 import { useLoginContext } from '../Login/LoginCartProvider';
 import next from '../PlpScreen/images/next.png';
 import Address from '../savedAddress.png';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+const Tab = createBottomTabNavigator();
+import HomeBar from '../HomeBar';
+import ProfileBar from '../ProfileBar';
+import Home1 from '../Fashion';
+import bell1 from '../PlpScreen/images/bell1.png';
+import categories1 from '../PlpScreen/images/category1.png';
+import home1 from '../PlpScreen/images/home1.png';
+import user1 from '../PlpScreen/images/user1.png';
+import Notification from '../Notification';
 
 const OrderSummary = ({ navigation }) => {
   const [check, setCheck] = useState([]);
   const [defaultAddressIndex, setDefaultAddressIndex] = useState(null);
   const [dropdownData, setDropdownData] = useState([]);
+  const [isAddressListNULL,setIsAddressListNULL]=useState(false);
 
   const {
     selectedAddress,
     setSelectedAddress,
     allSavedAddress,
+    setAllSavedAddress,
     setSelectedAddressListindex,
     isItForPlaceOrder,
+    setUserName,
+    setStreetAddress1,
+    setCity,setState,
+    setPinCode, setMobile,
+    setHouseNo,setDefaultAddres,setDisableAction
   } = useCartContext();
 
   
@@ -33,7 +50,7 @@ const OrderSummary = ({ navigation }) => {
   const {ip,token,popFromStack,pushToStack,
     currentPage, setCurrentPage,
     currentPageIndex,setCurrentPageIndex,
-    currentPageIndexCategory,setCurrentPageIndexCategory}=useLoginContext(); 
+    currentPageIndexCategory,setCurrentPageIndexCategory1}=useLoginContext(); 
 
 
   const [selectedAddressIndex, setSelectedAddressIndex] = useState(null);
@@ -50,6 +67,14 @@ const OrderSummary = ({ navigation }) => {
       setCurrentPage('mainHome');
       navigation.navigate(page)
     }else{
+      if(isAddressListNULL && isAddressListNULL.length<=0){
+        if(currentPage && currentPage[currentPage.length-1]!==page){
+          pushToStack('Payment2');
+          navigation.navigate('Payment2')
+        }else{
+          popFromStack(navigation);
+        }            
+      }else{
       if(currentPage && currentPage[currentPage.length-1]!==page){
         pushToStack(page);
         navigation.navigate(page)
@@ -57,9 +82,24 @@ const OrderSummary = ({ navigation }) => {
         popFromStack(navigation);
       }  
     }
+   }
+  }
+  function resetFeilds(){
+    setUserName("");
+    setMobile("");
+    setPinCode("");
+    setStreetAddress1("");
+    setState("");
+    setHouseNo("");
+    setCity("");
   }
   const forNavigate1=(page,id,tileIndex)=>{
     console.log(page+" "+currentPage[currentPage.length-1]);
+    // Alert.alert(JSON.stringify(id));
+   
+    if(id===-1){
+     resetFeilds();
+    }
     if(page==='mainHome'){
       setCurrentPage('mainHome');
       navigation.navigate(page)
@@ -72,9 +112,30 @@ const OrderSummary = ({ navigation }) => {
       }  
     }
     setCurrentPageIndex(id);
-    setCurrentPageIndexCategory(tileIndex);
+    setCurrentPageIndexCategory1(tileIndex);
   }
+  const forNavigate2=(page)=>{
+    console.log(page+" "+currentPage[currentPage.length-1]);
+    // Alert.alert(JSON.stringify(id));
+    setDisableAction(false);
 
+    if(page==='mainHome'){
+      setCurrentPage('mainHome');
+      navigation.navigate(page)
+    }else{
+      if(currentPage && currentPage[currentPage.length-1]!==page){
+        if(allSavedAddress.length<=1){
+          pushToStack('Payment2');
+          navigation.navigate('Payment2')
+        }else{
+          pushToStack('Payment1');
+          navigation.navigate('Payment1')
+        }
+      }else{
+        popFromStack(navigation);
+      }  
+    }
+  }
 
   const areAddressesEqual = (address1, address2) => {
     return address1.firstName === address2.firstName && address1.lastName === address2.lastName;
@@ -140,31 +201,58 @@ useEffect(()=>{
   
 },[showAllSavedAddress]);
 
+
+const getProfileData = async () => {
+  try {
+    const response = await axios.get(`http://${ip}:5454/api/users/profile`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,         
+       },
+    });
+    // console.log(response.data);
+   setAllSavedAddress(response.data.addresses);
+    setIsAddressListNULL((prevProducts) => {
+      const newProducts = response.data.addresses;
+      console.log("ProfiledataArray:" + JSON.stringify(newProducts));
+      return newProducts;
+    });
+    
+    console.log("\n\n\nTOKEN:"+token);
+  } catch (error) {
+    console.error('Error fetching Profiledata: in OrderSummary.jsx', error);
+  }
+}
+useEffect(()=>{
+  getProfileData();
+},[token]);
   return (
     <>
       {/* <Text>{JSON.stringify(allSavedAddress)}</Text> */}
-      <View style={{ flex: 1, backgroundColor: 'white' }}>
+      <View style={{ flex: 1, backgroundColor: 'white',}}>
        {/* <Text>{JSON.stringify(allSavedAddress)}</Text> */}
         {/* <Text>{currentPage}</Text> */}
-        <TouchableOpacity onPress={() => forNavigate('mainHome')}>
+        <TouchableOpacity onPress={() => {forNavigate('mainHome')
+                                          setDisableAction(true)
+        }}>
           <Image
             source={{ uri: 'https://shorturl.at/ckGU2' }}
-            style={{ width: 100, height: 100, marginLeft: '4%' }}
+            style={{ width: 100, height: 100, marginLeft: '4%' ,marginTop:'3%'}}
           />
         </TouchableOpacity>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: '1%', marginBottom: '3%' }}>
-          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <TouchableOpacity onPress={() => { popFromStack(navigation) }}>
-              <Image source={back} style={{ marginLeft: 12 }} />
-            </TouchableOpacity>
+   
+            <TouchableOpacity onPress={() => { popFromStack(navigation) }}
+             style={{ flexDirection: 'row', alignItems: 'center',padding:'4%' }}>
+              <Image source={back} />
+
             <Text style={{ paddingLeft: 10, color: 'black', textAlign: 'center' }}>
               Address
             </Text>
-          </View>
+            </TouchableOpacity>
           {
             isItForPlaceOrder?
             <TouchableOpacity style={{ marginRight: '4%' }} onPress={() => {popFromStack(navigation)}}>
-              <Text style={{ color: 'black' }}>CANCEL</Text>
+              <Text style={{ color: 'black',fontSize:13 }}>CANCEL</Text>
             </TouchableOpacity>:
             <TouchableOpacity style={{ marginRight: '4%' }} onPress={() => {popFromStack(navigation)}}>
               <Text style={{ color: 'black' }}></Text>
@@ -172,15 +260,10 @@ useEffect(()=>{
           }
         </View>
         <ScrollView showsVerticalScrollIndicator={false} style={{ marginBottom: '14%' }} refreshControl={<RefreshControl refreshing={false} onRefresh={() => { }} />}>
-          {
-            isItForPlaceOrder?
-            <Text style={{ color: 'black', padding: '3%', fontSize: 18, fontWeight: '800', marginTop: '3%' }}>
+
+            <Text style={{ color: 'black', padding: '3%', fontSize: 18, fontWeight: '800',  }}>
             Select a delivery address
-          </Text>:
-          <Text style={{ color: 'black', padding: '3%', fontSize: 18, fontWeight: '800', marginTop: '3%',marginLeft:'2%',marginBottom:'4%' }}>
-            {allSavedAddress && allSavedAddress.length>0 ?'Personal Addresses':''}
           </Text>
-          }
 {/* <TextInput
   style={{
     width: 360,
@@ -220,7 +303,7 @@ useEffect(()=>{
          
           {showAllSavedAddress && allSavedAddress.map((address, addressIndex) => (
             <>
-            <View key={addressIndex} style={{ padding: '1%' }}>
+            <View key={addressIndex} style={{ padding: '1%'}}>
               <TouchableOpacity
                 style={{
                   borderWidth: 1,
@@ -247,6 +330,7 @@ useEffect(()=>{
                   <Text style={{ color: 'black', fontWeight: '500', fontSize: 15 }}>
                     {address.firstName} {address.lastName}
                   </Text>
+                  <Text style={{ color: 'black', fontWeight: '300', fontSize: 13.6 }}>{address.houseNo}</Text>
                   <Text style={{ color: 'black', fontWeight: '300', fontSize: 13.6 }}>{address.streetAddress}</Text>
                   <Text style={{ color: 'black', fontWeight: '300', fontSize: 13.6 }}>
                     {address.city}, {address.state}, {address.zipCode}
@@ -260,7 +344,7 @@ useEffect(()=>{
                         isItForPlaceOrder?
                         <TouchableOpacity
                           style={{ backgroundColor: '#00338D', padding: '6%', borderRadius: 6,  width: 250,height:50 }}
-                          onPress={() => {forNavigate('Payment1')}}
+                          onPress={() => {forNavigate2('Payment1')}}
                          >
                          <Text style={{ color: 'white', textAlign: 'center',}}>Deliver to this address</Text>
                        </TouchableOpacity>:
@@ -281,8 +365,7 @@ useEffect(()=>{
             </>
           ))
           }
-          {
-            isItForPlaceOrder?
+
             <TouchableOpacity
             style={{
               borderTopWidth: 1,
@@ -295,23 +378,148 @@ useEffect(()=>{
               padding: '3%',
               marginLeft: '4%',
               marginRight: '4%',
-              borderRadius: 12
+              borderRadius: 12,
+              marginTop:'3%'
             }}
             // onPress={() => { navigation.navigate('AddressDetail', { editMode: false, selectedAddress: -1 })}}
             onPress={()=>{forNavigate1('AddressDetail',-1,false)}}
           >
-            <Text style={{ color: 'black', fontWeight: '400' }}>Add new Address</Text>
+            <Text style={{ color: 'black', fontWeight: '400'}}>Add new Address</Text>
             <Image source={next} style={{ width: 10, height: 15 }} />
-          </TouchableOpacity>:
-           <></>
-          }
+          </TouchableOpacity>
+          
 
         
 
         </ScrollView>
+        {BottomNavigator()}
       </View>
     </>
   );
+  function EmptyScreen() {
+    return null; // Render nothing
+  }
+  function BottomNavigator(){
+    return (
+      <Tab.Navigator 
+        initialRouteName="null"
+        tabBarOptions={{
+          activeTintColor: '#00338D',
+          showIcon: true,
+          labelStyle: {
+            margin: 1,  
+            fontSize: 10,
+            marginBottom: 4
+          },
+          tabStyle: {
+            height: 50,
+          },
+        }}
+      >
+        <Tab.Screen 
+          name="HomeBar" 
+          component={EmptyScreen}
+          options={{
+            headerShown: false,
+            tabBarLabel: 'Home',
+            tabBarIcon: ({ color, size }) => (
+              <Image 
+                source={home1}
+                style={{ width: 20, height: 20, tintColor: navigation.isFocused() ? 'grey' : color }}
+              />
+            ),
+            tabBarLabelStyle: { // Add this property to change the label color
+              color: 'grey', // Change the color to whatever color you prefer
+              marginBottom:'3%'
+            }
+          }}
+          listeners={{
+            tabPress: () => {
+              setCurrentPage('mainHome');
+              navigation.navigate('mainHome');
+            },
+          }}
+          
+        />
+        <Tab.Screen 
+          name="Home1" 
+          component={EmptyScreen} 
+          options={{
+            headerShown: false,
+            tabBarLabel: 'Category',
+            tabBarIcon: ({ color, size }) => (
+              <Image 
+                source={categories1}
+                style={{ width: 20, height: 20, tintColor: navigation.isFocused() ? 'grey' : color }}
+              />
+            ),
+            tabBarLabelStyle: { // Add this property to change the label color
+              color: 'grey', // Change the color to whatever color you prefer
+              marginBottom:'3%'
+            }
+
+          }}
+          listeners={{
+            tabPress: () => {
+              navigation.navigate('Home1');
+              setCurrentPage(['mainHome','Home1']);
+            },
+          }}
+        />
+        <Tab.Screen 
+          name="Notification" 
+          component={EmptyScreen} 
+          options={{  
+            headerShown: false,
+            tabBarLabel: 'Notification',
+            tabBarIcon: ({ color, size }) => (
+              <Image 
+                source={bell1}
+                style={{ width: 20, height: 20, tintColor: navigation.isFocused() ? 'grey' : color }}
+              />
+            ),
+            tabBarLabelStyle: { // Add this property to change the label color
+              color: 'grey', // Change the color to whatever color you prefer
+              marginBottom:'3%'
+            }
+
+          }}
+          listeners={{
+            tabPress: () => {
+              // navigation.navigate('Notification');
+            },
+          }}
+        />
+        <Tab.Screen 
+          name="Profile" 
+          component={EmptyScreen} 
+          options={{
+            headerShown: false,
+            // tabBarLabel: userprofile?.firstName,
+            tabBarIcon: ({ color, size }) => (
+              <Image 
+                source={user1}
+                style={{ width: 20, height: 20, tintColor: navigation.isFocused() ? 'grey' : color }}
+              />
+            ),
+            tabBarLabelStyle: { // Add this property to change the label color
+              color: 'grey', // Change the color to whatever color you prefer
+              marginBottom:'3%'
+            }
+
+          }}
+          listeners={{
+            tabPress: () => {
+              navigation.navigate('mainHome');
+              setCurrentPage(['mainHome']);
+            },
+          }}
+        />
+      </Tab.Navigator>
+    );
+  }
+
+  
 }
 
 export default OrderSummary;

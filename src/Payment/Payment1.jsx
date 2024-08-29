@@ -1,5 +1,5 @@
-import React,{useEffect} from 'react';
-import { Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import React,{useEffect,useState} from 'react';
+import { Image, ScrollView, Text, TouchableOpacity, View,Alert,PermissionsAndroid, Platform ,Button} from 'react-native';
 import TopBar1 from '../TopBar1';
 import back from '../PlpScreen/images/back.png';
 import { FlatList } from 'react-native-gesture-handler';
@@ -13,6 +13,7 @@ import { useCartContext } from '../Context/WomenContext';
 import { useLoginContext } from '../Login/LoginCartProvider';
 import axios from 'axios';
 import wallet2 from '../PlpScreen/images/wallet.png';
+import Geolocation from '@react-native-community/geolocation';
 
 
 
@@ -41,9 +42,10 @@ export default function Payment1({navigation})
     const {cartItem,deliveryAddress,setDeliveryAddress,
       selectedAddress,setSelectedAddress,selectedAddressIndex,
       orderPlaced,setOrderPlaced,setCartItem,
-      allSavedAddress,setAllSavedAddres,}=useCartContext();
+      allSavedAddress,setAllSavedAddres,filteredData,
+      selectedStorePickupDay,selectedStorePickupTime,disableAction,setDisableAction,selectedStoreId,deliveryOption}=useCartContext();
      
-    const { userName, streetaddress1, city, state, pinCode, mobile,orderId,setOrderId} = useCartContext();
+    const { userName,setUserName, streetaddress1, setStreetAddress1,city,setCity, state,setState, pinCode,setPinCode, mobile,setMobile,setHouseNo,orderId,setOrderId} = useCartContext();
 
 
       const {ip,token,popFromStack,pushToStack,
@@ -198,25 +200,125 @@ export default function Payment1({navigation})
        pushToStack('cardPayment');
        navigation.navigate('cardPayment');
     }
+
+
+      //show user the currently unavailable options
+      const showAlert = () => {
+        Alert.alert(
+          "Alert",
+          "We regret to inform you that this tender options is currently unavailable."
+        );
+      };
+      
+
+      const [location, setLocation] = useState({ latitude: null, longitude: null });
+
+      useEffect(() => {
+        const requestLocationPermission = async () => {
+          if (Platform.OS === 'android') {
+            try {
+              const granted = await PermissionsAndroid.request(
+                PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+                {
+                  title: 'Location Permission',
+                  message: 'This app needs access to your location.',
+                  buttonNeutral: 'Ask Me Later',
+                  buttonNegative: 'Cancel',
+                  buttonPositive: 'OK',
+                }
+              );
+              if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+                console.log('You can use the location');
+              } else {
+                console.log('Location permission denied');
+              }
+            } catch (err) {
+              console.warn(err);
+            }
+          }
+        };
+    
+        requestLocationPermission();
+      }, []);
+    
+      const getLocation = () => {
+        Geolocation.getCurrentPosition(
+          (position) => {
+            const { latitude, longitude } = position.coords;
+            setLocation({ latitude, longitude });
+          },
+          (error) => {
+            console.log(error.code, error.message);
+          },
+          { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
+        );
+      };
+      console.log(JSON.stringify("Latitude: "+ location.latitude+" "+"Longitude: "+location.longitude));
+
+      useEffect(() => {
+   {
+          if (allSavedAddress && allSavedAddress.length > 0) {
+            const selected = allSavedAddress[selectedAddress]; // Use index to find the selected address
+            Alert.alert(JSON.stringify(selected));
+            if (selected) {
+              setUserName(`${selected.firstName} ${selected.lastName}`);
+              setStreetAddress1(selected.streetAddress);
+              setCity(selected.city);
+              setState(selected.state);
+              setPinCode(selected.zipCode?selected.zipCode:'122001');
+              setMobile(selected.mobile);
+            }
+          }
+        }
+      }, [
+        userName,
+        mobile,
+        city,
+        pinCode,
+        state,
+        streetaddress1,
+        allSavedAddress,
+        selectedAddress,
+        setUserName,
+        setStreetAddress1,
+        setCity,
+        setState,
+        setPinCode,
+        setMobile,
+      ]);
+     
+
     return( 
         <>
      <View style={{ flex: 1, backgroundColor: 'white' }}>
-   
-     <TouchableOpacity  onPress={() => naviGating('Home')}>
+{/*    
+     <View>
+      <Button title="Get Location" onPress={getLocation} />
+      {location.latitude && location.longitude ? (
+        <Text>Latitude: {location.latitude}, Longitude: {location.longitude}</Text>
+      ) : (
+        <Text>No location data</Text>
+      )}
+    </View> */}
+
+     <TouchableOpacity  onPress={() => {naviGating('Home')
+                                       setDisableAction(true)
+     }}>
         <Image
           source={{ uri: 'https://shorturl.at/ckGU2' }}
           style={{ width: 100, height: 100, marginLeft: '4%',}}
         />
       </TouchableOpacity>   
      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3%' }}>
-  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-    <TouchableOpacity   onPress={() => popFromStack(navigation)}>
+
+    <TouchableOpacity  style={{ flexDirection: 'row', alignItems: 'center' }} onPress={() => popFromStack(navigation)}>
       <Image source={back} style={{ marginLeft: 12 }} />
-    </TouchableOpacity>
+
     <Text style={{ paddingLeft: 10, color: 'black', textAlign: 'center' }}>
       Payment Method
     </Text>
-  </View>
+    </TouchableOpacity>
+
   <TouchableOpacity style={{ marginRight: '4%' }} onPress={() => {popFromStack(navigation)}}>
     <Text style={{ color: 'black' }}>CANCEL</Text>
   </TouchableOpacity>
@@ -245,6 +347,29 @@ export default function Payment1({navigation})
                  )
                } */}
                {
+                !disableAction && (
+                filteredData && filteredData.length>0 && !disableAction?
+                <View style={styles.userDetail}>
+                   <Text style={styles.text}>Shipped to: </Text>
+                   {
+                   allSavedAddress.map((address, index) => (
+                    <View key={index} style={{ marginBottom: 10 }}>
+                      {index === selectedAddress && (
+                        <>
+                         <Text style={{ color: 'black', fontWeight: '500' }}>{filteredData[0].name ? filteredData[0].name.toUpperCase() : ''}</Text>
+                         <Text style={{ color: '#00338D', fontWeight: '400', fontSize: 13.6 }}>
+                            <Text style={{ color: '#00338D', fontWeight: '300' }}>Pick up Date: </Text>
+                          {selectedStorePickupDay ? selectedStorePickupDay : ''}
+                        </Text>
+                        <Text style={{ color: '#00338D', fontWeight: '400', fontSize: 13.6 }}>
+                            <Text style={{ color: '#00338D', fontWeight: '300' }}>Pick up Time: </Text>
+                            {selectedStorePickupTime ? selectedStorePickupTime : ''}
+                        </Text>                    
+                         </>
+                      )}
+                   </View>
+                  ))}                  
+                </View>:
                  <View style={styles.userDetail}>
                    <Text style={styles.text}>Deliver to: </Text>
                    {
@@ -262,7 +387,7 @@ export default function Payment1({navigation})
                   ))}
 
                    
-                 </View>
+                 </View>)
                }
                   
                   <Text style={styles.heading}>Your Saved Payment Methods</Text>
@@ -277,7 +402,7 @@ export default function Payment1({navigation})
                                 <Text>{paymentMethod.method1.payPlatform}</Text>
                                 <Text>UPI id:{paymentMethod.method1.payUpi}</Text>
                                 <TouchableOpacity style={styles.payBtn}
-                                  onPress={()=>{forNavigate('PaymentSuccess')}}
+                                  onPress={()=>{showAlert()}}
                                   >                               
                                     <Text style={{color:'white',textAlign:'center',fontWeight:'bold'}}>PAY NOW</Text>
                                 </TouchableOpacity>
@@ -295,7 +420,7 @@ export default function Payment1({navigation})
                                 <Text>{paymentMethod.method2.payPlatform}</Text>
                                 <Text>Card no : {paymentMethod.method2.cardNo}</Text>
                                 <TouchableOpacity style={styles.payBtn}
-                                 onPress={()=>{forNavigate('PaymentSuccess')}}>
+                                 onPress={()=>{showAlert()}}>
                                     <Text style={{color:'white',textAlign:'center',fontWeight:'bold'}}>PAY NOW</Text>
                                 </TouchableOpacity>
                          </View>
@@ -312,7 +437,7 @@ export default function Payment1({navigation})
                                 <Text>{paymentMethod.method3.payPlatform}</Text>
                                 <Text>Card no : {paymentMethod.method3.cardNo}</Text>
                                 <TouchableOpacity style={styles.payBtn}
-                                onPress={()=>{forNavigate('PaymentSuccess')}}>
+                                onPress={()=>{showAlert()}}>
                                  <Text style={{color:'white',textAlign:'center',fontWeight:'bold'}}>PAY NOW</Text>
                                 </TouchableOpacity>
                          </View>
@@ -321,9 +446,10 @@ export default function Payment1({navigation})
                   </View>  
 
                    <Text style={styles.heading}>Payment Offers</Text>
+
                    <View style={{alignItems:'center',marginBottom:'12%'}}>
        
-                   <View style={{flexDirection:'row',justifyContent:'center',marginTop:'5%'}}>                
+                   {/* <View style={{flexDirection:'row',justifyContent:'center',marginTop:'5%'}}>                
                   <View style={styles.offers}>
                     <View style={{flexDirection:'row',alignItems:'center'}}>
                       <Image source={{uri:'https://shorturl.at/iqtA4'}} style={{width:40,height:28,marginRight:'4%'}}/>
@@ -333,19 +459,21 @@ export default function Payment1({navigation})
                        <Image source={upperArrow} style={{width:22,height:12,transform: [{rotate:'-90deg'}],marginTop:'10%'}}/>
                      </View>
                   </View>
-                </View>
+                </View> */}
 
-                <View style={{flexDirection:'row',justifyContent:'center',marginTop:'2%'}}>                
-                  <View style={styles.offers}>
-                     <TouchableOpacity style={{flexDirection:'row',alignItems:'center'}}>
+                {/* <TouchableOpacity style={{flexDirection:'row',justifyContent:'center',marginTop:'2%'}}>                
+                  <TouchableOpacity style={styles.offers}>
+                     <TouchableOpacity style={{flexDirection:'row',alignItems:'center'}} 
+                      onPress={()=>{forNavigate('paymentSuccess')}}>
                         <Image source={{uri:'https://shorturl.at/cdUW6'}} style={{width:52,height:32,marginRight:'4%'}}/>
                         <Text style={styles.offerText}>Cash on Delivery</Text>
                     </TouchableOpacity>
-                     <View>
-                       <Image source={upperArrow} style={{width:22,height:12,transform: [{rotate:'-90deg'}],marginTop:'10%'}}/>
-                     </View>
-                  </View>
-                </View>
+                     <TouchableOpacity>
+                       <Image source={upperArrow} style={{width:22,height:12,transform: [{rotate:'-90deg'}],marginTop:'45%'}}/>
+                     </TouchableOpacity>
+                  </TouchableOpacity>
+                </TouchableOpacity> */}
+
                 <View style={{flexDirection:'row',justifyContent:'center',marginTop:'2%'}}>                
                   <TouchableOpacity style={styles.offers} activeOpacity={1}
                     onPress={() => {
@@ -353,12 +481,12 @@ export default function Payment1({navigation})
                       
                     }}
                     >
-                    <View style={{flexDirection:'row',alignItems:'center'}}>
+                    <View style={{flexDirection:'row',alignItems:'center',alignContent:'center'}}>
                         <Image source={wallet2} style={{width:42,height:32,marginRight:'4%'}}/>
                        <Text style={styles.offerText}>Other Payment Option</Text>
                      </View>
                      <View>
-                       <Image source={upperArrow} style={{width:22,height:12,transform: [{rotate:'-90deg'}],marginTop:'10%'}}/>
+                       <Image source={upperArrow} style={{width:22,height:12,transform: [{rotate:'-90deg'}],marginTop:'50%'}}/>
                      </View>
                   </TouchableOpacity>
                 </View>
@@ -403,7 +531,7 @@ const styles={
        borderRadius:10,
     },
     payBtn:{
-        backgroundColor:'#00338D',
+        backgroundColor:'grey',
         padding:7,
         borderRadius:7,
         width:240,

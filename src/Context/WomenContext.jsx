@@ -1,446 +1,4 @@
 import React,{ createContext, useContext, useState, useEffect, Children } from 'react';
-const manFormal=[
-    // {
-    //     id:1,
-    //     category:'Men Formal',
-    //     brandName:'Striped Shirt',
-    //     productName:'Opaque Striped Formal Shirt',
-    //     image:'http://surl.li/nwnrx',
-    //     rating:4.5,
-    //     discount:'0',
-    //     price:899,  
-    //     mrp:1299,
-    //     country:'India',
-    //     wearType:'formals',
-    //     Fabric:'Polyviscode with Satin Lining',
-    //     sleeves:'Full Sleeves',
-    //     fit:'Regular fit',
-    //     materialCare:'Dry clean only', 
-    //     productDescription:"If you're on the hunt for a shoe that's got you covered in every way, look no further than the avant men's rainbow sports shoes. These shoes combine performance, comfort, durability, and style to suit a variety of sports. Get ready to conquer your activities with confidence and flair!",
-    //     productCode:'74268923',
-    //     seller:'Beige Blazer'
-      
-    //   },
-    // {
-    //     id:2,
-    //     category:'Men Formal',
-    //     brandName:'Blue Blazer',
-    //     productName:'Women Navy Blue Blazer',
-    //     image:'http://surl.li/nwntx',
-    //     rating:4.7,
-    //     discount:'15',
-    //     price:3199,
-    //     mrp:3999,
-    //     country:'India',
-    //     wearType:'formals',
-    //     Fabric:'Polyviscode with Satin Lining',
-    //     sleeves:'Full Sleeves',
-    //     fit:'Regular fit',
-    //     materialCare:'Dry clean only',
-    //     productDescription:"If you're on the hunt for a shoe that's got you covered in every way, look no further than the avant men's rainbow sports shoes. These shoes combine performance, comfort, durability, and style to suit a variety of sports. Get ready to conquer your activities with confidence and flair!",
-    //     productCode:'74268923',
-    //     seller:'Beige Blazer'
-    //   },
-    // {
-    //     id:3,
-    //     category:'Men Formal',
-    //     brandName:'Striped Shirt',
-    //     productName:'Opaque Striped Formal Shirt',
-    //     image:'http://surl.li/nwnsd',
-    //     rating:4.5,
-    //     discount:'0',
-    //     price:899,  
-    //     mrp:1299,
-    //     country:'India',
-    //     wearType:'formals',
-    //     Fabric:'Polyviscode with Satin Lining',
-    //     sleeves:'Full Sleeves',
-    //     fit:'Regular fit',
-    //     materialCare:'Dry clean only',
-    //     productDescription:"If you're on the hunt for a shoe that's got you covered in every way, look no further than the avant men's rainbow sports shoes. These shoes combine performance, comfort, durability, and style to suit a variety of sports. Get ready to conquer your activities with confidence and flair!",
-    //     productCode:'74268923',
-    //     seller:'Beige Blazer'
-    //   },
-    // {
-    //     id:4,
-    //     category:'Men Formal',
-    //     brandName:'White Shirt',
-    //     productName:'Women Cotton White Shirt',
-    //     image:'http://surl.li/nwnul',
-    //     rating:4.3,
-    //     discount:'0',
-    //     price:3199,
-    //     mrp:3999,
-    //     country:'India',
-    //     wearType:'formals',
-    //     Fabric:'Polyviscode with Satin Lining',
-    //     sleeves:'Full Sleeves',
-    //     fit:'Regular fit',
-    //     materialCare:'Dry clean only',
-    //     productDescription:"If you're on the hunt for a shoe that's got you covered in every way, look no further than the avant men's rainbow sports shoes. These shoes combine performance, comfort, durability, and style to suit a variety of sports. Get ready to conquer your activities with confidence and flair!",
-    //     productCode:'74268923',
-    //     seller:'Beige Blazer'
-    //   },
-    // {
-    //     id:5,
-    //     category:'Men Formal',
-    //     brandName:'Lined Shirt',
-    //     productName:'Women Printed Green Shirt',
-    //     image:'http://surl.li/nwnwg',
-    //     rating:4.4,
-    //     discount:'0',
-    //     price:1034,
-    //     mrp:2899,
-    //     country:'India',
-    //     wearType:'formals',
-    //     Fabric:'Polyviscode with Satin Lining',
-    //     sleeves:'Full Sleeves',
-    //     fit:'Regular fit',
-    //     materialCare:'Dry clean only',
-    //     productDescription:"If you're on the hunt for a shoe that's got you covered in every way, look no further than the avant men's rainbow sports shoes. These shoes combine performance, comfort, durability, and style to suit a variety of sports. Get ready to conquer your activities with confidence and flair!",
-    //     productCode:'74268923',
-    //     seller:'Beige Blazer'
-    //   },
-    // {
-    //     id:6,
-    //     category:'Men Formal',
-    //     brandName:'Beige Blazer',
-    //     productName:'Women satin Formal Blazer',
-    //     image:'http://surl.li/nwnwt',
-    //     rating:4.8,
-    //     discount:'0',
-    //     price:4899,
-    //     mrp:5999,
-    //     country:'India',
-    //     wearType:'formals',
-    //     Fabric:'Polyviscode with Satin Lining',
-    //     sleeves:'Full Sleeves',
-    //     fit:'Regular fit',
-    //     materialCare:'Dry clean only',
-    //     productDescription:"If you're on the hunt for a shoe that's got you covered in every way, look no further than the avant men's rainbow sports shoes. These shoes combine performance, comfort, durability, and style to suit a variety of sports. Get ready to conquer your activities with confidence and flair!",
-    //     productCode:'74268923',
-    //     seller:'Beige Blazer'
-    //   },
-    // {
-    //     id:7,
-    //     category:'Men Formal',
-    //     brandName:'Beige Blazer',
-    //     productName:'Women satin Formal Blazer',
-    //     image:'http://surl.li/nwnxe',
-    //     rating:4.8,
-    //     discount:'0',
-    //     price:1034,
-    //     mrp:2899,
-    //     country:'India',
-    //     wearType:'formals',
-    //     Fabric:'Polyviscode with Satin Lining',
-    //     sleeves:'Full Sleeves',
-    //     fit:'Regular fit',
-    //     materialCare:'Dry clean only',
-    //     productDescription:"If you're on the hunt for a shoe that's got you covered in every way, look no further than the avant men's rainbow sports shoes. These shoes combine performance, comfort, durability, and style to suit a variety of sports. Get ready to conquer your activities with confidence and flair!",
-    //     productCode:'74268923',
-    //     seller:'Beige Blazer'
-    //   },
-    // {
-    //     id:8,
-    //     category:'Men Formal',
-    //     brandName:'Beige Blazer',
-    //     productName:'Women satin Formal Blazer',
-    //     image:'http://surl.li/nwnvt',
-    //     rating:4.8,
-    //     discount:'0',
-    //     price:2899,
-    //     mrp:3299,
-    //     country:'India',
-    //     wearType:'formals',
-    //     Fabric:'Polyviscode with Satin Lining',
-    //     sleeves:'Full Sleeves',
-    //     fit:'Regular fit',
-    //     materialCare:'Dry clean only',
-    //     productDescription:"If you're on the hunt for a shoe that's got you covered in every way, look no further than the avant men's rainbow sports shoes. These shoes combine performance, comfort, durability, and style to suit a variety of sports. Get ready to conquer your activities with confidence and flair!",
-    //     productCode:'74268923',
-    //     seller:'Beige Blazer'
-    //   },
-]
-const womanFormal=[
-  //   {
-  //       id:1,
-  //       category:'Women Formal',
-  //       brandName:'Beige Blazer',
-  //       productName:'Women satin Formal Blazer',
-  //       image:'http://surl.li/nrqaa',
-  //       rating:4.8,
-  //       discount:'38',
-  //       price:4899,
-  //       mrp:5999,
-  //       country:'India',
-  //       wearType:'formals',
-  //       Fabric:'Polyviscode with Satin Lining',
-  //       sleeves:'Full Sleeves',
-  //       fit:'Regular fit',
-  //       materialCare:'Dry clean only',
-  //       productDescription:"If you're on the hunt for a shoe that's got you covered in every way, look no further than the avant men's rainbow sports shoes. These shoes combine performance, comfort, durability, and style to suit a variety of sports. Get ready to conquer your activities with confidence and flair!",
-  //       productCode:'74268923',
-  //       seller:'Beige Blazer'
-  //  },
-  //   {
-  //       id:2,
-  //       category:'Women Formal',
-  //       brandName:'Blue Blazer',
-  //       productName:'Women Navy Blue Blazer',
-  //       image:'http://surl.li/myjqm',
-  //       rating:4.7,
-  //       discount:'15',
-  //       price:3199,
-  //       mrp:3999,
-  //       country:'India',
-  //       wearType:'formals',
-  //       Fabric:'Polyviscode with Satin Lining',
-  //       sleeves:'Full Sleeves',
-  //       fit:'Regular fit',
-  //       materialCare:'Dry clean only',
-  //       productDescription:"If you're on the hunt for a shoe that's got you covered in every way, look no further than the avant men's rainbow sports shoes. These shoes combine performance, comfort, durability, and style to suit a variety of sports. Get ready to conquer your activities with confidence and flair!",
-  //       productCode:'74268923',
-  //       seller:'Beige Blazer'
-  //  },
-  //   {
-  //       id:3,
-  //       category:'Women Formal',
-  //       brandName:'Striped Shirt',
-  //       productName:'Opaque Striped Formal Shirt',
-  //       image:'http://surl.li/myjrn',
-  //       rating:4.5,
-  //       discount:'0',
-  //       price:899,
-  //       mrp:1299,
-  //       country:'India',
-  //       wearType:'formals',
-  //       Fabric:'Polyviscode with Satin Lining',
-  //       sleeves:'Full Sleeves',
-  //       fit:'Regular fit',
-  //       materialCare:'Dry clean only',
-  //       productDescription:"If you're on the hunt for a shoe \nthat's got you covered in every way,\n look no further than the avant men's rainbow sports shoes. These shoes combine performance, comfort, durability, and style to suit a variety of sports. Get ready to conquer your activities with confidence and flair!",
-  //  },
-  //   {
-  //       id:4,
-  //       category:'Women Formal',
-  //       brandName:'White Shirt',
-  //       productName:'Women Cotton White Shirt',
-  //       image:'http://surl.li/myjsg',
-  //       rating:4.3,
-  //       discount:'0',
-  //       price:3199,
-  //       mrp:3999,
-  //       country:'India',
-  //       wearType:'formals',
-  //       Fabric:'Polyviscode with Satin Lining',
-  //       sleeves:'Full Sleeves',
-  //       fit:'Regular fit',
-  //       materialCare:'Dry clean only',
-  //       productDescription:"If you're on the hunt for a shoe \nthat's got you covered in every way,\n look no further than the avant men's rainbow sports shoes. These shoes combine performance, comfort, durability, and style to suit a variety of sports. Get ready to conquer your activities with confidence and flair!",
-  //   },
-  //   {
-  //       id:5,
-  //       category:'Women Formal',
-  //       brandName:'Lined Shirt',
-  //       productName:'Women Printed Green Shirt',
-  //       image:'http://surl.li/myjtj',
-  //       rating:4.4,
-  //       discount:'0',
-  //       price:1034,
-  //       mrp:2899,
-  //       country:'India',
-  //       wearType:'formals',
-  //       Fabric:'Polyviscode with Satin Lining',
-  //       sleeves:'Full Sleeves',
-  //       fit:'Regular fit',
-  //       materialCare:'Dry clean only',
-  //       productDescription:"If you're on the hunt for a shoe \nthat's got you covered in every way,\n look no further than the avant men's rainbow sports shoes. These shoes combine performance, comfort, durability, and style to suit a variety of sports. Get ready to conquer your activities with confidence and flair!",
-  //   },
-  //   {
-  //       id:6,
-  //       category:'Women Formal',
-  //       brandName:'Beige Blazer',
-  //       productName:'Women satin Formal Blazer',
-  //       image:'http://surl.li/myjsg',
-  //       rating:4.8,
-  //       discount:'0',
-  //       price:4899,
-  //       mrp:5999,
-  //       country:'India',
-  //       wearType:'formals',
-  //       Fabric:'Polyviscode with Satin Lining',
-  //       sleeves:'Full Sleeves',
-  //       fit:'Regular fit',
-  //       materialCare:'Dry clean only',
-  //       productDescription:"If you're on the hunt for a shoe \nthat's got you covered in every way,\n look no further than the avant men's rainbow sports shoes. These shoes combine performance, comfort, durability, and style to suit a variety of sports. Get ready to conquer your activities with confidence and flair!",
-  // },
-  //   {
-  //       id:7,
-  //       category:'Women Formal',
-  //       brandName:'Beige Blazer',
-  //       productName:'Women satin Formal Blazer',
-  //       image:'http://surl.li/myjty',
-  //       rating:4.8,
-  //       discount:'0',
-  //       price:1034,
-  //       mrp:2899,
-  //       country:'India',
-  //       wearType:'formals',
-  //       Fabric:'Polyviscode with Satin Lining',
-  //       sleeves:'Full Sleeves',
-  //       fit:'Regular fit',
-  //       materialCare:'Dry clean only',
-  //       productDescription:"If you're on the hunt for a shoe that's got you covered in every way,\n look no further than the avant men's rainbow sports shoes. These shoes combine performance, comfort, durability, and style to suit a variety of sports. Get ready to conquer your activities with confidence and flair!",
-  // },
-  //   {
-  //       id:8,
-  //       category:'Women Formal',
-  //       brandName:'Beige Blazer',
-  //       productName:'Women satin Formal Blazer',
-  //       image:'http://surl.li/nrpee',
-  //       rating:4.8,
-  //       discount:'0',
-  //       price:2899,
-  //       mrp:3299,
-  //       country:'India',
-  //       wearType:'formals',
-  //       Fabric:'Polyviscode with Satin Lining',
-  //       sleeves:'Full Sleeves',
-  //       fit:'Regular fit',
-  //       materialCare:'Dry clean only',
-  //       productDescription:"If you're on the hunt for a shoe \nthat's got you covered in every way,\n look no further than the avant men's rainbow sports shoes. These shoes combine performance, comfort, durability, and style to suit a variety of sports. Get ready to conquer your activities with confidence and flair!",
-  //  },
-  //  {
-  //   id:9,
-  //   category:'Women Formal',
-  //   brandName:'Beige Blazer',
-  //   productName:'Women satin Formal Blazer',
-  //   image:'https://shorturl.at/xKSX9',
-  //   rating:4.8,
-  //   discount:'0',
-  //   price:2899,
-  //   mrp:3299,
-  //   country:'India',
-  //   wearType:'formals',
-  //   Fabric:'Polyviscode with Satin Lining',
-  //   sleeves:'Full Sleeves',
-  //   fit:'Regular fit',
-  //   materialCare:'Dry clean only',
-  //   productDescription:"If you're on the hunt for a shoe \nthat's got you covered in every way,\n look no further than the avant men's rainbow sports shoes. These shoes combine performance, comfort, durability, and style to suit a variety of sports. Get ready to conquer your activities with confidence and flair!",
-  // },
-]
-const bestSeller=[
-  // {
-  //   id:1,
-  //   category:'bestSaled',
-  //   brandName:'Beige Blazer',
-  //   productName:'Women satin Formal Blazer',
-  //   image:'http://surl.li/nsckx',
-  //   rating:4.8,
-  //   discount:'0',
-  //   price:2899,
-  //   mrp:3299,
-  //   country:'India',
-  //   wearType:'formals',
-  //   Fabric:'Polyviscode with Satin Lining',
-  //   sleeves:'Full Sleeves',
-  //   fit:'Regular fit',
-  //   materialCare:'Dry clean only',
-  //   productDescription:"If you're on the hunt for a shoe \nthat's got you covered in every way,\n look no further than the avant men's rainbow sports shoes. These shoes combine performance, comfort, durability, and style to suit a variety of sports. Get ready to conquer your activities with confidence and flair!",
-  // },
-  // {
-  //   id:2,
-  //   category:'bestSaled',
-  //   brandName:'Beige Blazer',
-  //   productName:'Women satin Formal Blazer',
-  //   image:'http://surl.li/nscqv',
-  //   rating:4.8,
-  //   discount:'0',
-  //   price:2899,
-  //   mrp:3299,
-  //   country:'India',
-  //   wearType:'formals',
-  //   Fabric:'Polyviscode with Satin Lining',
-  //   sleeves:'Full Sleeves',
-  //   fit:'Regular fit',
-  //   materialCare:'Dry clean only',
-  //   productDescription:"If you're on the hunt for a shoe \nthat's got you covered in every way,\n look no further than the avant men's rainbow sports shoes. These shoes combine performance, comfort, durability, and style to suit a variety of sports. Get ready to conquer your activities with confidence and flair!",
-  // },
-  // {
-  //   id:3,
-  //   category:'bestSaled',
-  //   brandName:'Beige Blazer',
-  //   productName:'Women satin Formal Blazer',
-  //   image:'http://surl.li/nscvx',
-  //   rating:4.8,
-  //   discount:'0',
-  //   price:2899,
-  //   mrp:3299,
-  //   country:'India',
-  //   wearType:'formals',
-  //   Fabric:'Polyviscode with Satin Lining',
-  //   sleeves:'Full Sleeves',
-  //   fit:'Regular fit',
-  //   materialCare:'Dry clean only',
-  //   productDescription:"If you're on the hunt for a shoe \nthat's got you covered in every way,\n look no further than the avant men's rainbow sports shoes. These shoes combine performance, comfort, durability, and style to suit a variety of sports. Get ready to conquer your activities with confidence and flair!",
-  // },
-  // {
-  //   id:4,
-  //   category:'bestSaled',
-  //   brandName:'Beige Blazer',
-  //   productName:'Women satin Formal Blazer',
-  //   image:'http://surl.li/nscsu',
-  //   rating:4.8,
-  //   discount:'0',
-  //   price:2899,
-  //   mrp:3299,
-  //   country:'India',
-  //   wearType:'formals',
-  //   Fabric:'Polyviscode with Satin Lining',
-  //   sleeves:'Full Sleeves',
-  //   fit:'Regular fit',
-  //   materialCare:'Dry clean only',
-  //   productDescription:"If you're on the hunt for a shoe \nthat's got you covered in every way,\n look no further than the avant men's rainbow sports shoes. These shoes combine performance, comfort, durability, and style to suit a variety of sports. Get ready to conquer your activities with confidence and flair!",
-  // },
-  // {
-  //   id:5,
-  //   category:'bestSaled',
-  //   brandName:'Beige Blazer',
-  //   productName:'Women satin Formal Blazer',
-  //   image:'http://surl.li/nscxp',
-  //   rating:4.8,
-  //   discount:'0',
-  //   price:2899,
-  //   mrp:3299,
-  //   country:'India',
-  //   wearType:'formals',
-  //   Fabric:'Polyviscode with Satin Lining',
-  //   sleeves:'Full Sleeves',
-  //   fit:'Regular fit',
-  //   materialCare:'Dry clean only',
-  //   productDescription:"If you're on the hunt for a shoe \nthat's got you covered in every way,\n look no further than the avant men's rainbow sports shoes. These shoes combine performance, comfort, durability, and style to suit a variety of sports. Get ready to conquer your activities with confidence and flair!",
-  // },
-  // {
-  //   id:6,
-  //   category:'bestSaled',
-  //   brandName:'Beige Blazer',
-  //   productName:'Women satin Formal Blazer',
-  //   image:'http://surl.li/nsczp',
-  //   rating:4.8,
-  //   discount:'0',
-  //   price:2899,
-  //   mrp:3299,
-  //   country:'India',
-  //   wearType:'formals',
-  //   Fabric:'Polyviscode with Satin Lining',
-  //   sleeves:'Full Sleeves',
-  //   fit:'Regular fit',
-  //   materialCare:'Dry clean only',
-  //   productDescription:"If you're on the hunt for a shoe \nthat's got you covered in every way,\n look no further than the avant men's rainbow sports shoes. These shoes combine performance, comfort, durability, and style to suit a variety of sports. Get ready to conquer your activities with confidence and flair!",
-  // },
-
-]  
 const WomenContext=createContext();
 export function useCartContext(){
     return useContext(WomenContext);
@@ -457,9 +15,14 @@ export default function WomenCartProvider({children}){
     const[decreaseTotalAmount,setDecreaseTotalAmount]=useState(1100);
     const[deliveryOption,setDeliveryOption]=useState('0');
     const [filteredDataArray, setFilteredDataArray]=useState([]);
+    const[pt,setPt]=useState('');
+
+    //show loading buffering
+    const [showActivityIndicator, setShowActivityIndicator] = useState(false);
 
     //for sorting filter  
     const [sortBy,setSortBy]=useState("asc");
+    const [lovedItems, setLovedItems] = useState([]);
     const [cartCount, setCartCount] = useState(0);
 
     const[categorySelect, setCategorySelect]=useState(1); 
@@ -493,6 +56,7 @@ export default function WomenCartProvider({children}){
     const [pinCode, setPinCode] = useState("");
     const [mobile, setMobile] = useState("");
     const [houseNo, setHouseNo] = useState("");
+    const [DefaultAddress,setDefaultAddres]=useState(false);
 
     // It will all saved Addresses
     const [allSavedAddress,setAllSavedAddress]=useState([]);
@@ -521,15 +85,36 @@ export default function WomenCartProvider({children}){
     //
     const [isItForPlaceOrder,setIsItForPlaceOrder]=useState(false);
     
+    //
+    const [isCouponApplied,setIsCouponApplied]=useState(false);
 
     //
-    const [productIds, setProductIds]=useState([1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,104]);
+    const [redeemYouPoints,setRedeemYourPoints]=useState('');   
+
+    //
+    const [productIds, setProductIds] = useState([]);
+    
 
     //order ReceiptData
     const [receiptData,setReceiptData]=useState([]);
 
-    const [checkproductAvailabilityAtPincode1,setCheckproductAvailabilityAtPincode1]=useState(false);
+    const [isProductFoundAtPincode,setIsProductFoundAtPincode]=useState(false);
 
+    const [backUpPageIndex,setBackUpPageIndex]=useState();
+    const [searchedCiy,setSearchedCity]=useState("");
+    const [search, setSearch] = useState('');
+
+    const [dataStore,setDataStore]=useState([]);
+    const [selectedStoreAvailableSlots,setSelectedStoreAvailableSlots]=useState([]);
+   
+    //in wallet
+    const[addedMoney,setAddedMoney]=useState("");
+    //in wallet
+    const[transactionDetail,setTransactionDetail]=useState([]); 
+    //
+    const [selectedOption1,setSelectedOption1]=useState('31');
+    //in subscription of the product
+    const [scheduleSubscriptionOption,setScheduleSubscriptionOption]=useState('0');
 
     //selected address tile indes
     const [selectedAddressListIndex,setSelectedAddressListindex]=useState(0)
@@ -542,8 +127,70 @@ export default function WomenCartProvider({children}){
       setSelectedBagItem(updatedBag);      
     }
 
-const [emailError,setEmailError]=useState(false);
-const [error,setError]=useState(false);
+    const [emailError,setEmailError]=useState(false);
+    const [error,setError]=useState(false);
+
+    const [selectedStoreId,setSelectedStoreId]=useState(0);
+    const [selectedStorePickupDay,setSelectedStorePickupDay]=useState("")
+    const [selectedStorePickupTime,setSelectedStorePickupTime]=useState("")
+    const [filteredData, setFilteredData] = useState([]);
+
+    //get all available points & Tier
+    const [availablePoints,setAvailablePoints]=useState("");
+    const [userLoyaltyTier,setUserLoyaltyTier]=useState("");
+    
+    //get all reward points in history
+    const [getRewardHistoryPoint,setGetRewardHistoryPoint]=useState([]);
+    //get all reward Used points in history
+    const [getRewardHistoryUsedPoint,setGetRewardHistoryUsedPoint]=useState([]);
+    //
+    const[walletBalance,setWalletBalance]=useState("");
+    //cancel order reason
+    const[orderCancelReason,setOrderCancelReason]=useState(0);
+    //cancel reason LeaveMessage
+    const [cancelLeaveMessage,setCancelLeaveMessage]=useState(""); 
+    //return reason LeaveMessage
+    const [returnSelectedReason,setReturnSelectedReason]=useState(1);
+    const [returnLeaveMessage,setReturnLeaveMessage]=useState(""); 
+    //exchange reason LeaveMessage
+    const [exchangeLeaveMessage,setExchangeLeaveMessage]=useState(""); 
+        
+
+    //disable action of navigate from profileBar to storeLocator,My Payment, 
+    const [disableAction,setDisableAction]=useState(true);
+    //add money wallet through tender page
+    const [addMoneyToWalletTender,setAddMoneyToWalletTender]=useState(false); 
+
+    //use to store all productId,productSize,productQuantity for storePickUp Schedule
+    const [storeProductWithSizeAndQuantity,setStoreProductWithSizeAndQuantity]=useState();
+    
+    //use for modify the storePickUp Order Timing
+    const [modifyStorePickUp,setModifyStorePickUp]=useState(false);
+    const [showStorePickUpName,setShowStorePickUpName]=useState("");
+
+   //select exchange/return tab
+   const [isChecked, setChecked] = useState([]);
+
+
+  // select All Checkbox
+   const [selectAllCheckBox, setSelectAllCheckBox] = useState([]);
+
+  //show status of returned Product
+  const [showReturnedProductStatus,setShowReturnedProductStatus]=useState(false);
+
+  //isPromotionCouponApplied
+  const[promotionCouponApplied,setPromotionCouponApplied]=useState(false);
+    //apply promotion coupon 
+    const [inputPromotionCoupon,setInputPromotionCoupon]=useState("");
+    //show coupon burst
+    const [showConfetti, setShowConfetti] =useState(true);
+
+    //check is promtion coupon is applied or not 
+   const [checkIsPromotionCouponApplied,setCheckIsPromotionCouponApplied]=useState(0);
+
+   //currentProduct which is on PDP Page, store the productId of it
+   const [productIdOnPdp,setProductIdOnPdp]=useState(0);
+
     const DeleteWishItem=(itemId,itemCategory)=>{
       console.log("here "+itemId+" "+itemCategory);
       const updatedBag=selectedWishListItem.filter(item=>!(item.id===itemId && item.selcategory===itemCategory));
@@ -604,6 +251,7 @@ const [error,setError]=useState(false);
         pinCode, setPinCode,
         mobile, setMobile,
         houseNo, setHouseNo,
+        DefaultAddress,setDefaultAddres,
 
         // stored all saved addresses
         allSavedAddress,setAllSavedAddress,
@@ -643,10 +291,50 @@ const [error,setError]=useState(false);
         receiptData,setReceiptData,
         filteredDataArray, setFilteredDataArray,
 
-        checkproductAvailabilityAtPincode1,
-        setCheckproductAvailabilityAtPincode1
+        isProductFoundAtPincode,setIsProductFoundAtPincode,
+        backUpPageIndex,setBackUpPageIndex,
+        searchedCiy,setSearchedCity,
+        search, setSearch,
+        dataStore,setDataStore,
+        selectedStoreId,setSelectedStoreId,
+        selectedStoreAvailableSlots,setSelectedStoreAvailableSlots,
+        selectedStorePickupDay,setSelectedStorePickupDay,
+        selectedStorePickupTime,setSelectedStorePickupTime,
+        filteredData, setFilteredData,
+        availablePoints,setAvailablePoints,
+        userLoyaltyTier,setUserLoyaltyTier,
+        getRewardHistoryPoint,setGetRewardHistoryPoint,
+        getRewardHistoryUsedPoint,setGetRewardHistoryUsedPoint,
+        lovedItems, setLovedItems,
+        isCouponApplied,setIsCouponApplied,
+        redeemYouPoints,setRedeemYourPoints,
+        pt,setPt,
+        walletBalance,setWalletBalance,
+        addedMoney,setAddedMoney,
+        transactionDetail,setTransactionDetail,
+        selectedOption1,setSelectedOption1,
 
+        scheduleSubscriptionOption,setScheduleSubscriptionOption,
+        orderCancelReason,setOrderCancelReason,
+        cancelLeaveMessage,setCancelLeaveMessage,
+        returnLeaveMessage,setReturnLeaveMessage,
+        exchangeLeaveMessage,setExchangeLeaveMessage,
         
+        disableAction,setDisableAction,
+        showActivityIndicator, setShowActivityIndicator,
+        addMoneyToWalletTender,setAddMoneyToWalletTender,
+        storeProductWithSizeAndQuantity,setStoreProductWithSizeAndQuantity,
+        modifyStorePickUp,setModifyStorePickUp,
+        showStorePickUpName,setShowStorePickUpName,
+        isChecked, setChecked,
+        selectAllCheckBox, setSelectAllCheckBox,
+        returnSelectedReason,setReturnSelectedReason,
+        showReturnedProductStatus,setShowReturnedProductStatus,
+        promotionCouponApplied,setPromotionCouponApplied,
+        inputPromotionCoupon,setInputPromotionCoupon,
+        showConfetti, setShowConfetti,
+        checkIsPromotionCouponApplied,setCheckIsPromotionCouponApplied,
+        productIdOnPdp,setProductIdOnPdp
     }
     return (
         <WomenContext.Provider value={contextvalue}>

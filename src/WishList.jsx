@@ -9,6 +9,7 @@ import axios from 'axios';
 import { useCartContext } from './Context/WomenContext';
 import { useLoginContext } from './Login/LoginCartProvider';
 import { json } from 'react-router-dom';
+import add from './PlpScreen/images/add.png';
 
 export default function WishList({ navigation }) {
   const {
@@ -16,7 +17,8 @@ export default function WishList({ navigation }) {
     setWishListData,
     cartItem,
     setCartItem,
-    setIsProductWishlisted
+    setIsProductWishlisted,
+    lovedItems, setLovedItems
   } = useCartContext();
   const {ip,token,popFromStack,pushToStack,currentPage}=useLoginContext();
 
@@ -54,7 +56,6 @@ export default function WishList({ navigation }) {
           'Authorization': `Bearer ${token}`,
         },
       });
-  
       setCartItem(response.data);
       console.log("Updated CartItem: ", JSON.stringify(response.data));
     } catch (error) {
@@ -71,6 +72,7 @@ export default function WishList({ navigation }) {
           'Authorization': `Bearer ${token}`,
         },
       });
+      setLovedItems(response.data.wishlistItems.map(wishlistItem => wishlistItem.product.id));
       setWishListData(response.data);
       console.log('Updated Wishlist Data:', JSON.stringify(response.data));
     } catch (error) {
@@ -126,6 +128,7 @@ export default function WishList({ navigation }) {
  .then(response => {
    // Handle successful response
    removeBagItem(itemId);
+   getCartData();
    console.log(response.data);
 
 
@@ -136,6 +139,15 @@ export default function WishList({ navigation }) {
  });
 
   }
+
+
+  const navigateToFashion = (page) => {
+    if(currentPage && currentPage.length>0 && currentPage[currentPage.length-1]!==page){
+
+      pushToStack(page);
+      navigation.navigate(page);
+      }        
+  };
 
 
   return (
@@ -163,11 +175,9 @@ export default function WishList({ navigation }) {
                 {/* <Text>                 {item.id}: {item.product.title}, {item.product.discountedPrice}
 </Text> */}
                 <View style={{ flexDirection: 'row', padding: 14,}}>
-                  <TouchableOpacity
-                    onPress={() => navigation.navigate('mainPDP', { category: item.category.name, id: item.id })}
-                  >
-                    <Image source={{ uri: item.product.imageUrl }} style={{ width: 130, height: 150, borderRadius: 12 }} />
-                  </TouchableOpacity>
+
+                    <Image source={{ uri: item.product.imageUrl[0] }} style={{ width: 130, height: 150, borderRadius: 12 }} />
+                 
                   <View style={{ padding: 7, marginLeft: '5%' ,}}>
                     <Text style={{ fontWeight: 'bold', color: 'black' }}>{item.product.brand}</Text>
                     <Text style={{ color: 'black', fontSize: 10, padding: '1%' }}>{item.product.title}</Text>
@@ -197,7 +207,7 @@ export default function WishList({ navigation }) {
                     style={{ width: '50%', padding: 12, marginTop: '1%',  borderRightWidth: 0.2 }}
                     onPress={() => removeBagItem(item.id)}
                   >
-                    <Text style={{ textAlign: 'center', fontSize: 16, color: '#000000' }}>Remove</Text>
+                    <Text style={{ textAlign: 'center', fontSize: 16, color: '#000000'}}>Remove</Text>
                   </TouchableOpacity>
                   {/* 
                     const dataBag = {
@@ -226,7 +236,7 @@ export default function WishList({ navigation }) {
           </>
         ) : (
           <>
-            <View style={{ marginTop: '30%', marginLeft: '30%' }}>
+            <View style={{ marginTop: '15%', marginLeft: '30%' }}>
               <View style={{ width: 150, height: 10, backgroundColor: '#00A3A1', borderRadius: 4 }}></View>
               <View style={{ width: 150, height: 10, backgroundColor: '#00A3A1', borderRadius: 4, marginTop: '6%' }}></View>
               <View style={{ flexDirection: 'row' }}>
@@ -237,13 +247,18 @@ export default function WishList({ navigation }) {
                 <Image source={heart} style={{ width: 53, height: 50, marginTop: '3%', marginLeft: '6%' }} />
               </View>
             </View>
-            <View style={{ marginTop: '20%', flexDirection: 'row', justifyContent: 'center' }}>
-              <Text style={{ color: 'black', fontSize: 22 }}>Your wishlist is empty!</Text>
-            </View>
-            <View style={{ marginTop: '10%', flexDirection: 'row', justifyContent: 'center' }}>
-              <Text style={{ fontSize: 15 }}>Create multiple wishlist collections and share {'\n'}them with your loved ones.</Text>
+            <View style={{ marginTop: '14%', flexDirection: 'row', justifyContent: 'center' }}>
+              <Text style={{ color: 'black', fontSize: 22,fontWeight:'500' }}>Your wishlist is empty!</Text>
             </View>
           
+            <Text style={{ marginTop: '8%', fontSize: 15, fontWeight: '500', alignSelf: 'center', textAlign: 'center' }}>
+  Create multiple wishlist collections and share {'\n'} them with your loved ones.
+</Text>
+<TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', alignSelf: 'center',marginTop:'14%' }}
+  onPress={()=>{navigateToFashion('Fashion')}}>
+  <Image source={add} style={{ width: 20, height: 20 }} />
+  <Text style={{ marginLeft: 5, color: 'black', fontSize: 15, fontWeight: '500', textDecorationLine: 'underline',padding:1 }}>Add collection</Text>
+</TouchableOpacity>
           </>
         )}
             <Modal
@@ -256,7 +271,7 @@ export default function WishList({ navigation }) {
                 <View>
                   <TouchableWithoutFeedback>
                     <View style={styles.modalContent}>
-                      <Text style={{padding:'1%',fontWeight:'600',color:'white'}}>Successfully moved item to bag </Text>
+                      <Text style={{padding:'1%',fontWeight:'600',color:'white',marginLeft:'2%'}}>Successfully moved item to bag </Text>
                     </View>
                   </TouchableWithoutFeedback>
                 </View>

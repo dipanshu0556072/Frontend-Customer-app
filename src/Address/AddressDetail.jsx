@@ -19,11 +19,13 @@ import { useLoginContext } from '../Login/LoginCartProvider';
 import { useCartContext } from '../Context/WomenContext';
 import MobileVerify from '../Login/MobileVerify';
 import CheckBox from '@react-native-community/checkbox';
+import { json } from 'react-router-dom';
 
 export default function AddressDetail({ navigation}) {
   const [BtnColor, setBtnColor] = useState(false);
   const [Error, setError] = useState(false);
   const [showActivityIndicator, setShowActivityIndicator] = useState(false);
+  const [flag,setFlag]=useState(true);
   //for checking that we're updating address or not 
 
   const {
@@ -37,6 +39,8 @@ export default function AddressDetail({ navigation}) {
     streetaddress1,
     setStreetAddress1,
     city,
+    DefaultAddress,
+    setDefaultAddres,
     setCity,
     state,
     setState,
@@ -54,17 +58,28 @@ export default function AddressDetail({ navigation}) {
     selectedAddressListIndex,setSelectedAddressListindex,
     setProfileAddress
   } = useCartContext();
+
   const userNameArray = userName.split(' ');
 
   const {loginUserId,token,popFromStack,pushToStack,
     currentPage, setCurrentPage,
     currentPageIndex,setCurrentPageIndex,
-    currentPageIndexCategory,setCurrentPageIndexCategory,ip}=useLoginContext();  const [remove1,setRemove1]=useState(0);
+    currentPageIndexCategory,setCurrentPageIndexCategory,ip,currentPageIndexCategory1}=useLoginContext();  const [remove1,setRemove1]=useState(0);
 
-  const editMode=currentPageIndexCategory;
+  const editMode=currentPageIndexCategory1;
   const selectedAddress  = currentPageIndex;
-  
+  const [getCurrentUser,setCurrentUser]=useState([]);
+  const[]=useState();
 
+  useEffect(() => {
+    if (currentPageIndex > 0) {
+      getProfileData2(currentPageIndex);
+    }
+    if(pinCode && pinCode.length>5){
+     getState();
+    }
+  }, [currentPageIndex,pinCode,isChecked]);
+  
   useEffect(() => {
     if (
       userName &&
@@ -78,7 +93,33 @@ export default function AddressDetail({ navigation}) {
       setBtnColor(true);
       setError(false);
     }
-  }, [BtnColor]);
+  }, [BtnColor,setAllProfileId]);
+
+   async function addNewAddress()
+   {
+
+    const data={
+      firstName:userName.split(' ')[0],
+      lastName: userName.split(' ')[1]?userName.split(' ')[1]:'',
+      streetAddress: streetaddress1,
+      city: city,
+      state: state,
+      zipCode: pinCode,
+      mobile: mobile
+   }
+   try{
+    
+    axios.post(`http://${ip}:5454/api/orders/addresses`,data,{      
+      headers: {
+      'Authorization': `Bearer ${token}`,         
+     },})  
+     setDoesAddedNewAddress(true);
+     fetchData();
+   }catch(error){
+     console.log("Error in postAddress in scheduleSubscription.jsx",error);
+   }  
+   getProfileData(); 
+   }
 
   function NowUpdate(){
     if (profileAddress && profileAddress.addresses && profileAddress.addresses.length > 0) {
@@ -133,7 +174,24 @@ export default function AddressDetail({ navigation}) {
       console.error('Error fetching Profiledata:', error);
     }
   }
-
+  async function feedCurrentUser(){
+    console.log("\n\nfeedCurrentUser"+JSON.stringify(getCurrentUser));
+  }
+  const getProfileData2 = async (id) => {
+     const data=allSavedAddress.filter(obj=>obj.id===id);
+    //  Alert.alert("allSavedAddress"+JSON.stringify(data));
+    setUserName(data[0].firstName+" "+data[0].lastName);
+    setMobile(data[0].mobile);
+    if(flag){
+      setPinCode(data[0].zipCode);
+      setFlag(false);
+    }
+    setState(data[0].state);
+    setStreetAddress1(data[0].streetAddress);
+    setCity(data[0].city);
+    setHouseNo(data[0].houseNo);
+  }
+console.log("\n\nThis is data"+JSON.stringify(getCurrentUser));
   const removeAddressAtIndex = (indexToRemove) => {
     setAllSavedAddress(prevAddresses => {
       // Use filter to create a new array without the element at indexToRemove
@@ -150,10 +208,11 @@ function updateAllSavedAddress(){
 removeAddressAtIndex(selectedAddressListIndex);
 }
 
-
 const onSaveAddressPress = async () => {
   // Check if it's a new address (selectedAddress is -1)
+  // Alert.alert(editMode?'True':'false');
   if (selectedAddress === -1) {
+
     // Check if all required fields are filled
     if (
       userName.length > 0 &&
@@ -166,16 +225,22 @@ const onSaveAddressPress = async () => {
     ) {
       // Split the user's name
       const userNameArray = userName.split(' ');
+
       const dataAdd = {
         firstName: userNameArray[0],
-        lastName: userNameArray[1],
+        lastName: userNameArray[1]?userNameArray[1]:'',
         streetAddress: streetaddress1,
         city: city,
         state: state,
         zipCode: pinCode,
         mobile: mobile,
+        houseNo:houseNo,
+        defaultAddress:isChecked?'true':'false'
       };
       // Check if the entered data is valid
+      if(pinCode<6){
+     
+      }else{
       const isDataValid = (
         dataAdd.firstName && dataAdd.firstName.length > 0 &&
         dataAdd.lastName && dataAdd.lastName.length > 0 &&
@@ -187,7 +252,9 @@ const onSaveAddressPress = async () => {
       );
       
       if (isDataValid) {
+
         // Update allSavedAddress array with the new address
+        addNewAddress();
         setAllSavedAddress(prevSavedAddress => {
           const isUnique = !prevSavedAddress.some(prevData => (
             prevData.zipCode === dataAdd.zipCode
@@ -204,7 +271,7 @@ const onSaveAddressPress = async () => {
         setShowActivityIndicator(false);
       }, 1000);
     
-    } else {
+    } }else {
       Alert.alert("Please fill all Details");
       setError(true);
     }
@@ -219,11 +286,15 @@ const onSaveAddressPress = async () => {
       state: state,
       zipCode: pinCode,
       mobile: mobile,
+      houseNo:houseNo,
     };
+
+  
+    
     try {
       // Update the existing address with a PUT request
       const response = await axios.put(
-        `http://192.168.0.107:5454/api/orders/${loginUserId}/addresses/${selectedAddress}`,
+        `http://${ip}:5454/api/orders/${loginUserId}/addresses/${selectedAddress}`,
         dataAdd,
         {
           headers: {
@@ -245,9 +316,9 @@ const onSaveAddressPress = async () => {
     }
   }
 
-  // Add 'orderSummary' to the navigation stack and navigate to it
-  pushToStack('orderSummary');
-  navigation.navigate('orderSummary');
+  // // Add 'orderSummary' to the navigation stack and navigate to it
+  // pushToStack('orderSummary');
+  // navigation.navigate('orderSummary');
 };
 
 
@@ -257,7 +328,8 @@ const onSaveAddressPress = async () => {
 
   const [isChecked, setChecked] = useState(false);
 
-  const inputStyle = (errorCondition) => ({
+  const inputStyle = (errorCondition) => (
+    {
     height: 40,
     borderBottomWidth: errorCondition ? 1 : 0.5,
     marginTop: 10,
@@ -270,9 +342,72 @@ const onSaveAddressPress = async () => {
     backgroundColor: '#fff4f4',
   });
   console.log("\n\n\nAllsaved"+JSON.stringify(allSavedAddress));
+
+
+   // get automatically state based on the pincode
+   async function getState() {
+    try {
+      const response = await fetch(`http://www.postalpincode.in/api/pincode/${pinCode}`);
+      const data = await response.json(); // Parse JSON response
+      console.log(JSON.stringify(data)); // Log the parsed JSON data
+      // Alert.alert(JSON.stringify(data.PostOffice[0]?.State));
+      setState(data.PostOffice[0]?.State);
+      setCity(data.PostOffice[0]?.Taluk==="NA"?data.PostOffice[0]?.District:data.PostOffice[0]?.Taluk);
+    } catch (error) {
+      console.log("Got error in AddressDetail.jsx in getState()" + error);
+    }
+  }
+  
+
+const [allrSavedAddressForDefaultAddress,setAllSavedAddressForDefaultAddress]=useState([]);
+const [allProfileId,setAllProfileId]=useState([]);
+const [FlagBoolean,setFlagBoolean]=useState(true);
+
+// useEffect(() => {
+//     storeAllProfileId();
+// }, []);
+
+function storeAllProfileId() {
+  if (allSavedAddressForDefaultAddress && allSavedAddressForDefaultAddress.length > 0) {
+    setAllProfileId(prevIds => (
+      allSavedAddressForDefaultAddress.map(item => item.id)
+    ));
+  }
+}
+
+const getProfileDataForDefaultAddress = async () => {
+  try {
+    const response = await axios.get(`http://${ip}:5454/api/users/profile`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,         
+       },
+    });
+    // console.log(response.data);
+    
+  
+    setAllSavedAddressForDefaultAddress((prevProducts) => {
+      const newProducts = response.data.addresses;
+      console.log("ProfiledataArray:" + JSON.stringify(newProducts));
+      return newProducts;
+    });
+    console.log(JSON.stringify(response.data));
+    storeAllProfileId();
+  } catch (error) {
+    console.error('Error fetching Profiledata:', error);
+  }
+}
+
+useEffect(()=>{
+  if(isChecked){
+    getProfileDataForDefaultAddress();
+  } 
+},[isChecked,allProfileId]);
+
+
   return (
     <View style={{ flex: 1, backgroundColor: 'white' }}>
       {/* <Text>selected{selectedAddress}</Text> */}
+      {/* <Text>{JSON.stringify(allProfileId)}</Text> */}
       <TouchableOpacity onPress={() => navigation.navigate('Home')}>
         <Image
           source={{ uri: 'https://shorturl.at/ckGU2' }}
@@ -281,30 +416,25 @@ const onSaveAddressPress = async () => {
       </TouchableOpacity>
       {/* <Text>{editMode}{selectedAddress}</Text> */}
       {/* <Text>{userName}</Text> */}
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-          <View
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between'}}>
+          <TouchableOpacity
             style={{
               flexDirection: 'row',
               alignItems: 'center',
               alignItems: 'center',
             }}
-          >
-            <View>
-              <TouchableOpacity onPress={() => navigation.navigate('orderSummary')}>
+          onPress={() => navigation.navigate('orderSummary')}>
                 <Image source={back} style={{ marginLeft: 12 }} />
-              </TouchableOpacity>
-            </View>
-            <View>
+
               <Text style={{ paddingLeft: 10, color: 'black', textAlign: 'center' }}>
-                Delivery Address
+                Delivery Address {allProfileId}
               </Text>
-            </View>
-          </View>
+              </TouchableOpacity>
           <TouchableOpacity style={{ marginRight: '4%' }} onPress={() => {popFromStack(navigation)}}>
-            <Text style={{ color: 'black' }}>CANCEL</Text>
+            <Text style={{ color: 'black',fontSize:13 }}>CANCEL</Text>
           </TouchableOpacity>
-        </View>
-   
+
+   </View>
        <ScrollView showsVerticalScrollIndicator={false}> 
 
       <SafeAreaView style={{ flex: 1 }}>
@@ -330,6 +460,7 @@ const onSaveAddressPress = async () => {
             maxLength={10}
             onChangeText={(text) => setMobile(text)}
             onFocus={() => onFocusChange('mobile')}
+
           />
           <View style={styles.box1}>
             <Text style={styles.heading}>Address</Text>
@@ -343,6 +474,7 @@ const onSaveAddressPress = async () => {
                 maxLength={6}
                 onChangeText={(text) => setPinCode(text)}
                 onFocus={() => onFocusChange('pinCode')}
+                value={pinCode}
               />
             </View>
             <View style={{ marginLeft: '40%' }}>
@@ -354,19 +486,21 @@ const onSaveAddressPress = async () => {
                 placeholder="State"
                 onChangeText={(text) => setState(text)}
                 onFocus={() => onFocusChange('state')}
-                
+                value={state}
               />
             </View>
           </View>
           <TextInput
             style={inputStyle(!houseNo && Error)}
             placeholder="House / Floor No."
+            value={houseNo}
             onChangeText={(text) => setHouseNo(text)}
             onFocus={() => onFocusChange('houseNo')}
           />
           <TextInput
             style={inputStyle(!streetaddress1 && Error)}
             placeholder="Street Address"
+            value={streetaddress1}
             onChangeText={(text) => setStreetAddress1(text)}
             onFocus={() => onFocusChange('address')}
           />
@@ -375,16 +509,18 @@ const onSaveAddressPress = async () => {
             placeholder="City"
             onChangeText={(text) => setCity(text)}
             onFocus={() => onFocusChange('city')}
+            value={city}
           />
           <View style={styles.btn}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: '2%' }}>
+            {/* <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: '2%' }}>
               <CheckBox
                 disabled={false}
                 value={isChecked}
-                onValueChange={(newValue) => setChecked(newValue)}
+                onValueChange={(newValue) =>setChecked(newValue)
+                                             }
               />
               <Text style={{ color: 'black', fontFamily: 'montseart' }}>Set this as my default address.</Text>
-            </View>
+            </View> */}
 
             <TouchableOpacity
               style={{

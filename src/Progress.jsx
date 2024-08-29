@@ -18,7 +18,7 @@ const Progress = () => {
 
 
   useEffect(()=>{
-    if(changeOrderStatus==='SHIPPED'){
+    if(changeOrderStatus==='SHIPPED'||changeOrderStatus==='RETURNED'){
       start1();
       setTimeout(()=>{
         setSelectedStep(selectedStep+2);
@@ -30,7 +30,7 @@ const Progress = () => {
       //   setSelectedStep(3);
       // },6000);
     }
-    if(changeOrderStatus==='DELIVERED'){
+    if(changeOrderStatus==='DELIVERED'||changeOrderStatus==='PARTIAL_RETURNED'||changeOrderStatus==='RETURNED'){
       start1();
       setTimeout(()=>{
         setSelectedStep(selectedStep+2);
@@ -60,7 +60,6 @@ const Progress = () => {
       setTimeout(()=>{
         setSelectedStep(6);
       },6000);
-     
     }
   },[changeOrderStatus,]);
   const start1 = () => {
@@ -112,50 +111,74 @@ const Progress = () => {
 
         <View style={{ width: 6, height: 50, backgroundColor: '#f2f2f2',marginRight:'114%'   }}></View>
         
-        <View style={{flexDirection:'row',width:'100%',alignItems:'center',marginRight:'24%'}}>
-
-        <View
-          style={{
-            width: 30,
-            height: 30,
-            borderRadius: 15,
-            backgroundColor: selectedStep > 1 ? 'green' : 'grey',
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}
-        >
-          <Text style={{ color: '#fff' }}>2</Text>
-        </View>
-        <Text style={{marginLeft:'34%',fontWeight:'600',color:selectedStep > 1 ? '#00338D' : 'grey'}}>Order Shipped</Text>
         {
-          selectedStep>1?
-          <Text style={{marginLeft:'30%'}}>{OrderDate}</Text>:
-          <Text style={{marginLeft:'27%'}}></Text>
-         }
-        </View>
+  changeOrderStatus!=='CANCELLED' && 
+  (
+    <View style={{flexDirection:'row',width:'100%',alignItems:'center',marginRight:'24%'}}>
+    <View
+      style={{
+        width: 30,
+        height: 30,
+        borderRadius: 15,
+        backgroundColor: selectedStep > 1 ? 'green' : 'grey',
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}
+    >
+      <Text style={{ color: '#fff' }}>2</Text>
+    </View>
+    <Text style={{marginLeft:'34%',fontWeight:'600',color:selectedStep > 1 ? '#00338D' : 'grey'}}>Order Shipped</Text>
+    {
+      selectedStep>1?
+      <Text style={{marginLeft:'30%'}}>{OrderDate}</Text>:
+      <Text style={{marginLeft:'27%'}}></Text>
+     }
+    </View>    
+  )
+}
 
-        <View style={{ width: 6,height: 50, backgroundColor: '#f2f2f2',marginRight:'114%'  }}></View>
-        <View style={{flexDirection:'row',width:'100%',flexDirection:'row',alignItems:'center',marginRight:'24%'}}>
-        <View
-          style={{
-            width: 30,
-            height: 30,
-            borderRadius: 15,
-            backgroundColor: selectedStep > 2 ? 'green' : 'grey',
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}
-        >
-          <Text style={{ color: '#fff' }}>3</Text>
-        </View>
-         <Text style={{marginLeft:'34%',fontWeight:'600',color:selectedStep > 2 ? '#00338D' : 'grey'}}>Order Delivered</Text>
-         {
-          selectedStep>2?
-          <Text style={{marginLeft:'27%'}}>{OrderDate}</Text>:
-          <Text style={{marginLeft:'27%'}}></Text>
-         }
-        </View>
-        <View style={{ width: 6, height: 50,  backgroundColor: '#f2f2f2',marginRight:'114%'}}></View>
+{
+changeOrderStatus!=='CANCELLED' && 
+(
+  <View style={{ width: 6,height: 50, backgroundColor: '#f2f2f2',marginRight:'114%'  }}></View>
+)  
+}
+       
+       {
+        changeOrderStatus!=='CANCELLED' && (
+          <View style={{flexDirection:'row',width:'100%',flexDirection:'row',alignItems:'center',marginRight:'24%'}}>
+          <View
+            style={{
+              width: 30,
+              height: 30,
+              borderRadius: 15,
+              backgroundColor: selectedStep > 2 ? 'green' : 'grey',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+          >
+            <Text style={{ color: '#fff' }}>3</Text>
+          </View>
+           <Text style={{marginLeft:'34%',fontWeight:'600',color:selectedStep > 2 ? '#00338D' : 'grey'}}>Order Delivered</Text>
+           {
+            selectedStep>2?
+            <Text style={{marginLeft:'27%'}}>{OrderDate}</Text>:
+            <Text style={{marginLeft:'27%'}}></Text>
+           }
+          </View>  
+        )
+       }
+
+
+
+        {
+          changeOrderStatus==='CANCELLED' &&(<>
+          {
+            changeOrderStatus!=='CANCELLED' && 
+            (
+              <View style={{ width: 6, height: 50,  backgroundColor: '#f2f2f2',marginRight:'114%'}}></View>
+            )
+          }
         <View style={{flexDirection:'row',width:'100%',alignItems:'center',marginRight:'24%'}}>
 
         <View
@@ -170,16 +193,18 @@ const Progress = () => {
            
           }}
         >
-          <Text style={{ color: '#fff', }}>4</Text>
+          <Text style={{ color: '#fff', }}>{changeOrderStatus==='CANCELLED'?'2':'4'}</Text>
         </View>
           <Text style={{marginLeft:'34%',fontWeight:'600',color:selectedStep > 3 ? 'red' : 'grey'}}>Order Cancelled</Text>
           {
           selectedStep>3?
-          <Text style={{marginLeft:'27%'}}>{OrderDate}</Text>:
-          <Text style={{marginLeft:'27%'}}></Text>
+          <Text style={{marginLeft:'25%'}}>{OrderDate}</Text>:
+          <Text style={{marginLeft:'25%'}}></Text>
          }
-
-        </View>
+       </View>
+       </>
+        )
+        }
       </View>
 
       <View
@@ -191,6 +216,9 @@ const Progress = () => {
           top: 0,
         }}
       >
+  {
+    changeOrderStatus!=='CANCELLED' && 
+    (<>
     <Animated.View
   style={{
     width: 6,
@@ -210,7 +238,10 @@ const Progress = () => {
     backgroundColor: 'green',
   }}
 ></Animated.View>
-
+       
+    </>)
+  }      
+ 
 <Animated.View
   style={{
     width: 6,
