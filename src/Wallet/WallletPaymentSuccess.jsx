@@ -7,13 +7,10 @@ import { useLoginContext } from '../Login/LoginCartProvider';
 import { useGroceryContext } from '../Grocery/GroceryContext';
 
 const WalletPaymentSuccess = ({ navigation, route }) => {
-  const { userName, streetaddress1, city, state, pinCode, mobile,orderId,setOrderId,redeemYouPoints,setRedeemYourPoints,addedMoney,setAddedMoney,setWalletBalance,
+  const { addedMoney,setAddedMoney,setWalletBalance,
     addMoneyToWalletTender,setAddMoneyToWalletTender
   } = useCartContext();
-  const {ip,token,popFromStack,pushToStack,
-    currentPage, setCurrentPage,
-    currentPageIndex,setCurrentPageIndex,
-    currentPageIndexCategory,setCurrentPageIndexCategory,loginUserId,}=useLoginContext(); 
+  const {ip,token, setCurrentPage,loginUserId,}=useLoginContext(); 
  
     const{whichPageToNavigate}=useGroceryContext();
 

@@ -10,6 +10,7 @@ import axios from 'axios';
 import { NavigationContainer } from '@react-navigation/native';
 import { useCartContext } from '../Context/WomenContext';
 import { json } from 'react-router-dom';
+import TopBar from '../PlpScreen/TopBar';
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -151,7 +152,13 @@ const RewardHistory = ({navigation}) => {
     return (
     <View style={{flex:1,backgroundColor:'white'}}>
       <View style={{marginLeft:'3%',}}>
-        <Image source={kpmg} style={{width:100,height:100}}/>
+      <TopBar
+        navigation={navigation}
+        showKPMGLogo={true}
+        showSearchLogo={false}
+        showCartLogo={false}
+        showWishListLogo={false}
+      />
         <TouchableOpacity style={{flexDirection:'row',alignItems:'center',}}
             onPress={()=>{popFromStack(navigation)}}>
             <View>

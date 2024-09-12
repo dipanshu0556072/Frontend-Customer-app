@@ -18,12 +18,13 @@ const LoginCartProvider = ({children}) => {
   const [OrderDate,setOrderDate]=useState("");  
   const [profileData,setProfileData]=useState([]);
   const[otp,setOtp]=useState('');
+
+// Determines whether to navigate to the main home page or the forgot password page
+const [navigationDestination, setNavigationDestination] = useState(0);
+
   //get all user list 
   const [userList,setUserList]=useState([]);
-  
-
-
-  const [ip,setIp]=useState("192.168.0.119");
+  const [ip,setIp]=useState("192.168.1.100");
   const [userName,setUserName]=useState("");
   const [mobileNumber, setMobileNumber] = useState('');  
   const [checkMobile,setCheckMobile]=useState('');
@@ -125,8 +126,12 @@ const LoginCartProvider = ({children}) => {
       currentPageIndexCategory,setCurrentPageIndexCategory,
 
       pushToStack: (page) => {
-        setStack([...stack, page]);
-        setCurrentPage([...currentPage, page]);
+        if(stack.includes(page)){
+           setStack(stack.filter((item)=>item!==page));
+        }else{
+          setStack([...stack, page]);
+          setCurrentPage([...currentPage, page]);  
+        }
       },
     
       popFromStack: (navigation) => {
@@ -164,7 +169,9 @@ const LoginCartProvider = ({children}) => {
       profileData,setProfileData,
       otp,setOtp,
       userList,setUserList,
-      DateOfAnniversary,setDateOfAnniversary
+      DateOfAnniversary,setDateOfAnniversary,
+
+      navigationDestination, setNavigationDestination
       
   }  
   return (

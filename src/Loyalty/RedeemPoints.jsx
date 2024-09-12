@@ -17,6 +17,7 @@ import flightsimage from '../PlpScreen/images/flightsimage.png'
 import thirtyOFF from '../PlpScreen/images/thirtyOFF.png'
 import cardScratch from '../PlpScreen/images/cardScratch.png'
 import { useCartContext } from '../Context/WomenContext';
+import TopBar from '../PlpScreen/TopBar';
 
 const RedeemPoints = ({navigation}) => {
 
@@ -52,7 +53,13 @@ const RedeemPoints = ({navigation}) => {
     <View style={{flex:1,backgroundColor:'white'}}>
         <ScrollView>
         <View style={{marginLeft:'3%'}}>
-        <Image source={kpmg} style={{width:100,height:100}}/>
+        <TopBar
+        navigation={navigation}
+        showKPMGLogo={true}
+        showSearchLogo={false}
+        showCartLogo={false}
+        showWishListLogo={false}
+      />
         <TouchableOpacity style={{flexDirection:'row',alignItems:'center',}}
             onPress={()=>{popFromStack(navigation)}}>
             <View>

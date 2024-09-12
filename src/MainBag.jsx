@@ -1,5 +1,5 @@
 import React, {useEffect, useState, useRef, useMemo} from 'react';
-import TopBar from './TopBar3';
+
 import back from './PlpScreen/images/back.png';
 import {
   Alert,
@@ -23,9 +23,7 @@ import 'react-native-gesture-handler';
 import {useCartContext} from './Context/WomenContext';
 import shopBag from './PlpScreen/images/shopBag.webp';
 import axios from 'axios';
-import Payment1 from './Payment/Payment2';
 import {useLoginContext} from './Login/LoginCartProvider';
-import TopBar1 from './TopBar3';
 import cross from './PlpScreen/images/close.png';
 import bag from './PlpScreen/images/bag.png';
 import heart from './PlpScreen/images/heart.png';
@@ -39,6 +37,8 @@ import couponDiscount from './PlpScreen/images/CouponDiscount.png';
 import ConfettiCannon from 'react-native-confetti-cannon';
 import animationImage from './PlpScreen/AnimationCoupon.json';
 import cropCheers from './PlpScreen/images/cropCheers.png';
+import { useIsFocused } from '@react-navigation/native';
+import TopBar from './PlpScreen/TopBar';
 
 const lastViewData = [
   {
@@ -182,6 +182,15 @@ const MainBag = ({navigation}) => {
   //     console.error('Error Posting nowRedeemYourPointsManually data:', error);
   //   }
   // };
+
+
+  const isFocused = useIsFocused();
+
+  useEffect(() => {
+    if (isFocused) {
+      checkIsPromotionCouponIsApplied();
+    }
+  }, [isFocused]);
 
   //get user Loyalty Tier
   async function getUserTier() {
@@ -367,7 +376,7 @@ const MainBag = ({navigation}) => {
           },
         },
       );
-
+      checkIsPromotionCouponIsApplied();
       // console.log('Response from the server:', response.data);
       // Handle the response from the server as needed
       // await new Promise(resolve => setTimeout(resolve, 500));
@@ -757,6 +766,10 @@ const MainBag = ({navigation}) => {
   const handleSortModalClose = () => {
     // Additional logic to handle sorting or other actions
     setSortModalVisible(false);
+    setShowActivityIndicator(true);
+    setTimeout(() => {
+      setShowActivityIndicator(false);
+    }, 100);
   };
   const showStoreNotification = () => {
     setSortModalVisible(true);
@@ -941,56 +954,14 @@ const MainBag = ({navigation}) => {
   }, []);
   return (
     <View style={{flex: 1, backgroundColor: 'white'}}>
-      {/* <Text>{intialAmount}</Text> */}
-      {/* <Text>{JSON.stringify(profileAddress)}</Text> */}
 
-      <View
-        style={{
-          padding: 12,
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-        }}>
-        <TouchableOpacity onPress={() => forNavigate('mainHome')}>
-          <Image
-            source={{uri: 'https://shorturl.at/ckGU2'}}
-            style={{width: 100, height: 100}}
-          />
-        </TouchableOpacity>
-
-        <View style={{flexDirection: 'row'}}>
-          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-            <TouchableOpacity
-              onPress={() => forNavigate('mainBag')}
-              style={{marginRight: 10}}>
-              <Image source={bag} style={{marginRight: '-5%'}} />
-              {cartCount > 0 && (
-                <View
-                  style={{
-                    position: 'absolute',
-                    backgroundColor: 'red',
-                    borderRadius: 10,
-                    width: 20,
-                    height: 20,
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    top: -5,
-                    right: -5,
-                  }}>
-                  <Text style={{color: 'white'}}>{cartCount}</Text>
-                </View>
-              )}
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => forNavigate('WishList')}
-              style={{marginLeft: 10}}>
-              <View style={{marginLeft: '4%'}}>
-                <Image source={heart} style={{}} />
-              </View>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </View>
+<TopBar
+          navigation={navigation}
+          showKPMGLogo={true}
+          showSearchLogo={false}
+          showCartLogo={false}
+          showWishListLogo={true}
+        />
       <View style={{flexDirection: 'row', alignItems: 'center'}}>
         <TouchableOpacity
           onPress={() => {
@@ -1260,6 +1231,7 @@ const MainBag = ({navigation}) => {
                         <TouchableOpacity
                           onPress={() => {
                             handleSortModalClose();
+                            setDeliveryOption('0');
                           }}>
                           <Text style={{fontSize: 23}}>╳</Text>
                         </TouchableOpacity>
@@ -1902,7 +1874,7 @@ const MainBag = ({navigation}) => {
                       textAlign: 'center',
                       marginTop: '2%',
                       color: 'red',
-                      fontSize: 12,
+                      fontSize: 10,
                     }}>
                     Please enter points to redeem!
                   </Text>

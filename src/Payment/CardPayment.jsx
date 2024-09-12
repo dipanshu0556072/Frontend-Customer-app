@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import TopBar1 from '../TopBar1';
-import {Alert, Image, Text, View, TextInput, TouchableOpacity } from 'react-native';
+import { Alert, Image, Text, View, TextInput, TouchableOpacity } from 'react-native';
 import back from '../PlpScreen/images/back.png';
 import { useCartContext } from '../Context/WomenContext';
 import axios from 'axios';
 import { useLoginContext } from '../Login/LoginCartProvider';
-import visa from '../Order/visa.png'
+import visa from '../Order/visa.png';
 
 export default function CardPayment({ navigation }) {
   const [cardNumber, setCardNumber] = useState('');
@@ -23,48 +23,52 @@ export default function CardPayment({ navigation }) {
   const [cardHolderNameError, setCardHolderNameError] = useState(false);
   const [expiryError, setExpiryError] = useState(false);
   const [cvvError, setCvvError] = useState(false);
-  const [visaImage,setVisaImage]=useState(false);
+  const [visaImage, setVisaImage] = useState(false);
 
-  useEffect(()=>{
-    if(cardNumber && cardNumber.length>4){
+  useEffect(() => {
+    if (cardNumber && cardNumber.length > 4) {
       setVisaImage(true);
-    }else{
+    } else {
       setVisaImage(false);
     }
-  },[visaImage,cardNumber]);
+  }, [visaImage, cardNumber]);
 
-  const {cartItem,setCartItem,selectedAddress,
-    setSelectedAddress,orderItemPrice,
-    totalAmount,orderIdCounter ,
+  const {
+    cartItem, setCartItem, selectedAddress,
+    setSelectedAddress, orderItemPrice,
+    totalAmount, orderIdCounter,
     userName, setUserName,
     streetaddress1, setStreetAddress1,
     city, setCity,
     state, setState,
     pinCode, setPinCode,
-    mobile, setMobile,disableAction,setDisableAction,
-    allSavedAddress,setAllSavedAddress,
-    placedOrder,setPlacedOrder,
-    trackCurrentOrderId,setTrackCurrentOrderId}=useCartContext();
+    mobile, setMobile, disableAction, setDisableAction,
+    allSavedAddress, setAllSavedAddress,
+    placedOrder, setPlacedOrder,
+    trackCurrentOrderId, setTrackCurrentOrderId
+  } = useCartContext();
 
-    const {ip,token,popFromStack,pushToStack,
-      currentPage, setCurrentPage,
-      currentPageIndex,setCurrentPageIndex,
-      currentPageIndexCategory,setCurrentPageIndexCategory}=useLoginContext(); 
- 
-      const forNavigate=(page)=>{
-        if(page==='mainHome'){
-         setCurrentPage('mainHome');
-         navigation.navigate('mainHome');
-        }else{
-          console.log(page+" "+currentPage[currentPage.length-1]);
-          if(currentPage && currentPage[currentPage.length-1]!==page){
-            pushToStack(page);
-            navigation.navigate(page)
-          }else{
-            popFromStack(navigation);
-          }  
-        }
+  const {
+    ip, token, popFromStack, pushToStack,
+    currentPage, setCurrentPage,
+    currentPageIndex, setCurrentPageIndex,
+    currentPageIndexCategory, setCurrentPageIndexCategory
+  } = useLoginContext();
+
+  const forNavigate = (page) => {
+    if (page === 'mainHome') {
+      setCurrentPage('mainHome');
+      navigation.navigate('mainHome');
+    } else {
+      console.log(page + " " + currentPage[currentPage.length - 1]);
+      if (currentPage && currentPage[currentPage.length - 1] !== page) {
+        pushToStack(page);
+        navigation.navigate(page)
+      } else {
+        popFromStack(navigation);
       }
+    }
+  }
 
   // useEffect(() => {
   //   const fetchData = async () => {
@@ -89,31 +93,31 @@ export default function CardPayment({ navigation }) {
   // }, [token]);
 
   //storing the selected AddressData
-useEffect(() => {
-  if (selectedAddress !== null && allSavedAddress[selectedAddress]) {
-    const selectedAddressData = allSavedAddress[selectedAddress];
+  useEffect(() => {
+    if (selectedAddress !== null && allSavedAddress[selectedAddress]) {
+      const selectedAddressData = allSavedAddress[selectedAddress];
 
-    // Update the dataAdd object with the selected address data
-    setUserName(`${selectedAddressData.firstName} ${selectedAddressData.lastName}`);
-    setStreetAddress1(selectedAddressData.streetAddress);
-    setCity(selectedAddressData.city);
-    setState(selectedAddressData.state);
-    setPinCode(selectedAddressData.zipCode);
-    setMobile(selectedAddressData.mobile);
+      // Update the dataAdd object with the selected address data
+      setUserName(`${selectedAddressData.firstName} ${selectedAddressData.lastName}`);
+      setStreetAddress1(selectedAddressData.streetAddress);
+      setCity(selectedAddressData.city);
+      setState(selectedAddressData.state);
+      setPinCode(selectedAddressData.zipCode);
+      setMobile(selectedAddressData.mobile);
+    }
+    setDisableAction(true);
+  }, [disableAction, selectedAddress, allSavedAddress, setUserName, setStreetAddress1, setCity, setState, setPinCode, setMobile]);
+
+  const userNameArray = userName.split(' ');
+  const dataAdd = {
+    firstName: userNameArray[0],
+    lastName: userNameArray[1],
+    streetAddress: streetaddress1,
+    city: city,
+    state: state,
+    zipCode: pinCode,
+    mobile: mobile
   }
-  setDisableAction(true);
-}, [disableAction,selectedAddress, allSavedAddress, setUserName, setStreetAddress1, setCity, setState, setPinCode, setMobile]);
-
-       const userNameArray = userName.split(' ');
-        const dataAdd={
-          firstName:userNameArray[0],
-          lastName:userNameArray[1],
-          streetAddress:streetaddress1,
-          city:city,
-          state:state,
-          zipCode:pinCode,
-          mobile:mobile
-        }
 
   const handleFocus = (field) => {
     switch (field) {
@@ -146,215 +150,269 @@ useEffect(() => {
     }
   };
 
- const proceedToPay=async()=>{
-  const enteredMonth = parseInt(expiry.substring(0, 2), 10);
-  if (cardNumber.length < 16 || cardHolderName.length <= 0 || expiry.length < 5 || cvv.length < 3) {
-    if (cardNumber.length < 16) {
-      setCardNumberError(true);
+  const proceedToPay = async () => {
+    const enteredMonth = parseInt(expiry.substring(0, 2), 10);
+    if (cardNumber.length < 16 || cardHolderName.length <= 0 || expiry.length < 5 || cvv.length < 3) {
+      if (cardNumber.length < 16) {
+        setCardNumberError(true);
+      }
+      if (cardHolderName.length <= 0) {
+        setCardHolderNameError(true);
+      }
+      if (expiry.length < 5) {
+        setExpiryError(true);
+      }
+
+      if (cvv.length < 3) {
+        setCvvError(true);
+        // Display error message for invalid CVV
+        Alert.alert('Error', 'Please enter a valid CVV (3 digits)');
+        return;
+      }
     }
-    if (cardHolderName.length <= 0) {
-      setCardHolderNameError(true);
-    }
-    if (expiry.length < 5) {
-      setExpiryError(true);
-    }
-  
-    if (cvv.length < 3) {
-      setCvvError(true);
-      // Display error message for invalid CVV
-      Alert.alert('Error', 'Please enter a valid CVV (3 digits)');
+    else if (enteredMonth > 12) {
+      // Display error message for invalid month
+      Alert.alert('Please enter a valid month (1-12)');
       return;
     }
-  }
-  else if (enteredMonth > 12) {
-    // Display error message for invalid month
-    Alert.alert('Please enter a valid month (1-12)');
-    return;
-  }
-  else{
-    pushToStack('paymentSuccess');
-    navigation.navigate('paymentSuccess');
-  }
-  console.log("here"+userName +" "+ mobile +" "+ city +" "+pinCode  +" "+ state  +" "+streetaddress1);
-  if (userName && mobile && city &&  state && streetaddress1) {
-    // Assuming dataAdd is available here
-  //   axios.post('http://192.168.0.107:5454/api/orders/', dataAdd, {
-  //     headers: {
-  //       'Authorization': Bearer ${token},
-  //     },
-  //   }).then(response => {
-  //     setDeliveryAddress(response.data);
-  //     console.log(response.data);
-  //     navigation.navigate('paymentSuccess');
-  //   }).catch(error => {
-  //     console.log(error);
-  //   });
-  // } else {
-  //   setError(true);
-  
+    else {
+      pushToStack('paymentSuccess');
+      navigation.navigate('paymentSuccess');
+    }
+    console.log("here" + userName + " " + mobile + " " + city + " " + pinCode + " " + state + " " + streetaddress1);
+    if (userName && mobile && city && state && streetaddress1) {
+      // Assuming dataAdd is available here
+      //   axios.post('http://192.168.0.107:5454/api/orders/', dataAdd, {
+      //     headers: {
+      //       'Authorization': Bearer ${token},
+      //     },
+      //   }).then(response => {
+      //     setDeliveryAddress(response.data);
+      //     console.log(response.data);
+      //     navigation.navigate('paymentSuccess');
+      //   }).catch(error => {
+      //     console.log(error);
+      //   });
+      // } else {
+      //   setError(true);
 
+
+    }
   }
- }
- useEffect(()=>{
-  
-  setTimeout(()=>{
-    setCardNumberError(false);
-    setCardHolderNameError(false);
-    setExpiryError(false);
-    setCvvError(false);
-  },5000);
+  useEffect(() => {
 
- },[cardNumberError,cardHolderNameError,expiryFocus,cvvError]);
-  
+    setTimeout(() => {
+      setCardNumberError(false);
+      setCardHolderNameError(false);
+      setExpiryError(false);
+      setCvvError(false);
+    }, 5000);
 
- 
-  
-
+  }, [cardNumberError, cardHolderNameError, expiryFocus, cvvError]);
 
   return (
     <>
-    <View style={{ flex: 1, backgroundColor: 'white' }}>
+      <View style={styles.mainContainer}>
 
-    <TouchableOpacity onPress={() => {forNavigate('mainHome')}}>
-        <Image
-          source={{ uri: 'https://shorturl.at/ckGU2' }}
-          style={{ width: 100, height: 100, marginLeft: '4%' }}
-        />
-      </TouchableOpacity>
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: '1%', marginBottom: '3%' }}>
-  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-    <TouchableOpacity onPress={() => {popFromStack(navigation) }}>
-      <Image source={back} style={{ marginLeft: 12 }} />
-    </TouchableOpacity>
-    <Text style={{ paddingLeft: 10, color: 'black', textAlign: 'center' }}>
-   
-    </Text>
-  </View>
-  <TouchableOpacity style={{ marginRight: '4%' }} onPress={() => {popFromStack(navigation)}}>
-    <Text style={{ color: 'black' }}>CANCEL</Text>
-  </TouchableOpacity>
-</View>
-
-      <View style={{ padding: '5%' }}>
-        <Text style={{ color: 'black', textAlign: 'center',marginRight:'53%',padding:'3%',fontWeight:'600',fontSize:19}}>Add Card Details</Text>
-        <View style={styles.container}>
-          <View style={styles.labelContainer}></View>
-          <View style={{ position: 'relative' }}>
-  <TextInput
-    style={[
-      styles.inputField,
-      { borderColor: cardNumberFocus ? '#00338D' : cardNumberError ? 'red' : '#D3D3D3' },
-    ]}
-    placeholder='Card Number'
-    maxLength={16}
-    inputMode='numeric'
-    onFocus={() => handleFocus('cardNumber')}
-    placeholderTextColor='#999'
-    onChangeText={(text) => setCardNumber(text)}
-  />
-  {
-    visaImage && (
-      <Image
-      source={visa} // Replace 'yourImageSource' with the actual source for your image
-      style={{
-        position: 'absolute',
-        top: 8, // Adjust the top value to position the image vertically
-        right: 8, // Adjust the right value to position the image horizontally
-        width: 37, // Adjust the width of the image
-        height: 12, // Adjust the height of the image
-      }}
-    />
-    )
-  }
-
-</View>
-
-        <TextInput
-            style={[
-              styles.inputField,
-              { borderColor: cardHolderNameFocus ? '#00338D' : cardHolderNameError ? 'red' : '#D3D3D3' },
-            ]}
-            value={cardHolderName}
-            placeholder='Card Holder Name'
-            onFocus={() => handleFocus('cardHolderName')}
-            placeholderTextColor='#999'
-            onChangeText={(text) => setCardHolderName(text.toUpperCase())}
-            />
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-          <TextInput
-  style={[
-    styles.inputField,
-    { borderColor: expiryFocus ? '#00338D' : expiryError ? 'red' : '#D3D3D3' },
-  ]}
-  placeholder='MM-YY'  
-  inputMode='numeric'
-  onFocus={() => handleFocus('expiry')}
-  placeholderTextColor='#999'
-  maxLength={5}
-  onChangeText={(text) => {
-    const numericText = text.replace(/[^0-9]/g, ''); // Remove non-numeric characters
-
-    let formattedText = '';
-    if (numericText.length > 1) {
-      formattedText = `${numericText.slice(0, 2)}/${numericText.slice(2, 4)}`;
-    } else {
-      formattedText = numericText;
-    }
-
-    setExpiry(formattedText);
-  }}
-/>
-
-            <TextInput
-              style={[
-                styles.inputField,
-                { borderColor: cvvFocus ? '#00338D' : cvvError ? 'red' : '#D3D3D3' },
-              ]}
-              placeholder='cvv'
-              onFocus={() => handleFocus('cvv')}
-              placeholderTextColor='#999'
-              maxLength={3}
-              onChangeText={(text)=>setCvv(text)}
-              inputMode='numeric'
-              secureTextEntry={true}
-            />
+        <TouchableOpacity onPress={() => { forNavigate('mainHome') }}>
+          <Image
+            source={{ uri: 'https://shorturl.at/ckGU2' }}
+            style={styles.topImage}
+          />
+        </TouchableOpacity>
+        <View style={styles.header}>
+          <View style={styles.headerLeft}>
+            <TouchableOpacity onPress={() => { popFromStack(navigation) }}>
+              <Image source={back} style={styles.backIcon} />
+            </TouchableOpacity>
+            <Text style={styles.headerText}></Text>
           </View>
-          <View style={styles.horizontalLine1}></View>
-          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: '5%' }}>
-            <Text style={{ padding: '4%', color: 'black', fontSize: 17 }}>TOTAL ₹{totalAmount}</Text>
-            <TouchableOpacity
-               onPress={proceedToPay}
-              style={{ backgroundColor: '#00338D', padding: '4%', borderRadius: 7 }}>
-              <Text style={{ color: 'white', fontWeight: '500' }}>PROCEED TO PAY</Text>
+          <TouchableOpacity style={styles.cancelButton} onPress={() => { popFromStack(navigation) }}>
+            <Text style={styles.cancelText}>CANCEL</Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.contentContainer}>
+          <Text style={styles.title}>Add Card Details</Text>
+          <View style={styles.container}>
+            <View style={styles.labelContainer}></View>
+            <View style={styles.inputWrapper}>
+              <TextInput
+                style={[
+                  styles.inputField,
+                  { borderColor: cardNumberFocus ? '#00338D' : cardNumberError ? 'red' : '#D3D3D3' },
+                ]}
+                placeholder='Card Number'
+                maxLength={16}
+                inputMode='numeric'
+                onFocus={() => handleFocus('cardNumber')}
+                placeholderTextColor='#767272'
+                onChangeText={(text) => setCardNumber(text)}
+              />
+            </View>
+
+            <View style={styles.labelContainer}></View>
+            <View style={styles.inputWrapper}>
+              <TextInput
+                style={[
+                  styles.inputField,
+                  { borderColor: cardHolderNameFocus ? '#00338D' : cardHolderNameError ? 'red' : '#D3D3D3' },
+                ]}
+                placeholder='Card Holder Name'
+                onFocus={() => handleFocus('cardHolderName')}
+                placeholderTextColor='#767272'
+                onChangeText={(text) => setCardHolderName(text)}
+              />
+            </View>
+
+            <View style={styles.labelContainer}></View>
+            <View style={styles.expiryCvvContainer}>
+              <View style={styles.expiryWrapper}>
+                <TextInput
+                  style={[
+                    styles.expiryInput,
+                    { borderColor: expiryFocus ? '#00338D' : expiryError ? 'red' : '#D3D3D3' },
+                  ]}
+                  placeholder='MM/YY'
+                  maxLength={5}
+                  onFocus={() => handleFocus('expiry')}
+                  placeholderTextColor='#767272'
+                  onChangeText={(text) => setExpiry(text)}
+                />
+              </View>
+
+              <View style={styles.cvvWrapper}>
+                <TextInput
+                  style={[
+                    styles.cvvInput,
+                    { borderColor: cvvFocus ? '#00338D' : cvvError ? 'red' : '#D3D3D3' },
+                  ]}
+                  placeholder='CVV'
+                  maxLength={3}
+                  inputMode='numeric'
+                  onFocus={() => handleFocus('cvv')}
+                  placeholderTextColor='#767272'
+                  onChangeText={(text) => setCvv(text)}
+                />
+              </View>
+            </View>
+            <View>
+              {visaImage && <Image source={visa} style={styles.visaIcon} />}
+            </View>
+          </View>
+
+          <View style={styles.proceedButtonContainer}>
+            <TouchableOpacity onPress={proceedToPay} disabled={isLoading} style={styles.proceedButton}>
+              <Text style={styles.proceedButtonText}>PROCEED TO PAY</Text>
             </TouchableOpacity>
           </View>
         </View>
       </View>
-      </View>
     </>
-  );
+  )
 }
 
 const styles = {
-  container: {
-    width: 365,
-    borderWidth: 1,
-    borderColor: '#D3D3D3',
-    borderRadius: 12,
-    padding: 22,
+  mainContainer: {
+    flex: 1,
+    backgroundColor: 'white'
   },
-  labelContainer: {
+  topImage: {
+    width: '100%',
+    height: 160,
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  headerLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  backIcon: {
+    width: 25,
+    height: 25,
+    marginLeft: 10,
+  },
+  headerText: {
+    marginLeft: 10,
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  cancelButton: {
+    marginRight: 10,
+  },
+  cancelText: {
+    color: 'red',
+    fontSize: 16,
+  },
+  contentContainer: {
+    margin: 20,
+  },
+  title: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    marginBottom: 20,
+  },
+  container: {
     marginBottom: 10,
   },
-  inputField: {
-    borderBottomWidth: 1,
-    marginTop: '10%',
-    color: 'black',
+  labelContainer: {
+    marginBottom: 5,
   },
-  horizontalLine1: {
-    borderBottomWidth: 0.6,
-    borderBottomColor: '#D3D3D3',
-    marginVertical: 8,
-    marginTop: '10%',
+  inputWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  inputField: {
+    flex: 1,
+    borderWidth: 1,
+    padding: 10,
+    borderRadius: 5,
+    marginBottom: 10,
+  },
+  expiryCvvContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  expiryWrapper: {
+    flex: 0.5,
+    marginRight: 5,
+  },
+  expiryInput: {
+    borderWidth: 1,
+    padding: 10,
+    borderRadius: 5,
+  },
+  cvvWrapper: {
+    flex: 0.5,
+    marginLeft: 5,
+  },
+  cvvInput: {
+    borderWidth: 1,
+    padding: 10,
+    borderRadius: 5,
+  },
+  visaIcon: {
+    width: 60,
+    height: 40,
+    marginTop: 10,
+  },
+  proceedButtonContainer: {
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  proceedButton: {
+    backgroundColor: '#00338D',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+  },
+  proceedButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 };

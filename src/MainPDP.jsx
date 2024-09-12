@@ -38,16 +38,58 @@ import {TextInput, Alert} from 'react-native';
 import {json} from 'react-router-dom';
 import WishList from './WishList';
 import offerDiscount from './PlpScreen/images/offerDiscount.png';
+import {useIsFocused} from '@react-navigation/native';
 
 export const BagContext = createContext();
 
 const MainPDP = ({navigation}) => {
+  const isFocused = useIsFocused();
+
+  useEffect(() => {
+    if (isFocused) {
+      getAllCoupons();
+      getBestCouponByProductId();
+    }
+  }, [isFocused]);
+
+  //get all active coupons
+  async function getAllCoupons() {
+    try {
+      const response = await axios.get(
+        `http://${ip}:5454/api/promotions/active`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+      setActiveCoupons(response.data);
+    } catch (error) {
+      console.log('Got error in mainPdp from activeCoupons access' + error);
+    }
+  }
+
+  //get best coupon available for the particular productId
+  const [getBestCoupon, setGetBestCoupon] = useState([]);
+  async function getBestCouponByProductId() {
+    try {
+      const response = await axios.get(
+        `http://${ip}:5454/api/bestdeals/best/${productIdOnPdp}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+      setGetBestCoupon(response.data);
+    } catch (error) {
+      console.log('Got error in mainPdp from activeCoupons access' + error);
+    }
+  }
+
   const scrollY = new Animated.Value(0);
 
   const [cartCount, setCartCount] = useState(0);
-
-
-
   //get the rating of the currentProduct
   const [productRatings, setProductRatings] = useState({});
   useEffect(() => {
@@ -834,6 +876,9 @@ const MainPDP = ({navigation}) => {
   //   );
   // }
 
+  //get all active coupons
+  const [getActiveCoupons, setActiveCoupons] = useState([]);
+
   return (
     <>
       <View style={{flex: 1, backgroundColor: 'white'}}>
@@ -1497,40 +1542,41 @@ const MainPDP = ({navigation}) => {
                               source={offerDiscount}
                               style={styles.offerImage}
                             />
-                            <View>
-                              <Text style={styles.offerHeading}>Coupon</Text>
-                              <Text style={styles.couponOfferText}>
-                                Get Flat Rs.500 off on 1990 and above.
-                              </Text>
-                              <View
-                                style={{
-                                  marginTop: '6%',
-                                  width: 65,
-                                  alignContent: 'center',
-                                  borderStyle: 'dashed',
-                                  borderColor: 'rgb(53, 94, 59)',
-                                  borderWidth: 1,
-                                }}>
-                                <Text
+                        
+                              <View>
+                                <Text style={styles.offerHeading}>Coupon</Text>
+                                <Text style={styles.couponOfferText}>{getBestCoupon.promotionDetails}</Text>
+                                <View
                                   style={{
-                                    color: 'black',
-                                    fontWeight: '500',
-                                    backgroundColor: 'rgba(144, 238, 144,0.4)',
-                                    textAlign: 'center',
-                                    fontSize: 12,
-                                    padding: 4,
+                                    marginTop: '6%',
+                                    width: 65,
+                                    alignContent: 'center',
+                                    borderStyle: 'dashed',
+                                    borderColor: 'rgb(53, 94, 59)',
+                                    borderWidth: 1,
                                   }}>
-                                  GLOBAL
-                                </Text>
+                                  <Text
+                                    style={{
+                                      color: 'black',
+                                      fontWeight: '500',
+                                      backgroundColor:
+                                        'rgba(144, 238, 144,0.4)',
+                                      textAlign: 'center',
+                                      fontSize: 12,
+                                      padding: 4,
+                                    }}>
+                                  
+                                  </Text>
+                                </View>
                               </View>
-                            </View>
+                      
                           </View>
                         </View>
                         <TouchableOpacity
                           style={styles.moreOfferOption}
                           onPress={toggleCouponModal}>
                           <Text style={styles.seeMoreText}>
-                            +10 Coupon offers
+                            +{getActiveCoupons.length>1 && `${getActiveCoupons.length-1} Coupon offers`} 
                           </Text>
                         </TouchableOpacity>
                       </View>
@@ -1545,10 +1591,32 @@ const MainPDP = ({navigation}) => {
                             <View>
                               <Text style={styles.offerHeading}>Promotion</Text>
                               <Text style={styles.bankOfferText}>
-                                Get upto 15% Mobwik cashback on a minimum
-                                transaction of Rs 1500.{' '}
+                              {getBestCoupon.promotionDetails}
                               </Text>
+                              <View
+                                  style={{
+                                    marginTop: '6%',
+                                    width: 65,
+                                    alignContent: 'center',
+                                    borderStyle: 'dashed',
+                                    borderColor: 'rgb(53, 94, 59)',
+                                    borderWidth: 1,
+                                  }}>
+                                  <Text
+                                    style={{
+                                      color: 'black',
+                                      fontWeight: '500',
+                                      backgroundColor:
+                                        'rgba(144, 238, 144,0.4)',
+                                      textAlign: 'center',
+                                      fontSize: 12,
+                                      padding: 4,
+                                    }}>
+                                  
+                                  </Text>
+                                </View>
                             </View>
+                            
                           </View>
                         </View>
                         <TouchableOpacity style={styles.moreOfferOption}>
@@ -1743,46 +1811,86 @@ const MainPDP = ({navigation}) => {
                           </View>
                           <ScrollView
                             style={styles.scrollView}
-                            nestedScrollEnabled={true}>
-                            <View style={styles.offerContainer} key={index}>
-                              <View style={styles.offerBox}>
-                                <Text style={styles.offerHead}>
-                                  Get 5% off on purchases of ₹1500 or more.
-                                </Text>
-                                <View style={styles.offerValidity}>
+                            nestedScrollEnabled={true}
+                            showsVerticalScrollIndicator={false} // Add this line
+                          >
+                            {getActiveCoupons.map((item, index) => (
+                              <View style={styles.offerContainer} key={index}>
+                                <View style={styles.offerBox}>
+                                  <Text style={styles.offerHead}>
+                                    {item.description}
+                                  </Text>
                                   <View
                                     style={{
-                                      height: 5,
-                                      backgroundColor: 'black',
-                                      width: 5,
-                                      borderRadius: 12,
-                                    }}
-                                  />
-                                  <Text style={styles.offerText}>
-                                    Offer start date{' '}
-                                    <Text style={styles.dateText}>
-                                      June 01,2024
+                                      width: 120,
+                                      marginLeft: '4%',
+                                      marginBottom: '2%',
+                                      alignContent: 'center',
+                                      borderStyle: 'dashed',
+                                      borderColor: 'rgb(53, 94, 59)',
+                                      borderWidth: 1,
+                                    }}>
+                                    <Text
+                                      style={{
+                                        color: 'black',
+                                        fontWeight: '500',
+                                        backgroundColor:
+                                          'rgba(144, 238, 144,0.4)',
+                                        textAlign: 'center',
+                                        fontSize: 12,
+                                        padding: 4,
+                                      }}>
+                                      {item.promoCode}
                                     </Text>
-                                  </Text>
-                                </View>
-                                <View style={styles.offerValidity}>
-                                  <View
-                                    style={{
-                                      height: 5,
-                                      backgroundColor: 'black',
-                                      width: 5,
-                                      borderRadius: 12,
-                                    }}
-                                  />
-                                  <Text style={styles.offerText}>
-                                    Offer end date{' '}
-                                    <Text style={styles.dateText}>
-                                      December 31,2024
+                                  </View>
+
+                                  <View style={styles.offerValidity}>
+                                    <View
+                                      style={{
+                                        height: 5,
+                                        backgroundColor: 'black',
+                                        width: 5,
+                                        borderRadius: 12,
+                                      }}
+                                    />
+                                    <Text style={styles.offerText}>
+                                      Offer start date{' '}
+                                      <Text style={styles.dateText}>
+                                        {new Date(
+                                          item.startDate,
+                                        ).toLocaleDateString('en-US', {
+                                          day: '2-digit',
+                                          month: 'long',
+                                          year: 'numeric',
+                                        })}
+                                      </Text>
                                     </Text>
-                                  </Text>
+                                  </View>
+                                  <View style={styles.offerValidity}>
+                                    <View
+                                      style={{
+                                        height: 5,
+                                        backgroundColor: 'black',
+                                        width: 5,
+                                        borderRadius: 12,
+                                      }}
+                                    />
+                                    <Text style={styles.offerText}>
+                                      Offer end date{' '}
+                                      <Text style={styles.dateText}>
+                                        {new Date(
+                                          item.endDate,
+                                        ).toLocaleDateString('en-US', {
+                                          day: '2-digit',
+                                          month: 'long',
+                                          year: 'numeric',
+                                        })}
+                                      </Text>
+                                    </Text>
+                                  </View>
                                 </View>
                               </View>
-                            </View>
+                            ))}
                           </ScrollView>
                         </View>
                       </View>
@@ -2349,11 +2457,10 @@ const styles = StyleSheet.create({
 
   offerMainContainer: {
     width: 370,
-    height: 120,
     margin: '3%',
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: '10%',
+    marginBottom: '5%',
   },
 
   containerWrapper: {
@@ -2365,7 +2472,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 20,
     width: '100%', // Adjust width to fill the wrapper
-    height: 120,
+    minHeight: 140,
   },
 
   promotionContainer: {
@@ -2373,7 +2480,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 20,
     width: '100%', // Adjust width to fill the wrapper
-    height: 120,
+    minHeight: 140,
   },
 
   seeMoreText: {
@@ -2421,7 +2528,7 @@ const styles = StyleSheet.create({
     marginTop: '13%',
     flexShrink: 1,
     flexWrap: 'wrap',
-    maxWidth: '98%',
+    maxWidth: '90%',
   },
   couponModalContainer: {
     backgroundColor: 'white',
@@ -2434,7 +2541,7 @@ const styles = StyleSheet.create({
   offerContainer: {
     marginTop: '3%',
     width: '100%',
-    height: 100,
+    height: 120,
     borderWidth: 0.6,
     borderColor: '#D3D3D3',
     borderRadius: 12,

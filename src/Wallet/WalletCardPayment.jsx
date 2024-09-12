@@ -6,6 +6,7 @@ import { useCartContext } from '../Context/WomenContext';
 import axios from 'axios';
 import { useLoginContext } from '../Login/LoginCartProvider';
 import visa from '../Order/visa.png'
+import TopBar from '../PlpScreen/TopBar';
 
 export default function WalletCardPayment({ navigation }) {
   const [cardNumber, setCardNumber] = useState('');
@@ -214,13 +215,13 @@ useEffect(() => {
   return (
     <>
     <View style={{ flex: 1, backgroundColor: 'white' }}>
-
-    <TouchableOpacity onPress={() => {forNavigate('mainHome')}}>
-        <Image
-          source={{ uri: 'https://shorturl.at/ckGU2' }}
-          style={{ width: 100, height: 100, marginLeft: '4%' }}
-        />
-      </TouchableOpacity>
+    <TopBar
+        navigation={navigation}
+        showKPMGLogo={true}
+        showSearchLogo={false}
+        showCartLogo={false}
+        showWishListLogo={false}
+      />
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: '1%', marginBottom: '3%' }}>
   <View style={{ flexDirection: 'row', alignItems: 'center' }}>
     <TouchableOpacity onPress={() => {popFromStack(navigation) }}>

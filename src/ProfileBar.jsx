@@ -855,12 +855,6 @@ updatePassword,setUpdatePassword}=useLoginContext();
   </View>
 </View>
 
-
-              
-              {/* <TouchableOpacity onPress={handleSortModalClose }
-                style={{ flexDirection: 'row', justifyContent: 'center', backgroundColor: '#00338D', width: '26%',padding:'2.5%', alignSelf: 'flex-end',borderRadius:12}}>
-                 <Text style={{ color: 'white', textAlign: 'center',fontWeight:'600'}}>APPLY</Text>
-              </TouchableOpacity> */}
              </View>
   
 

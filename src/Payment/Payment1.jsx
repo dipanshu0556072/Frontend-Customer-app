@@ -68,52 +68,6 @@ export default function Payment1({navigation})
           }
         }
     
-  
-    // useEffect(() => {
-  //   if (
-  //     userName && mobile && city && pinCode && state && streetaddress1
-  //   ) {
-  //     const userNameArray = userName.split(' ');
-  //     const dataAdd ={
-  //       firstName:userNameArray[0],
-  //       lastName:userNameArray[1],
-  //       streetAddress:streetaddress1,
-  //       city:city,
-  //       state:state,
-  //       zipCode:pinCode,
-  //       mobile:mobile
-  //   }
-
-  //     console.log('\n\n\n\n\ndataAdd', JSON.stringify(dataAdd));
-  //     console.log('\n\ndataUserName',userNameArray[0]+" "+userNameArray[1]+" "+
-  //                streetaddress1+" "+city+" "+state+" "+pinCode+" "+mobile);
-
-  //     // Make a POST request to the specified API endpoint
-  //     axios.post('http://192.168.0.107:5454/api/orders/', dataAdd, {
-  //       headers: {
-  //         'Authorization': Bearer ${token},         
-  //       },
-  //     })
-  //       .then(response => {
-  //         // Handle successful response
-  //         console.log(response.data);
-  //         // Additional logic can be added here if needed
-  //       })
-  //       .catch(error => {
-  //         // Handle error
-  //         console.error('Error making API request:', error);
-  //       });
-  //   }
-
-  //   setTimeout(() => {
-  //     setOrderId(orderId+1);
-  //     navigation.navigate('ShopTrack');
-  //   }, 2000);
-  // }, [navigation, token, userName, streetaddress1, city, state, pinCode, mobile]);
-
-
-    
-  
       function naviGating(page){
         pushToStack(page);
         navigation.navigate(page);
@@ -324,28 +278,6 @@ export default function Payment1({navigation})
   </TouchableOpacity>
 </View>
            <ScrollView>
-                 {/* { !orderPlaced && (
-                  <View style={styles.userDetail}>
-                  <Text style={styles.text}>Deliver to: {cartItem.user.addresses[selectedAddress].firstName} {cartItem.user.addresses[selectedAddress].lastName}</Text>
-                        <Text style={styles.text}>{cartItem.user.addresses[selectedAddress].streetAddress},{cartItem.user.addresses[selectedAddress].city}</Text>
-                        <Text style={styles.text}>{cartItem.user.addresses[selectedAddress].mobile}</Text>
-                        <Text style={styles.text}>{cartItem.user.addresses[selectedAddress].state},{cartItem.user.addresses[selectedAddress].zipCode}</Text>
-                        <TouchableOpacity
-                          style={{
-                            padding: 10,
-                            borderRadius: 5,
-                            marginTop:18,
-                            backgroundColor:'#00338D'
-                         }}
-                         onPress={()=>{navigation.navigate('AddressDetail')}}
-                        >
-                         <Text style={{ color: 'white', textAlign: 'center' }}>
-                              Change or Add new Address
-                         </Text>
-                        </TouchableOpacity>
-                  </View>
-                 )
-               } */}
                {
                 !disableAction && (
                 filteredData && filteredData.length>0 && !disableAction?

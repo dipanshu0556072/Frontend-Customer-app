@@ -1,6 +1,5 @@
 import { StyleSheet, Text, View,Image,FlatList,TouchableOpacity, ScrollView} from 'react-native'
 import React from 'react'
-import kpmg from '../PlpScreen/kpmglogo.png';
 import gold from '../PlpScreen/images/gold.png';
 import platinum from '../PlpScreen/images/platinum.png';
 import silver from '../PlpScreen/images/silver.png';
@@ -11,6 +10,7 @@ import gold4 from '../PlpScreen/images/gold4.png';
 import gold5 from '../PlpScreen/images/gold5.png';
 import { useLoginContext } from '../Login/LoginCartProvider';
 import back from '../PlpScreen/images/back1.png'
+import TopBar from '../PlpScreen/TopBar';
 
 const PlatinumTier = ({navigation}) => {
     const data = [
@@ -26,9 +26,13 @@ const PlatinumTier = ({navigation}) => {
     return (
     <View style={{flex:1,backgroundColor:'white'}}>
       <ScrollView>
-      <TouchableOpacity onPress={()=>{popFromStack(navigation)}}>
-         <Image source={kpmg} style={{width:115,height:46,margin:'4%'}}/>
-        </TouchableOpacity>     
+      <TopBar
+        navigation={navigation}
+        showKPMGLogo={true}
+        showSearchLogo={false}
+        showCartLogo={false}
+        showWishListLogo={false}
+      />
         
        <View style={{height:360}}>
        <FlatList

@@ -3,11 +3,10 @@ import React from 'react';
 import kpmg from './images/kpmg2.png';
 const LoginTop1 = () => {
   return (
-        <View style={styles.row1}>
+        <View style={styles.row}>
             <View style={{justifyContent:'center'}}>
                <Image source={kpmg} style={{marginLeft:'40%',}}/>
             </View>
-           
         </View>
   )
 }
@@ -15,8 +14,8 @@ const LoginTop1 = () => {
 export default LoginTop1
 
 const styles = StyleSheet.create({
-    row1:{
-        height:'25%',
+    row:{
+        height:'32%',
         width:'100%',
         flexDirection:'row',
         backgroundColor:'#005eb5',

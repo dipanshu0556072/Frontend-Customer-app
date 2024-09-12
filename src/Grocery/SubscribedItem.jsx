@@ -5,7 +5,7 @@ import { useLoginContext } from '../Login/LoginCartProvider'
 import back from '../PlpScreen/images/back.png';
 import axios from 'axios';
 import { useGroceryContext } from './GroceryContext';
-import kpmg from '../PlpScreen/images/kpmg3.png'
+import TopBar from '../PlpScreen/TopBar';
 
 const SubscribedItem = ({navigation}) => {
     const {ip,token,popFromStack,pushToStack,
@@ -64,17 +64,14 @@ const SubscribedItem = ({navigation}) => {
 
     return (
     <View style={{flex:1,backgroundColor:'white'}}>
-       <TouchableOpacity style={{margin:'3%'}} onPress={()=>{forNavigate('mainHome')}}>
-       <Image source={kpmg} style={{ width: 100, height: 100 }} />
-       </TouchableOpacity>
-       {/* <View style={styles.backBtn}>
-        <TouchableOpacity onPress={() => popFromStack(navigation)}>
-          <View style={styles.backBtn}>
-               <Image source={back} style={{ marginLeft: 12 }} />
-              <Text style={{ color: 'black',marginLeft:'3%'}}>Subscribed Item</Text>
-          </View>          
-        </TouchableOpacity>
-       </View> */}
+          <TopBar
+        navigation={navigation}
+        showKPMGLogo={true}
+        showSearchLogo={false}
+        showCartLogo={false}
+        showWishListLogo={false}
+      />
+
        <ScrollView>
   
          <Text style={styles.mainHeading}>Subscribed Item List</Text>

@@ -1,298 +1,333 @@
-import { StyleSheet, Text, View,Image, TextInput, TouchableOpacity,ActivityIndicator } from 'react-native'
-import React,{useEffect, useState} from 'react';
-import arrow from './images/arrow.png';
+import {
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  TextInput,
+  TouchableOpacity,
+  ActivityIndicator,
+} from 'react-native';
+import React, {useState, useEffect} from 'react';
 import google from './images/google.png';
 import fb from './images/fb.png';
 import LoginTop from './LoginTop1';
-import { useLoginContext } from './LoginCartProvider';
+import {useLoginContext} from './LoginCartProvider';
+import eye1 from '../Login/images/view2.png';
+import eye2 from '../Login/images/view1.png';
 import axios from 'axios';
-import { useNavigation } from '@react-navigation/native';
-import CheckBox from '@react-native-community/checkbox';
-import eye1 from '../Login/images/view1.png';
-import eye2 from '../Login/images/view2.png';
 
 const SignIn = ({navigation}) => {
-
-  const {ip,emailId, setEmailId,password,setPassword,userLogin,setUserLogin,token,setToken,loginUserId,setLoginUserId} = useLoginContext()
-  const[btnColor,setBtnColor]=useState(false);
-  const[Error,setError]=useState(false);
-  const[authError,setAuthError]=useState(false);
-  const[authError1,setAuthError1]=useState(false);
-  
+  const {
+    ip,
+    emailId,
+    setEmailId,
+    password,
+    setPassword,
+    setToken,
+    setUserLogin,
+  } = useLoginContext();
+  const [seePassword, setSeePassword] = useState(true);
+  const [emailError, setEmailError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+  const [authError, setAuthError] = useState('');
+  const [btnColor, setBtnColor] = useState('grey');
   const [showActivityIndicator, setShowActivityIndicator] = useState(false);
 
 
-  const [seePassword,setSeePassword]=useState(true);
-  function Eye() {
-    setSeePassword((prevState) => !prevState);
-  }
-
-  function Close() {
-    setSeePassword((prevState) => !prevState);
-  }
-
-  useEffect(()=>{
-    if(emailId.length>=10 && password.length>0){
-      setBtnColor(true);
-    }else{
-      setBtnColor(false);
+  // Function to validate email
+  const validateEmail = () => {
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailPattern.test(emailId)) {
+      setEmailError('Enter a valid email');
+      return false;
     }
-  });
+    setEmailError('');
+    return true;
+  };
 
-  const signInBody = {
-    "email":emailId,
-    "password":password
-  }
-  
-  const postSignIn = async (signInBody) => {
-    console.log(signInBody);
+  // Function to handle form submission
+  const handleSubmit = async () => {
+    if (!emailId || !password) {
+      // Check if any field is empty
+      if (!emailId) setEmailError('Please fill the email field');
+      if (!password) setPasswordError('Please fill the password field');
+      return;
+    }
 
-  if(token===""){
+    if (validateEmail()) {
+      // Call the signInApi function
+      try {
+        setAuthError(''); // Clear previous errors
+        setShowActivityIndicator(true); // Show loader
+        const response = await signInApi(emailId, password);
+
+        // If Successful authentication
+        if (response.status === 200) {
+          setUserLogin(response.data);
+          setToken(response.data.jwt);
+          console.log('jwt:' + response.data.jwt);
+          setTimeout(() => {
+            navigation.navigate('mainHome');
+          }, 3500);
+        } else if (
+          response &&
+          (response.data.error === 'password not match' ||
+            response.data.error.includes('user not found'))
+        ) {
+          setTimeout(() => {
+            setAuthError('EmailId or Password is incorrect');
+            setShowActivityIndicator(false);
+          }, 2000);
+        }
+      } catch (error) {
+        // Handle authentication errors
+        if (error.response?.data?.error === 'password not match') {
+          setAuthError('Password is incorrect');
+          setShowActivityIndicator(false);
+        } else if (error.response?.data?.error.includes('user not found')) {
+          setAuthError(`EmailId not found: ${emailId}`);
+          setShowActivityIndicator(false);
+        } else {
+          setShowActivityIndicator(false);
+          setAuthError('An error occurred. Please try again.');
+        }
+      }
+    }
+  };
+
+  // Function to make the API call
+  const signInApi = async (email, password) => {
+    const data = {
+      email: email.toLowerCase(),
+      password: password,
+    };
+
     try {
-      const response = await axios.post(`http://${ip}:5454/auth/signin`, signInBody);
-      setUserLogin(response.data); 
-      // console.log("Here userLogin " + userLogin + "\nhere login \n" + JSON.stringify(response.data));
-      // console.log("here login \n" + JSON.stringify(response.data.jwt));
-      
-        setToken(response.data.jwt);
-      
-        setLoginUserId(response.data);
-     
-      if (response.status === 200) {
-         // Successful authentication
-      setUserLogin(response.data);
-      setToken(response.data.jwt);
-  
-          // Show Activity Indicator
-    setShowActivityIndicator(true);
-
-    setTimeout(() => {
-      navigation.reset({
-        index: 0,
-        routes: [{ name: 'mainHome' }],
-      });  
-      setShowActivityIndicator(false);
-    }, 2000);
-
-      console.log("Authentication Token: "+response.data.jwt);
-      } else {
-     // Authentication failed
-
-     console.log("Authentication failed:", response.data.error);
-
-     if(response.data.error==='password not match'){
-       setAuthError1(true);
-     }else{
-      setAuthError(true);     
+      const response = await axios.post(
+        `http://${ip}:5454/auth/signin`,
+        data,
+        null,
+      );
+      return response;
+    } catch (error) {
+      console.log('Error in signInApi: ', error);
+      throw error;
     }
-     }
-    }
-    catch (error) {
-      console.log('Error fetching:', error);
-      setError(true);
-    }
-  }else{
-    const header = {
-      'Authorization': `Bearer ${token}`,         
-    }
-    try {
-      const response = await axios.post(`http://${ip}:5454/auth/signin`, signInBody,{header});
-      setUserLogin(response.data);
-      // console.log("Here userLogin " + userLogin + "\nhere login \n" + JSON.stringify(response.data));
-      // console.log("here login \n" + JSON.stringify(response.data.jwt));
-      
-        setToken(response.data.jwt);
-        console.log("\n\n\nhereUserId"+response.data);
-        console.log(response.data.jwt);
-      
-     
-      if (response.status === 200) {
-         // Successful authentication
-      setUserLogin(response.data);
-      setToken(response.data.jwt);
-  
-          // Show Activity Indicator
-    setShowActivityIndicator(true);
+  };
 
-      console.log("Authentication Token: "+response.data.jwt);
-      } else {
-     // Authentication failed
-     console.log("Authentication failed:", response.data.error);
-     if(response.data.error==='password not match'){
-      setAuthError1(true);
-     }else{
-      setAuthError(true);   
-       }
-     }
-    }
-    catch (error) {
-      console.log('Error fetching:', error);
-      setError(true);
-    }
-
-  }
-}
-
-  
+  // Effect to update button color based on field validity
   useEffect(() => {
-    let timeout;
-    if (Error) {
-      timeout = setTimeout(() => {
-        setError(false);
-      }, 5000);
-    }
-    if (authError) {
-      timeout = setTimeout(() => {
-        setAuthError(false);
-      }, 5000);
-    }
-    if (authError1) {
-      timeout = setTimeout(() => {
-        setAuthError(false);
-      }, 5000);
-    }
-  
-    return () => clearTimeout(timeout); // Clear timeout on component unmount or when useEffect runs again
-  }, [Error, authError,authError1]);
-    
-  const handleTextInputChange = (text) => {
-    setEmailId(text);
-  };
-//   
-  const handleTextInputChange1 = (text) => {
-    setPassword(text);
-  };
-  async function SignInBtn(){
-    console.log("submitbtn");
-    postSignIn(signInBody);
+    setBtnColor(emailId && password ? '#00338D' : 'grey');
+  }, [emailId, password]);
+
+  {
+    /*----------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
   }
 
   return (
-  <> 
-     <View style={styles.container}>
-        <LoginTop/>
-        <View style={styles.row2}>
-             <Text style={{fontSize:28,fontWeight:'bold',textAlign:'center',marginTop:'10%',color:'#00338D'}}>Login</Text>
+    <View style={styles.container}>
+      <LoginTop />
+      <View style={styles.loginContainer}>
+        <Text style={styles.mainHeading}>Login</Text>
 
-             <TextInput   style={{
-               borderBottomWidth: 0.5,
-               width: '90%',
-               marginTop: '7%',
-               marginLeft: '5%',
-               borderBottomColor: authError? 'red' : 'black',  // Fix: Use lowercase "error"
-              }}             
-             placeholder='email id'
-             value={emailId}
-             onChangeText={handleTextInputChange}
-             />
-              <View style={{flexDirection:"row",position:'relative'}}>
+        <TextInput
+          style={[styles.txtInpt, emailError ? styles.errorInput : null]}
+          placeholder="Email ID"
+          value={emailId}
+          onChangeText={setEmailId}
+        />
+        {emailError ? <Text style={styles.errorText}>{emailError}</Text> : null}
 
-              
-             <TextInput  style={{
-                borderBottomWidth: 0.5,
-                width: '88%',
-                marginTop: '7%',
-                marginLeft: '5%',
-                borderBottomColor:authError1? 'red' : 'black',  // Fix: Use lowercase "error"
-               }}
-             placeholder='password'
-             value={password}
-             secureTextEntry={seePassword}
-             onChangeText={handleTextInputChange1}
-             />
-             
-             {
-            seePassword ?
-          (
-           <TouchableOpacity onPress={Eye}>
-             <Image source={eye2} style={{width:21,height:18,marginTop:'160%',}}/>
-           </TouchableOpacity>
-          ) :
-         (
-           <TouchableOpacity onPress={Close}>
-             <Image source={eye1} style={{width:21,height:18,marginTop:'160%',}}/>
+        <View
+          style={[
+            styles.loginInputContainer,
+            passwordError ? styles.errorInput : null,
+          ]}>
+          <TextInput
+            style={styles.txtInpt2}
+            placeholder="Password"
+            secureTextEntry={seePassword}
+            value={password}
+            onChangeText={setPassword}
+          />
+          <TouchableOpacity
+            onPress={() => setSeePassword(!seePassword)}
+            style={styles.eyeBtnContainer}>
+            <Image source={seePassword ? eye1 : eye2} style={styles.eyeBtn} />
           </TouchableOpacity>
-         )
-          }  
-</View>
-            
-             <TouchableOpacity style={{backgroundColor:btnColor?'#00338D':'grey',height:'11%',width:'90%',padding:9,
-                 marginTop:'8%',marginLeft:'5%',alignItems:'center'}}
-                 onPress={SignInBtn}
-                 >
-                  <Text style={{color:'white',fontWeight:'700',fontSize:15}}>Submit</Text>
-             </TouchableOpacity>
-             {
-              authError?
-              <Text style={{textAlign:'center',marginTop:'2%',color:'#d10808'}}>You are not registered with us kindly signup!</Text>:
-              <Text></Text>
-             }
-             {
-              authError1?
-              <Text style={{textAlign:'center',marginTop:'2%',color:'#d10808'}}>invalid password!</Text>:
-              <Text></Text>
-             }
         </View>
-        <View style={styles.row3}>
-         <View>
-           <View style={{flexDirection:'row'}}>
-             <Text style={{color:'black',fontSize:15}}>Signup using</Text>
-             <TouchableOpacity
-              onPress={()=>{navigation.navigate('EmailLogin')}}
-              >
-               <Text style={{color:'black',fontWeight:'bold',textDecorationLine:'underline',fontSize:15}}> Email</Text>
-             </TouchableOpacity>
-           </View>
-           <TouchableOpacity style={{flexDirection:'row'}}
-             onPress={()=>{navigation.navigate('forgotPassword')}}>
-             <Text style={{fontSize:15,textDecorationLine:'underline',fontSize:12,padding:'0.5%'}}>forgot password</Text>
-           </TouchableOpacity>
+        {passwordError ? (
+          <Text style={styles.errorText}>{passwordError}</Text>
+        ) : null}
+
+        <TouchableOpacity
+          style={[styles.submitBtn, {backgroundColor: btnColor}]}
+          onPress={handleSubmit}>
+          <Text style={styles.submitBtnText}>Submit</Text>
+        </TouchableOpacity>
+
+        {authError ? <Text style={styles.errorText1}>{authError}</Text> : null}
+
+        {/* SignUp box */}
+        <View style={styles.signUpBox}>
+          <View style={styles.signUpRow}>
+            <Text style={styles.signUpBoxText1}>Sign Up using </Text>
+            <TouchableOpacity onPress={() => navigation.navigate('EmailLogin')}>
+              <Text style={styles.signUpBoxText2}>Email</Text>
+            </TouchableOpacity>
           </View>
-          <View style={{height:'120%',width:0.8,backgroundColor:'black',marginLeft:'4%'}}></View>
-          <Image source={fb} style={{width:30,height:30,marginLeft:'5%'}}/>
-          <Image source={google} style={{width:30,height:30,marginLeft:'5%'}}/>
-        </View> 
-        <View style={styles.row4}>
-       
-           <Text style={{padding:1}}>By signing up your agree to our <Text style={{color:'#00338D',fontWeight:'500',textDecorationLine:'underline'}}>Terms of services &{'\n'} Privacy Policy</Text></Text>
+
+          <Image source={fb} style={styles.signUpImage} />
+          <Image source={google} style={styles.signUpImage} />
         </View>
-     </View>
-     {showActivityIndicator && (
+        <TouchableOpacity
+          onPress={() => {
+            navigation.navigate('forgotPassword');
+          }}>
+          <Text style={styles.forgotPasswordText}>forgot password</Text>
+        </TouchableOpacity>
+
+        {/* Terms & conditions box */}
+        <View style={styles.conditionsBox}>
+          <Text style={styles.conditionText1}>
+            By signing up you're agree to our
+          </Text>
+          <TouchableOpacity>
+            <Text style={styles.conditionText2}>
+              {' '}
+              Terms of services & Privacy Policy
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      {/*-------------------------------------------show activity indicator-------------------------------------------------------------*/}
+      {showActivityIndicator && (
         <View style={styles.activityIndicatorContainer}>
           <ActivityIndicator size="large" color="#00338D" />
         </View>
       )}
-
-  </>
-  )
-}
-
-export default SignIn
+      {/*--------------------------------------------------------------------------------------------------------*/}
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
-  container:{
-    width:'100%',
-    height:'100%',
+  container: {
+    width: '100%',
+    backgroundColor:'white'
+  },
+  loginContainer: {
+    width: '100%',
+  },
+  mainHeading: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginTop: '10%',
+    color: '#00338D',
+  },
+  txtInpt: {
+    borderBottomWidth: 0.5,
+    width: '90%',
+    marginTop: '7%',
+    marginLeft: '5%',
+  },
+  txtInpt2: {
+    width: '85%',
+    marginTop: '7%',
+  },
+  eyeBtn: {
+    width: 21,
+    height: 21,
+  },
+  eyeBtnContainer: {
+    position: 'absolute',
+    right: 10,
+  },
+  loginInputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderBottomWidth: 0.5,
+    width: '90%',
+    height: 80,
+    marginLeft: '5%',
+    marginRight: '5%',
+  },
+  submitBtn: {
+    height: '8%',
+    width: '90%',
+    padding: 9,
+    marginTop: '8%',
+    marginLeft: '5%',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  submitBtnText: {
+    textAlign: 'center',
+    color: 'white',
+    fontWeight: '700',
+    fontSize: 15,
+  },
+  signUpBox: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'flex-end',
+    height: 85,
+  },
+  signUpBoxText1: {
+    color: 'black',
+  },
+  signUpBoxText2: {
+    marginRight: '1%',
+    fontWeight: '700',
+    color: 'black',
+    textDecorationLine: 'underline',
+  },
+  signUpRow: {
+    flexDirection: 'row',
+    borderRightWidth: 0.7,
+    padding: 5,
+  },
+  signUpImage: {
+    width: 25,
+    height: 25,
+    marginLeft: '3%',
+  },
+  conditionsBox: {
+    marginTop: '6%',
+    flexDirection: 'row',
+    height: 100,
+    width: '90%',
+    alignSelf: 'center',
+    alignItems: 'center',
   },
 
-  row2:{
-    marginTop:'1%'
+  conditionText1: {
+    fontSize: 12,
   },
-  textInput:{
-    borderBottomWidth:0.5,
-    width:'90%',
-    marginTop:'7%',
-    marginLeft:'5%',
+  conditionText2: {
+    fontSize: 12,
+    textDecorationLine: 'underline',
+    color: '#00338D',
+    fontWeight: '600',
   },
-  row3:{
-    flexDirection:'row',
-    justifyContent:'center'
+  errorText: {
+    color: 'red',
+    marginLeft: '5%',
+    fontSize: 10,
+    marginTop: 5,
   },
-  row4:{
-    height:'28%',
-    width:'100%',
-    justifyContent:'flex-end',
-    padding:'10%'
+  errorText1: {
+    color: 'red',
+    marginLeft: '5%',
+    fontSize: 10,
+    marginTop: 5,
+    textAlign: 'center',
+  },
+  errorInput: {
+    borderColor: 'red',
+    borderBottomWidth: 1,
   },
   activityIndicatorContainer: {
     position: 'absolute',
@@ -304,5 +339,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: 'rgba(255,255,255,0.7)', // Semi-transparent background
   },
+  forgotPasswordText: {
+    textAlign: 'center',
+    fontSize: 12,
+    marginRight: '14%',
+    textDecorationLine: 'underline',
+  },
+});
 
-})
+export default SignIn;
