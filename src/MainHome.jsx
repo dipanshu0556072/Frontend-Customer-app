@@ -350,7 +350,9 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
   },
   row1: {
-    flex: 1,
+    marginTop: '3%',
+    width: '100%',
+    height: 420,
   },
   topRow: {
     marginLeft: '2%',
@@ -394,6 +396,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     height: 70,
     marginBottom: 5,
+    width: '100%',
   },
   notificationBoxAlternate: {
     borderColor: '#00338D',
@@ -410,21 +413,15 @@ const styles = StyleSheet.create({
   },
   labelStyle: {
     margin: 1,
-    fontSize: 10, // Adjust label font size as needed
+    fontSize: 10,
     marginBottom: 4,
   },
   tabStyle: {
-    height: 50, // Adjust the height as needed
+    height: 50,
   },
   icon: {
     width: 20,
     height: 20,
-  },
-
-  row1: {
-    marginTop: '3%',
-    width: '100%',
-    height: 420,
   },
   headerRowContainer: {
     marginLeft: '5%',
@@ -465,7 +462,7 @@ const styles = StyleSheet.create({
   },
   tabBarLabel: {
     fontSize: 12,
-    fontWeight: 'bold', // Font bold for the selected tab
+    fontWeight: 'bold',
   },
   topRow1: {
     borderColor: '#00338D',
@@ -474,11 +471,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     backgroundColor: '#f5f2f2',
     height: 70,
-  },
-  topColumn: {
-    width: '100%',
-    flexDirection: 'row',
-    alignItems: 'center',
   },
   scrollContainer: {
     flexGrow: 1,
@@ -497,7 +489,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   categoryItem: {
-    width: '100%', // Adjust as needed
+    width: '100%',
     marginBottom: 16,
     alignItems: 'center',
   },
@@ -523,7 +515,7 @@ const styles = StyleSheet.create({
     width: 1,
     backgroundColor: '#d1cfcf',
     height: '100%',
-    marginLeft: '28%', // Adjust as needed
+    marginLeft: '28%',
   },
   column2: {
     width: '485%',
@@ -553,11 +545,9 @@ const styles = StyleSheet.create({
   },
   txt4: {
     fontSize: 15,
-    color: '#52514e',
-    marginLeft: '5%',
     color: '#A4343A',
+    marginLeft: '5%',
   },
-
   row2: {
     marginTop: '0.8%',
     justifyContent: 'space-between',
@@ -585,7 +575,6 @@ const styles = StyleSheet.create({
     bottom: 0,
     position: 'fixed',
     borderRadius: 10,
-    backgroundColor: 'white',
   },
   horizontalLine1: {
     borderBottomWidth: 0.3,
@@ -603,92 +592,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#E9EBED',
     borderColor: '#f4f5f6',
     borderWidth: 1,
-  },
-  notificationBox: {
-    borderColor: '#00338D',
-    borderWidth: 0.5,
-    backgroundColor: 'white',
-    height: 70,
-    width: '100%',
-    marginBottom: 5,
-  },
-  notificationContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    width: '100%',
-    paddingHorizontal: '2%',
-  },
-  iconWrapper: {
-    marginLeft: '2%',
-  },
-  iconImage: {
-    width: 24,
-    height: 24,
-  },
-  textWrapper: {
-    marginLeft: '2%',
-  },
-  primaryText: {
-    color: 'black',
-  },
-  linkText: {
-    textDecorationLine: 'underline',
-    fontWeight: '300',
-    color: '#00338D',
-    fontSize: 12,
-  },
-  timestamp: {
-    fontSize: 11.5,
-    color: '#00A3A1',
-    marginTop: '4%',
-  },
-  nextIcon: {
-    width: 10,
-    height: 10,
-    marginLeft: '29%',
-  },
-  notificationBox: {
-    borderColor: '#00338D',
-    borderWidth: 0.5,
-    backgroundColor: 'white',
-    height: 70,
-    width: '100%',
-    marginBottom: 5,
-  },
-  notificationContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    width: '100%',
-    paddingHorizontal: '2%',
-  },
-  iconWrapper: {
-    marginLeft: '2%',
-  },
-  iconImage: {
-    width: 24,
-    height: 24,
-  },
-  textWrapper: {
-    marginLeft: '2%',
-  },
-  primaryText: {
-    color: 'black',
-  },
-  linkText: {
-    textDecorationLine: 'underline',
-    fontWeight: '300',
-    color: '#00338D',
-    fontSize: 12,
-  },
-  timestamp: {
-    fontSize: 11.5,
-    color: '#00A3A1',
-    marginTop: '4%',
-  },
-  nextIcon: {
-    width: 10,
-    height: 10,
-    marginLeft: '20%',
   },
   headerWrapper: {
     marginLeft: '5%',
@@ -726,10 +629,6 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 10,
     marginLeft: '3%',
     marginRight: '3%',
-  },
-  tabBarLabel: {
-    fontSize: 12,
-    fontWeight: 'bold',
   },
   backIcon: {
     marginLeft: 12,
