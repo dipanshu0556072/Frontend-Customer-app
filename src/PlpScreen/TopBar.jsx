@@ -5,6 +5,7 @@ import bag from '../PlpScreen/images/bag.png';
 import heart from '../PlpScreen/images/heart.png';
 import kpmg from '../PlpScreen/images/kpmg.png';
 import { useLoginContext } from "../Login/LoginCartProvider";
+import { useCartContext } from "../Context/WomenContext";
 
 export default function TopBar1({ 
   navigation, 
@@ -15,6 +16,7 @@ export default function TopBar1({
 }) {
   const [isSearchVisible, setIsSearchVisible] = useState(false);
   const { pushToStack, popFromStack, currentPage } = useLoginContext();
+  const {setBannerComponentName,setProducts}=useCartContext();
 
   const handleTouchablePress = () => {
     Keyboard.dismiss();
@@ -30,12 +32,19 @@ export default function TopBar1({
     }
   }
 
+  //if home button pressed
+  const onPressHome=()=>{
+    forNavigate('mainHome');
+    setBannerComponentName('homeBar');
+    setProducts([]);
+
+  }
   return (
     <TouchableWithoutFeedback onPress={handleTouchablePress}>
       <View style={styles.container}>
         <View style={styles.topBar}>
           {showKPMGLogo && (
-            <TouchableOpacity onPress={() => forNavigate('mainHome')}>
+            <TouchableOpacity onPress={() => {onPressHome()}}>
               <Image source={kpmg} style={styles.kpmgImage} />
             </TouchableOpacity>
           )}

@@ -29,6 +29,7 @@ import EmailVerify from './src/Login/EmailVerify';
 import Gender from './src/Login/Gender';
 import MainHome from './src/MainHome';
 import Profile from './src/Profile';
+import mobileNumberVerify from './src/Login/Login2.jsx';
 import Notification from './src/Notification';
 import Fashion from './src/Fashion';
 import MainPlp from './src/MainPlp';
@@ -101,7 +102,13 @@ import GroceryPdpPage from './src/Grocery/GroceryPdpPage.jsx';
 import ReturnPage1 from './src/Order/ReturnPage1.jsx';
 import ReturnOrderStatus from './src/Order/ReturnOrderStatus.jsx';
 import ReturnOrderProgressBar from './src/Order/ReturnOrderProgressBar.jsx';
+import AddCarousel from './src/Components/BannerCarousel.jsx';
+import DealsOnBrands from './src/Components/DealsOnBrands.jsx';
+import BestSeller from './src/Components/BestSeller.jsx';
+import PlayAndEarn from './src/Components/PlayAndEarn.jsx';
+
 import Exp from './src/Exp.jsx';
+
 
 const App = () => {
   return (
@@ -139,19 +146,17 @@ const App = () => {
                 <Stack.Screen name="mobileVerify" component={MobileVerify} />
                 <Stack.Screen name="forgotPassword" component={ForgetPassword}/>
                 <Stack.Screen name="forgotChangePassword" component={ForgotChangePassword}/>
+                <Stack.Screen name="mobileNumberVerify" component={mobileNumberVerify}/>
                
                 {/*-------------------------------------HOME SECTION-----------------------------------------------------------------*/}
                 <Stack.Screen name="mainHome" component={MainHome} />
                 <Stack.Screen name="Fashion" component={Fashion} />
                 <Stack.Screen name="mainPlp" component={MainPlp} />
                 <Stack.Screen name="mainPDP" component={MainPDP} />
-
                 <Stack.Screen name="WishList" component={WishList} />
                 <Stack.Screen name="Gender" component={Gender} />
-
                 <Stack.Screen name="Footer" component={Footer} />
                 <Stack.Screen name="Notification" component={Notification} />
-
                 <Stack.Screen name="mainBag" component={MainBag} />
                 <Stack.Screen
                   name="paymentSuccess"

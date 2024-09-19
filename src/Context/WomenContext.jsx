@@ -191,6 +191,9 @@ export default function WomenCartProvider({children}){
    //currentProduct which is on PDP Page, store the productId of it
    const [productIdOnPdp,setProductIdOnPdp]=useState(0);
 
+   //banner based on component
+   const [bannerComponentName, setBannerComponentName] = React.useState('homeBar');
+
     const DeleteWishItem=(itemId,itemCategory)=>{
       console.log("here "+itemId+" "+itemCategory);
       const updatedBag=selectedWishListItem.filter(item=>!(item.id===itemId && item.selcategory===itemCategory));
@@ -334,7 +337,8 @@ export default function WomenCartProvider({children}){
         inputPromotionCoupon,setInputPromotionCoupon,
         showConfetti, setShowConfetti,
         checkIsPromotionCouponApplied,setCheckIsPromotionCouponApplied,
-        productIdOnPdp,setProductIdOnPdp
+        productIdOnPdp,setProductIdOnPdp,
+        bannerComponentName, setBannerComponentName
     }
     return (
         <WomenContext.Provider value={contextvalue}>

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   StyleSheet,
   Text,
@@ -274,6 +274,7 @@ function NotificationBar({navigation}) {
 }
 
 function MainHome({navigation}) {
+
   const {userprofile} = useCartContext();
   return (
     <Tab.Navigator

@@ -552,6 +552,7 @@ const UserProfile = ({navigation}) => {
                       style={{marginLeft: '-5%'}}
                       onPress={() => {
                         setEditMobilePen(!editMobilePen);
+
                       }}>
                       <Image
                         source={edit}
@@ -578,7 +579,7 @@ const UserProfile = ({navigation}) => {
                   <TouchableOpacity
                     style={{marginLeft: '-6%'}}
                     onPress={() => {
-                      navigation.navigate('Login2', {mob: mobile});
+                      navigation.navigate('mobileNumberVerify', {mob: mobile});
                     }}>
                     <Text
                       style={{
@@ -593,7 +594,7 @@ const UserProfile = ({navigation}) => {
                   <TouchableOpacity
                     style={{marginLeft: '38%'}}
                     onPress={() => {
-                      navigation.navigate('Login2', {mob: mobile});
+                      navigation.navigate('mobileNumberVerify', {mob: mobile});
                     }}>
                     <Text
                       style={{
@@ -708,7 +709,7 @@ const UserProfile = ({navigation}) => {
                   <TouchableOpacity
                     style={{marginLeft: '-6%'}}
                     onPress={() => {
-                      navigation.navigate('Login2', {
+                      navigation.navigate('mobileNumberVerify', {
                         mob: AlternativeMobileNumber,
                       });
                     }}>
@@ -725,7 +726,7 @@ const UserProfile = ({navigation}) => {
                   <TouchableOpacity
                     style={{marginLeft: '38%'}}
                     onPress={() => {
-                      navigation.navigate('Login2', {
+                      navigation.navigate('mobileNumberVerify', {
                         mob: AlternativeMobileNumber,
                       });
                     }}>

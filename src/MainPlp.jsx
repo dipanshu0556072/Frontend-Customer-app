@@ -47,8 +47,6 @@ const MainPlp = ({navigation}) => {
     setCurrentPageIndexCategory,
     targetParentCategory,
     setTargetParentCategory,
-    currentPageIndexCategory1,
-    setCurrentPageIndexCategory1,
   } = useLoginContext();
   const [productRatings, setProductRatings] = useState({});
 
@@ -77,27 +75,19 @@ const MainPlp = ({navigation}) => {
   const {
     products,
     setProducts,
-    dataArray,
-    setDataArray,
     sortBy,
     setSortBy,
     wishListData,
     setWishListData,
-    seeMoreFilter,
-    setSeeMoreFilter,
     seeMoreFilterCatefory,
     setSeeMoreFilterCategory,
     productIds,
     filteredDataArray,
     setFilteredDataArray,
-    backUpPageIndex,
-    setBackUpPageIndex,
     lovedItems,
     setLovedItems,
-    setProductIds,
     showActivityIndicator,
     setShowActivityIndicator,
-    productIdOnPdp,
     setProductIdOnPdp,
   } = useCartContext();
 
@@ -289,7 +279,6 @@ const MainPlp = ({navigation}) => {
     });
   }
 
-  const [tul, setTul] = useState([]);
   const getWishListData = async () => {
     try {
       const response = await axios.get(`http://${ip}:5454/api/wishlist/`, {
@@ -399,113 +388,6 @@ const MainPlp = ({navigation}) => {
         console.log('Error' + error);
       });
   };
-
-  useEffect(() => {
-    setFilteredDataArray([]);
-    setFilteredDataArray(
-      products.filter(
-        product =>
-          product.category &&
-          product.category.name === targetCategory &&
-          product.category.parentCategory &&
-          product.category.parentCategory.parentCategory &&
-          product.category.parentCategory.parentCategory.name ===
-            targetParentCategory,
-      ),
-    );
-
-    if (seeMoreFilter) {
-      const filtered = products.filter(
-        product =>
-          product.brand === seeMoreFilterCatefory &&
-          product.category &&
-          product.category.parentCategory &&
-          product.category.parentCategory.parentCategory &&
-          product.category.parentCategory.parentCategory.name ===
-            targetParentCategory,
-      );
-
-      setFilteredDataArray(filtered);
-    } else {
-      // setFilteredDataArray(products); // Reset to all products
-    }
-
-    return () => {
-      setShowActivityIndicator(false); // Set loading to false when the component unmounts or the dependency changes
-    };
-  }, [seeMoreFilterCatefory]);
-
-  // Sort the data based on query
-  useEffect(() => {
-    let sortedProducts;
-
-    if (filteredDataArray && filteredDataArray.length > 0) {
-      sortedProducts = [...filteredDataArray];
-      console.log('\n\n\n\n\nSorted Products' + JSON.stringify(sortedProducts));
-    } else {
-      sortedProducts = [...products];
-    }
-
-    switch (sortBy) {
-      case 'low':
-        sortedProducts = sortedProducts.sort(
-          (a, b) => a.discountedPrice - b.discountedPrice,
-        );
-        break;
-      case 'high':
-        sortedProducts = sortedProducts.sort(
-          (a, b) => b.discountedPrice - a.discountedPrice,
-        );
-        break;
-      case 'asc':
-        sortedProducts = sortedProducts.sort((a, b) =>
-          a.brand.localeCompare(b.brand),
-        );
-        break;
-      case 'dsc':
-        sortedProducts = sortedProducts.sort((a, b) => {
-          const dateA = new Date(a.createdAt);
-          const dateB = new Date(b.createdAt);
-
-          // Sort in descending order based on createdAt date
-          return dateB - dateA;
-        });
-        break;
-
-      case 'rating':
-        sortedProducts = sortedProducts.sort((a, b) => {
-          // Get the highest rating for each product
-          const highestRatingA = Math.max(
-            ...a.ratings.map(rating => parseFloat(rating.rating) || 0),
-            0,
-          );
-          const highestRatingB = Math.max(
-            ...b.ratings.map(rating => parseFloat(rating.rating) || 0),
-            0,
-          );
-
-          // Sort in descending order based on the highest rating
-          return highestRatingB - highestRatingA;
-        });
-        break;
-
-      default:
-        break;
-    }
-
-    const filteredArray = sortedProducts.filter(
-      product =>
-        product.category.name === targetCategory &&
-        product.category.parentCategory.parentCategory.name ===
-          targetParentCategory,
-    );
-    setFilteredDataArray(filteredArray);
-    return () => {
-      setTimeout(() => {
-        setShowActivityIndicator(false); // Set loading to false when the component unmounts or the dependency changes
-      }, 1000);
-    };
-  }, [sortBy]);
 
   const handleSortPress = () => {
     setSortModalVisible(true);
@@ -755,6 +637,64 @@ const MainPlp = ({navigation}) => {
     );
   }
 
+  //sort the product based on sorting from backend
+  const sortProductFromBackend = async (sortBy, category) => {
+    try {
+      const response = await axios.get(
+        `http://${ip}:5454/api/admin/products/${sortBy}?category=${category}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+      setFilteredDataArray(response.data);
+    } catch (error) {
+      console.log(
+        'got error in the sortProductFromBackend in mainPlp.jsx',
+        error,
+      );
+    }
+  };
+
+  //sort the products
+  const sortProduct = sortBy => {
+    const category = [
+      ...new Set(filteredDataArray.map(product => product.category.name)),
+    ];
+    sortProductFromBackend(sortBy, category);
+  };
+  // Define the mapping of radio button values to sort strings
+  const sortOptions = {
+    low: 'sortByLowPrice',
+    high: 'sortByHighPrice',
+    dsc: 'sortByNewArrival',
+    rating: 'sortByRating',
+  };
+
+  //if back button pressed then again put all clothes data in products useState
+  const fetchData = async(category) => {
+    try {
+      const response = axios.get(
+        `http://${ip}:5454/api/admin/products/getProductBySecondCategory?category=Women`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+      setProducts(response.data);
+    } catch (error) {
+      console.log('getting error in the homeBar.jsx in fetchData' + error);
+    }
+  };
+
+  //if back button pressed
+  const backButtonPressed = () => {
+    fetchData();
+    popFromStack(navigation);
+  };
+
   return (
     <>
       <View style={{flex: 1, backgroundColor: 'white'}}>
@@ -762,7 +702,7 @@ const MainPlp = ({navigation}) => {
         <View style={{padding: '4%'}}>
           <TouchableOpacity
             onPress={() => {
-              popFromStack(navigation);
+              backButtonPressed();
             }}
             style={{}}>
             <View style={{flexDirection: 'row', alignItems: 'center'}}>
@@ -775,7 +715,6 @@ const MainPlp = ({navigation}) => {
                   fontFamily: 'sans-serif',
                 }}>
                 {targetCategory.toUpperCase()}
-                {tul}
               </Text>
             </View>
             <Text style={{marginLeft: '7%', fontSize: 10, color: '#949292'}}>
@@ -882,9 +821,12 @@ const MainPlp = ({navigation}) => {
                       borderColor: '#dbd9d9',
                     }}
                   />
+
                   <RadioButton.Group
                     onValueChange={newValue => {
                       setSortBy(newValue);
+                      const sortString = sortOptions[newValue]; // Get the corresponding string
+                      sortProduct(sortString); // Call sortProduct with the mapped string
                     }}
                     value={sortBy}>
                     <View style={{marginTop: '6%'}}>
@@ -894,9 +836,7 @@ const MainPlp = ({navigation}) => {
                           alignItems: 'center',
                           marginBottom: 10,
                         }}>
-                        <TouchableOpacity style={{marginLeft: '2%'}}>
-                          <RadioButton value="low" />
-                        </TouchableOpacity>
+                        <RadioButton value="low" />
                         <Text
                           style={{
                             color: '#00338D',
@@ -912,9 +852,7 @@ const MainPlp = ({navigation}) => {
                           alignItems: 'center',
                           marginBottom: 10,
                         }}>
-                        <TouchableOpacity style={{marginLeft: '2%'}}>
-                          <RadioButton value="high" />
-                        </TouchableOpacity>
+                        <RadioButton value="high" />
                         <Text
                           style={{
                             color: '#00338D',
@@ -930,9 +868,7 @@ const MainPlp = ({navigation}) => {
                           alignItems: 'center',
                           marginBottom: 10,
                         }}>
-                        <TouchableOpacity style={{marginLeft: '2%'}}>
-                          <RadioButton value="dsc" />
-                        </TouchableOpacity>
+                        <RadioButton value="dsc" />
                         <Text
                           style={{
                             color: '#00338D',
@@ -948,9 +884,7 @@ const MainPlp = ({navigation}) => {
                           alignItems: 'center',
                           marginBottom: 10,
                         }}>
-                        <TouchableOpacity style={{marginLeft: '2%'}}>
-                          <RadioButton value="rating" />
-                        </TouchableOpacity>
+                        <RadioButton value="rating" />
                         <Text
                           style={{
                             color: '#00338D',
@@ -960,11 +894,6 @@ const MainPlp = ({navigation}) => {
                           Sort by rating
                         </Text>
                       </View>
-
-                      {/* <TouchableOpacity onPress={handleSortModalClose }
-                style={{ flexDirection: 'row', justifyContent: 'center', backgroundColor: '#00338D', width: '26%',padding:'2.5%', alignSelf: 'flex-end',borderRadius:12}}>
-                 <Text style={{ color: 'white', textAlign: 'center',fontWeight:'600'}}>APPLY</Text>
-              </TouchableOpacity> */}
                     </View>
                   </RadioButton.Group>
                 </View>

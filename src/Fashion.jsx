@@ -1,552 +1,261 @@
-import React, { useEffect, useMemo, useRef, useState} from 'react';
-import {Button,StyleSheet,Image, View, Dimensions, Text, ScrollView, FlatList,TouchableOpacity, SafeAreaView } from 'react-native';
-import discount from './PlpScreen/images/discount.png';
-import selfcheckout from './PlpScreen/images/selfcheckout.png';
-import pickup from './PlpScreen/images/pickup.png';
+import React from 'react';
+import {
+  StyleSheet,
+  Image,
+  View,
+  Dimensions,
+  Text,
+  ScrollView,
+  TouchableOpacity,
+  Alert,
+} from 'react-native';
 import cashback from './PlpScreen/images/cashback.png';
-import playearn1 from './PlpScreen/images/playearn1.png';
-import playearn2 from './PlpScreen/images/playearn2.png';
-import fortune from './PlpScreen/images/fortune.png';
-import scrollarrow from './PlpScreen/images/scrollarrow.png';
+
 import TopBar from './PlpScreen/TopBar';
-import quickshop from './PlpScreen/images/quickshop.jpeg';
 import beauty from './PlpScreen/images/beauty.webp';
 import gift from './PlpScreen/images/gift.png';
-import add1 from './PlpScreen/images/add1.png';
-import add2 from './PlpScreen/images/add2.png';
-import add3 from './PlpScreen/images/add3.png';
-import add4 from './PlpScreen/images/add4.png';
-import add5 from './PlpScreen/images/add5.png';
 import banner1 from './PlpScreen/images/banner1.png';
-import banner2 from './PlpScreen/images/banner2.png';
-import brand1 from './PlpScreen/images/brand1.png';
-import brand2 from './PlpScreen/images/brand2.png';
-import brand3 from './PlpScreen/images/brand3.png';
-import brand4 from './PlpScreen/images/brand4.png';
-import brand5 from './PlpScreen/images/brand5.png';
-import brand6 from './PlpScreen/images/brand6.png';
-import bestSell1 from './PlpScreen/images/bestSell1.png';
-import bestSell2 from './PlpScreen/images/bestSell2.png';
-import bestSell3 from './PlpScreen/images/bestSell3.png';
-import bestSell4 from './PlpScreen/images/bestSell4.png';
-import bestSell5 from './PlpScreen/images/bestSell5.png';
-import bestSell6 from './PlpScreen/images/bestSell6.png';
-import { useCartContext } from './Context/WomenContext';
+import {useCartContext} from './Context/WomenContext';
 import back from './PlpScreen/images/back.png';
 import men from './PlpScreen/images/Men2.png';
 import kid from './PlpScreen/images/kid2.png';
-import { useLoginContext } from './Login/LoginCartProvider';
+import {useLoginContext} from './Login/LoginCartProvider';
 import axios from 'axios';
-import Women from './PlpScreen/images/Womne.png'
-import fashionBanner from './PlpScreen/images/fashionBanner.png';
-import menFashion from './PlpScreen/images/menFashion.png'
-import menFashion1 from './PlpScreen/images/menFashion1.png'
+import Women from './PlpScreen/images/Womne.png';
+import BannerCarousel from './Components/BannerCarousel';
+import DealsOnBrands from './Components/DealsOnBrands';
+import BestSeller from './Components/BestSeller';
+import PlayAndEarn from './Components/PlayAndEarn';
 
+export default function Home({navigation}) {
+  const {products,setProducts, setBannerComponentName} = useCartContext();
+  const {ip, token} = useLoginContext();
+  const {pushToStack, popFromStack, currentPage, setCurrentPageIndex} =
+    useLoginContext();
 
-export default function Home({navigation}){
- 
-  const {products,setProducts}=useCartContext();
-  const {ip,token,setLoginUserId,setCurrentPage} = useLoginContext();
-    const {selectedItemIndex, setSelectedItemIndex, 
-      currentPageIndex,currentPageIndexCategory, 
-      setCurrentPageIndexCategory,pushToStack,popFromStack,
-      currentPage,
-      setCurrentPageIndex,
-      } = useLoginContext();
-  // Ref for flatlist
-  const flatlistRef = useRef();
-  
-  // Screen width for layout
-  const screenWidth = Dimensions.get('window').width - 1;
-  
-  // State for the active index of the carousel
-  const [activeIndex, setActiveIndex] = useState(0);
-
-  
-  useEffect(() => {
-    const getData = async () => {
-      try {
-        const response = await axios.get(`http://${ip}:5454/api/admin/products/all`, {
-          headers: {
-            'Authorization': `Bearer ${token}`,         
+  //filter the product data based on the Fashion tile
+  const filterProductData = async category => {
+    let response;
+    try {
+      if (category) {
+        response = await axios.get(
+          `http://${ip}:5454/api/admin/products/getProductBySecondCategory?category=men`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
           },
-        });
-        console.log(response.data);
-        setProducts((prevProducts) => {
-          const newProducts = response.data;
-          
-          console.log("dataArray:" + newProducts.length);
-          return newProducts;
-        });
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      }
-    }
-  
-    getData();
-  }, [token]);
-
-  console.log("\n\n\nProducts"+JSON.stringify(products));
-  // Auto Scroll
-  useEffect(() => {
-    let interval = setInterval(() => {
-      // Scroll logic for auto-scrolling
-      if (activeIndex === carouselData.length - 1) {
-        flatlistRef.current.scrollToIndex({
-          index: 0,
-          animated: true,
-        });
+        );
+          //      Alert.alert('Filtered by category'+category);
       } else {
-        flatlistRef.current.scrollToIndex({
-          index: (activeIndex + 1) % carouselData.length,
-          animated: true,
-        });
+        response = await axios.get(
+          `http://${ip}:5454/api/admin/products/getProductByTopCategory?category=clothes`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          },
+        );
+        //   Alert.alert('Filtered by top category');
       }
-    }, 2100);
-    
-    // Cleanup the interval on component unmount
-    return () => clearInterval(interval);
-  }, [activeIndex]);
-
-  // Function to calculate layout for flatlist items
-  const getItemLayout = (_, index) => ({
-    length: screenWidth,
-    offset: screenWidth * index,
-    index,
-  });
-
-  // Data for the carousel
-  const carouselData = [
-    { id: 1, image: fashionBanner },
-    { id: 2, image: menFashion },
-    { id: 3, image: menFashion1 },
-    { id: 4, image: add4 },
-    { id: 5, image: add1 },
-  ];
-
-  // Display Images
-  const renderItem = ({ item, index }) => (
-    <View>
-      <View style={{ justifyContent: 'center', alignItems: 'center', paddingTop: '4%', padding: 8 }}>
-        <TouchableOpacity>
-          <Image source={item.image} style={{ width: 395, height: 220 }} />
-        </TouchableOpacity>
-      </View>
-    </View>
-  );
- 
-  
-
-  // Handle Scroll
-  const handleScroll = (event) => {
-    const scrollPosition = event.nativeEvent.contentOffset.x;
-    // Use Math.round to get the correct active index
-    const index = Math.round(scrollPosition / screenWidth);
-    setActiveIndex(index);
+      setProducts([]);
+      setProducts(response.data);
+    } catch (error) {
+      console.log(
+        'getting error in the homeBar.jsx in filterProductData' + error,
+      );
+    }
   };
 
-  // Render Dot Indicators
-  const renderDotIndicators = () => (
-    carouselData.map((dot, index) => (
-      <View
-        key={index}
-        style={{
-          backgroundColor: activeIndex === index ? '#00338D' : '#D5D5D5',
-          height: 10,
-          width: 10,
-          borderRadius: 5,
-          marginHorizontal: 6,
-        }}
-      />
-    ))
-  );
+  const navigateToMainPlp = (page, itemId, category) => {
+    filterProductData(category);
 
-    const data1 = [
-        { id: '1', source: brand1 },
-        { id: '2', source: brand2 },
-        { id: '3', source: brand3 },
-        { id: '4', source: brand4 },
-        { id: '5', source: brand5},
-        { id: '6', source: brand6 },
-        // Add more images as needed
-      ];
-      const data2 = [
-        { id: '1', source: bestSell1 },
-        { id: '2', source: bestSell2 },
-        { id: '3', source: bestSell3  },
-        { id: '4', source: bestSell4  },
-        { id: '5', source: bestSell5  },
-        { id: '6', source: bestSell6  },
-        // Add more images as needed
-      ];
+    if (
+      currentPage &&
+      currentPage.length > 0 &&
+      currentPage[currentPage.length - 1] !== page
+    ) {
+      setCurrentPageIndex(itemId);
+      pushToStack(page);
+      navigation.navigate(page);
+    }
+  };
 
-      const data3 = [
-        { id: '1', source: 'http://surl.li/nrpee' },
-        { id: '2', source: 'http://surl.li/nrpee' },
-        { id: '3', source: 'http://surl.li/nrpee'},
-        { id: '4', source: 'http://surl.li/nrpwq' },
-        { id: '5', source: 'http://surl.li/nrpwq' },
-        { id: '6', source: 'http://surl.li/nrpwq' },
-        { id: '7', source: 'http://surl.li/nrpwq' },
-        { id: '8', source: 'http://surl.li/nrpwq' },
-        // Add more images as needed
-      ];
-      const data4 = [
-        { id: '1', source: 'http://surl.li/nrpwq' },
-        { id: '2', source: 'http://surl.li/nrqaa' },
-        { id: '3', source: 'http://surl.li/nspjm' },
-        { id: '4', source: 'http://surl.li/nsppt' },
-        { id: '5', source: 'http://surl.li/nspmp'},
-        { id: '6', source: 'http://surl.li/nspkc' },
-        { id: '7', source: 'http://surl.li/nrpwq' },
-        { id: '8', source: 'http://surl.li/nrqaa' },
-        { id: '9', source: 'http://surl.li/nspjm' },
-        { id: '10', source: 'http://surl.li/nsppt' },
-        { id: '11', source: 'http://surl.li/nspmp'},
-        { id: '12', source: 'http://surl.li/nspkc' },
-        // Add more images as needed
-      ];
-      const data5 = [
-          { id:'1',image:[quickshop,quickshop,quickshop]},
-          { id:'2',image:[quickshop,quickshop]},    
-          { id:'3',image:[quickshop,quickshop]},
-          { id:'4',image:[quickshop,quickshop]},
-          { id:'5',image:[quickshop,quickshop]},
-          { id:'6',image:[quickshop,quickshop]},
-      ];
-      const [isModalVisible, setModalVisible] = useState(false);
+  //tabs to navigate
+  const Tab = ({image, page, title, value}) => {
+    return (
+      <View style={styles.categoryItem}>
+        <TouchableOpacity
+          onPress={() => navigateToMainPlp(page, value, title)}
+          disabled={!page}
+          style={styles.categoryButton}>
+          <Image source={image} style={styles.categoryImage} />
+          <Text style={styles.categoryLabel}>{title}</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  };
 
-      const toggleModal = () => {
-        setModalVisible(!isModalVisible);
-      };
-      function Fashion(){
-        navigation.navigate('Fashion');
-      }
-      const navigateToMainPlp = (page,itemId) => {
-        if(currentPage && currentPage.length>0 && currentPage[currentPage.length-1]!==page){
-          setCurrentPageIndex(itemId);
-          pushToStack(page);
-          navigation.navigate(page);
-          }        
-      };
+  //if back button pressed
+  const backButtonPressed = bannerName => {
+    filterProductData();
+    popFromStack(navigation), setBannerComponentName(bannerName);
+  };
 
   return (
-        <>
-          <View style={{ flex: 1, backgroundColor: 'white' }}>
-            <TopBar navigation={navigation}/>
-           <ScrollView>  
-     
-           <View style={{ flexDirection: 'column',backgroundColor:'white' }}>
-           {/* <Text>{currentPage}</Text> */}
-             <View style={{flexDirection:'row',alignItems:'center',alignItems:'center',marginBottom:'3%'}}>
-               <View>
-                  <TouchableOpacity
-                   onPress={() => popFromStack(navigation)} style={{flexDirection:'row',alignItems:'center',padding:'4%'}}>
-                    <Image source={back}  
-                      style={{marginLeft:12}}/>
-
-                 <Text style={{paddingLeft:10,color:'black',textAlign:'center'}}>Fashion</Text>              
-
-                 </TouchableOpacity>
-               </View>
-       </View>
-        <View style={styles.horizontalLine1}></View>
-
-
-
-
-
-<View>
-<View style={{flexDirection:'row',margin:'3%'}}>
-
-<View style={{width:120,height:110,    
-    shadowColor: 'grey',
-    shadowOffset: { width: 60, height: 25 },
-    shadowOpacity: 0.25,
-    shadowRadius: 35.84,
-    elevation: 10}}>
-      <TouchableOpacity
-          onPress={() => {navigateToMainPlp('categoryPage',1)}} 
-           style={{}}
-         >
-              <Image source={men} style={{width:105,height:105,borderRadius:12,borderColor:'#00338D',borderWidth:0.4,marginLeft:'4%',}}/>
-              <Text style={{textAlign:'center',fontWeight:'bold',fontSize:12,marginRight:'8%',padding:'2%',color:'#00338D'}}>MEN</Text>
-
-</TouchableOpacity>
-</View>  
-<View style={{width:120,height:110,    
-    shadowColor: 'grey',
-    shadowOffset: { width: 60, height: 25 },
-    shadowOpacity: 0.25,
-    shadowRadius: 35.84,
-    marginLeft:'4%',
-    elevation: 10}}>
-      <TouchableOpacity
-          onPress={() => {navigateToMainPlp('categoryPage',2)}} 
-           style={{}}
-         >
-              <Image source={Women} style={{width:105,height:105,borderRadius:12,borderColor:'#00338D',borderWidth:0.4,}}/>
-              <Text style={{textAlign:'center',fontWeight:'bold',fontSize:12,marginRight:'8%',padding:'2%',color:'#00338D'}}>WOMEN</Text>
-
-</TouchableOpacity>
-</View>  
-<View style={{width:120,height:110,
-    shadowOffset: { width: 60, height: 25 },
-    shadowOpacity: 0.25,
-    shadowRadius: 35.84,
-    marginLeft:'2.5%',
-    elevation: 10}}>
-      <TouchableOpacity
+    <>
+      <View style={styles.mainContainer}>
+        {/*header*/}
+        <TopBar navigation={navigation} />
+        <ScrollView>
+          <View style={styles.mainBox}>
          
-           style={{}}
-         >
-              <Image source={kid} style={{width:105,height:105,borderRadius:12,borderColor:'#00338D',borderWidth:0.4,}}/>
-              <Text style={{textAlign:'center',fontWeight:'bold',fontSize:12,marginRight:'8%',padding:'2%',color:'#00338D'}}>KIDS</Text>
+            {/*backArrow Box*/}
+            <View style={styles.backContainer}>
+              <TouchableOpacity
+                onPress={() => {
+                  backButtonPressed('homeBar');
+                }}
+                style={styles.backButton}>
+                <Image source={back} style={styles.backImage} />
+                <Text style={styles.backArrowText}>Fashion</Text>
+              </TouchableOpacity>
+            </View>
 
-</TouchableOpacity>
-</View>  
-{/* 
-<TouchableOpacity
-          onPress={() => {navigateToMainPlp('categoryPage',1)}} 
-           style={{}}
-         >
-              <Image source={men} style={{width:110,height:110,borderRadius:12,borderColor:'#00338D',borderWidth:0.4,marginLeft:'4%',}}/>
-              <Text style={{textAlign:'center',fontWeight:'bold',fontSize:12,marginRight:'8%',padding:'2%',color:'#00338D'}}>MEN</Text>
-           </TouchableOpacity>
-           <TouchableOpacity 
-              onPress={() => {navigateToMainPlp('categoryPage',2)}}  
+            <View style={styles.horizontalLine} />
 
-              >
-              <Image source={Women} style={{width:110,height:110,borderRadius:12,borderColor:'#00338D',borderWidth:0.4,marginLeft:'11%'}}/>
-              <Text style={{textAlign:'center',fontWeight:'bold',fontSize:12,marginRight:'8%',padding:'2%',color:'#00338D'}}>WOMEN</Text>
-           </TouchableOpacity>
-           <TouchableOpacity>
-              <Image source={kid} style={{width:110,height:110,borderRadius:12,borderColor:'#00338D',borderWidth:0.4,marginLeft:'2%'}}/>
-              <Text style={{textAlign:'center',fontWeight:'bold',fontSize:12,marginRight:'8%',padding:'2%',color:'#00338D'}}>KIDS</Text>
-           </TouchableOpacity> */}
-</View>
-<View style={{flexDirection:'row',padding:'2%',marginTop:'3%'}}>
- 
- <TouchableOpacity style={{width:120,height:110,
-    shadowOffset: { width: 60, height: 25 },
-    shadowOpacity: 0.25,
-    shadowRadius: 35.84,
-    elevation: 10}}>
-    <Image source={beauty} style={{width:110,height:110,borderRadius:12,borderColor:'#00338D',borderWidth:0.4,marginLeft:'4%',}}/>
-    <Text style={{textAlign:'center',fontWeight:'bold',fontSize:12,marginRight:'8%',padding:'2%',color:'#00338D'}}>BEAUTY</Text>
- </TouchableOpacity>
- <TouchableOpacity>
-    <Image source={gift} style={{width:110,height:110,borderRadius:12,borderColor:'#00338D',borderWidth:0.4,marginLeft:'11%',}}/>
-    <Text style={{textAlign:'center',fontWeight:'bold',fontSize:12,marginRight:'8%',padding:'2%',color:'#00338D'}}>& MORE</Text>
- </TouchableOpacity>
-</View>
+            <View style={styles.categoryRow1}>
+              <Tab image={men} page="categoryPage" title="MEN" value={1} />
+              <Tab image={Women} page="categoryPage" title="WOMEN" value={2} />
+              <Tab image={kid} title="KIDS" />
+            </View>
 
-</View>
-        <View style={styles.horizontalLine1}></View>
+            <View style={[styles.categoryRow2, styles.spacingTop]}>
+              <Tab image={beauty} title="BEAUTY" />
+              <Tab image={gift} title="& MORE" />
+            </View>
 
+            <View style={styles.horizontalLine}></View>
 
+            {/*show Banners  */}
+            <BannerCarousel />
 
+            {/*Deals on the brands */}
+            <DealsOnBrands />
 
+            <TouchableOpacity style={styles.bannerTouchableOpacity}>
+              <Image source={banner1} style={styles.bannerImage} />
+            </TouchableOpacity>
 
-    <SafeAreaView>
-    <FlatList
-    nestedScrollEnabled={true}
-  data={carouselData}
-  ref={flatlistRef}
-  horizontal={true}
-  pagingEnabled={true}
-  onScroll={handleScroll}
-  getItemLayout={getItemLayout}
-  keyExtractor={(item) => item.id.toString()} // Use toString() to ensure it's a string
-  showsHorizontalScrollIndicator={false}
-  renderItem={renderItem}
-/>
-  
-  </SafeAreaView>
-      <View
-        style={{flexDirection:'row',justifyContent:'center',marginTop:30}}
-        >
-       {renderDotIndicators()}
-      </View>  
- 
+            {/*Best Seller*/}
+            <BestSeller />
 
-      <View style={{flexDirection:'row',paddingTop:20,padding:4,justifyContent:'space-evenly'}}>
-         <View style={{flexDirection:'row'}}>
-            <Image source={discount} style={{width:30,height:30,alignItems:'center',}}/>
-            <Text style={{color:'#005EBB',alignItems:'center',fontSize:13,paddingLeft:3}}>Amazing Deals {'\n'} & Offers</Text>
-         </View>
-         <View style={{flexDirection:'row'}}>
-            <Image source={selfcheckout} style={{width:35,height:35}}/>
-            <Text style={{color:'#005EBB',flexWrap:'wrap',fontSize:13,paddingLeft:3}}>Store Self{'\n'} Checkout</Text>
-         </View>
-         <View style={{flexDirection:'row'}}>
-            <Image source={pickup} style={{width:35,height:35,alignItems:'center',}}/>
-            <Text style={{color:'#005EBB',alignItems:'center',fontSize:13,paddingLeft:3}}>Express Store {'\n'}Pickup</Text>
-         </View>
+            <View>
+              <Image source={cashback} style={styles.cashBackBannerImage} />
+            </View>
+
+            {/*Play and Earn */}
+            <PlayAndEarn />
+          </View>
+        </ScrollView>
       </View>
-      <View style={styles.horizontalLine2}></View>
-
-
-
-
-      <View style={{}}>
- <View style={{}}>
-
-        {/* <View style={{flexDirection:'row'}}> 
-      <SafeAreaView>
-        <FlatList
-        nestedScrollEnabled={true}
-        data={data4}
-        horizontal={true}
-        showsHorizontalScrollIndicator={false} // Optional: hide horizontal scrollbar
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <TouchableOpacity style={{marginStart:10}}>  
-            <Image source={{uri:item.source}} style={{width:80,height:80,borderRadius:50}} />
-          </TouchableOpacity>
-        )}
-    />   
-</SafeAreaView>
-       </View>    */}
-     </View>
-
- </View>
-
-
-
-
-
-    
- <View style={{backgroundColor:'#f7f8fc',marginTop:'4%',marginLeft:'4%',marginBottom:'3%'}}>
-    <Text style={{color:'#00338D',fontSize:14,fontWeight:'500',marginBottom:'3%'}}>DEALS ON TOP BRANDS</Text>
-    <View style={{flexDirection:'row',paddingRight:'3%'}}> 
-      <SafeAreaView>
-        <FlatList
-        nestedScrollEnabled={true}
-        data={data1}
-        horizontal={true}
-        showsHorizontalScrollIndicator={false} // Optional: hide horizontal scrollbar
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-        <TouchableOpacity style={{marginStart:10}}>  
-          <Image source={item.source} style={{width:100,height:130,borderRadius:12,paddingRight:'2%'}} />
-        </TouchableOpacity>
-      )}
-    />   
-</SafeAreaView>
-     </View>
-
- </View>
-
-
-
-       <TouchableOpacity style={{justifyContent:'center',alignItems:'center',paddingTop:25}}>
-         <Image source={banner1} style={{width:395,height:300}}/>
-       </TouchableOpacity>
-       <View style={{backgroundColor:'#f7f8fc',marginTop:'4%'}}>
-
-       <View style={{paddingTop:30,padding:10,}}>
-        <Text style={{color:'#00338D',fontSize:14,fontWeight:'500'}}>BEST SELLERS</Text>
-        <View style={{flexDirection:'row'}}> 
-      <View style={{justifyContent:'center'}}>
-         <Image source={scrollarrow}/>
-      </View>
-      <SafeAreaView>
-        <FlatList
-        nestedScrollEnabled={true}
-        data={data2}
-        horizontal={true}
-        showsHorizontalScrollIndicator={false} // Optional: hide horizontal scrollbar
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-        <TouchableOpacity
-        onPress={()=>navigation.navigate('mainPDP',{ category: 'Men Formal', id: item.id })}  
-         style={{marginStart:10,padding:8}}>  
-          <Image source={item.source} style={{width:120,height:150,borderRadius:12}} />
-        </TouchableOpacity>
-      )}
-    />   
-</SafeAreaView>
-
-       </View>    
-     </View>
-    </View> 
-
-     <View style={{paddingTop:30,padding:10,}}>
-        <Text style={{color:'#00338D',fontSize:14,fontWeight:'500'}}>SLASH & SAVE ON TOP BEAUTY PRODUCTS</Text>
-        <TouchableOpacity style={{justifyContent:'center',alignItems:'center',paddingTop:10}}>
-         <Image source={banner2} style={{width:395,height:200}}/>
-       </TouchableOpacity>
-     </View>
-
-     {/* <View style={{backgroundColor:'#f7f8fc',marginTop:'4%'}}>
-     <View style={{padding:'3%',}}>
-        <Text style={{color:'#00338D',fontSize:14,fontWeight:'500'}}>BUDGET BUYS</Text>
-      <View style={{flexDirection:'row',marginTop:'1%'}}> 
-      <SafeAreaView>
-        <FlatList
-        nestedScrollEnabled={true}
-        data={data3}
-        numColumns={4}
-        showsHorizontalScrollIndicator={false} // Optional: hide horizontal scrollbar
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-        <TouchableOpacity style={{marginStart:2,padding:4}}>  
-          <Image source={{uri:item.source}} style={{width:85,height:107,borderRadius:12,marginBottom:'5%'}} />
-        </TouchableOpacity>
-      )}
-    />   
-</SafeAreaView>
-
-       </View>  
-     </View>
-     </View> */}
-
-
-     
-     <View style={{marginTop:'4%'}}>
-        <Image source={cashback} style={{width:395,}}/>
-     </View>
-
-     <View style={{paddingTop:30,padding:10,}}>
-        <Text style={{color:'#00338D',fontSize:17,fontWeight:'500'}}>PLAY & EARN</Text>
-        <View style={{flexDirection:'row',justifyContent:'space-evenly'}}>
-             <View>
-                <Image source={playearn1} style={{width:150,height:100}}/>
-             </View>
-             <View>
-                <Image source={playearn2} style={{width:180,height:100}}/>
-             </View>
-        </View>
-    </View>
-    
-
-    <View style={{paddingTop:10,padding:10,justifyContent:'center',flexDirection:'row'}}>
-        <Image source={fortune} style={{}}/>
-    </View>
-  </View>
-
-</ScrollView>
-
-
-</View>
- 
-      </>
-      );
+    </>
+  );
 }
 
 const styles = StyleSheet.create({
-  horizontalLine1: {
+  mainContainer: {
+    flex: 1,
+    backgroundColor: 'white',
+  },
+  mainBox: {
+    flexDirection: 'column',
+  },
+  backContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: '3%',
+  },
+  backButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingBottom: '2%',
+  },
+  backImage: {
+    marginLeft: 12,
+  },
+  backArrowText: {
+    paddingLeft: 10,
+    color: 'black',
+    textAlign: 'center',
+  },
+  categoryRow1: {
+    flexDirection: 'row',
+    marginLeft: '5%',
+    marginTop: '4%',
+    marginBottom: '2%',
+  },
+
+  categoryRow2: {
+    flexDirection: 'row',
+    margin: '3%',
+  },
+
+  categoryItem: {
+    width: 120,
+    height: 110,
+    shadowColor: 'grey',
+    shadowOffset: {width: 60, height: 25},
+    shadowOpacity: 0.25,
+    shadowRadius: 35.84,
+    elevation: 10,
+  },
+  categoryButton: {},
+  categoryImage: {
+    width: 105,
+    height: 105,
+    borderRadius: 12,
+    borderColor: '#00338D',
+    borderWidth: 0.4,
+  },
+  categoryLabel: {
+    textAlign: 'center',
+    fontWeight: 'bold',
+    fontSize: 12,
+    marginRight: '8%',
+    padding: '2%',
+    color: '#00338D',
+  },
+  spacingLeft: {
+    marginLeft: '4%',
+  },
+  spacingLeftSmall: {
+    marginLeft: '2.5%',
+  },
+  spacingTop: {
+    padding: '2%',
+    marginTop: '3%',
+  },
+  spacingLeftLarge: {
+    marginLeft: '2%',
+  },
+  horizontalLine: {
     borderBottomWidth: 0.3,
     borderBottomColor: '#d1d1d1',
   },
-  horizontalLine2: {
-    marginTop:'3%',
-    borderBottomWidth: 0.3,
-    borderBottomColor: '#d1d1d1',
+  bannerTouchableOpacity: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingTop: 25,
   },
-  
+  bannerImage: {
+    width: 395,
+    height: 300,
+  },
+  cashBackBannerImage: {
+    marginTop: '4%',
+  },
+  cashBackBannerImage: {
+    width: 395,
+  },
 });
-
-
-
