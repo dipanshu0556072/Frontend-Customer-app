@@ -32,8 +32,8 @@ import Profile from './src/Profile';
 import mobileNumberVerify from './src/Login/Login2.jsx';
 import Notification from './src/Notification';
 import Fashion from './src/Fashion';
-import MainPlp from './src/MainPlp';
-import MainPDP from './src/MainPDP';
+import MainPlp from './src/PLP_Page.jsx';
+import MainPDP from './src/MainPdp.jsx';
 import WishList from './src/WishList';
 import MainBag from './src/MainBag';
 import CardPayment from './src/Payment/CardPayment';
@@ -106,6 +106,7 @@ import AddCarousel from './src/Components/BannerCarousel.jsx';
 import DealsOnBrands from './src/Components/DealsOnBrands.jsx';
 import BestSeller from './src/Components/BestSeller.jsx';
 import PlayAndEarn from './src/Components/PlayAndEarn.jsx';
+import PLPComponent from './src/Components/PLPComponent.jsx';
 
 import Exp from './src/Exp.jsx';
 
@@ -152,6 +153,7 @@ const App = () => {
                 <Stack.Screen name="mainHome" component={MainHome} />
                 <Stack.Screen name="Fashion" component={Fashion} />
                 <Stack.Screen name="mainPlp" component={MainPlp} />
+                <Stack.Screen name="plpPage" component={PLPComponent} />
                 <Stack.Screen name="mainPDP" component={MainPDP} />
                 <Stack.Screen name="WishList" component={WishList} />
                 <Stack.Screen name="Gender" component={Gender} />

@@ -6,6 +6,7 @@ import { useCartContext } from '../Context/WomenContext';
 import axios from 'axios';
 import { useLoginContext } from '../Login/LoginCartProvider';
 import visa from '../Order/visa.png';
+import TopBar from '../PlpScreen/TopBar';
 
 export default function CardPayment({ navigation }) {
   const [cardNumber, setCardNumber] = useState('');
@@ -213,13 +214,12 @@ export default function CardPayment({ navigation }) {
   return (
     <>
       <View style={styles.mainContainer}>
-
-        <TouchableOpacity onPress={() => { forNavigate('mainHome') }}>
-          <Image
-            source={{ uri: 'https://shorturl.at/ckGU2' }}
-            style={styles.topImage}
-          />
-        </TouchableOpacity>
+      <TopBar
+          navigation={navigation}
+          showCartLogo={false}
+          showWishListLogo={false}
+          showSearchLogo={false}
+        />
         <View style={styles.header}>
           <View style={styles.headerLeft}>
             <TouchableOpacity onPress={() => { popFromStack(navigation) }}>

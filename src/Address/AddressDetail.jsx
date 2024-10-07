@@ -12,7 +12,7 @@ import {
   ActivityIndicator,
   Alert
 } from 'react-native';
-import TopBar from '../TopBar1';
+
 import back from '../PlpScreen/images/back.png';
 import axios from 'axios';
 import { useLoginContext } from '../Login/LoginCartProvider';
@@ -20,6 +20,7 @@ import { useCartContext } from '../Context/WomenContext';
 import MobileVerify from '../Login/MobileVerify';
 import CheckBox from '@react-native-community/checkbox';
 import { json } from 'react-router-dom';
+import TopBar from '../PlpScreen/TopBar';
 
 export default function AddressDetail({ navigation}) {
   const [BtnColor, setBtnColor] = useState(false);
@@ -406,16 +407,12 @@ useEffect(()=>{
 
   return (
     <View style={{ flex: 1, backgroundColor: 'white' }}>
-      {/* <Text>selected{selectedAddress}</Text> */}
-      {/* <Text>{JSON.stringify(allProfileId)}</Text> */}
-      <TouchableOpacity onPress={() => navigation.navigate('Home')}>
-        <Image
-          source={{ uri: 'https://shorturl.at/ckGU2' }}
-          style={{ width: 100, height: 100, marginLeft: '4%', marginTop: '3%' }}
+        <TopBar
+          navigation={navigation}
+          showCartLogo={false}
+          showWishListLogo={false}
+          showSearchLogo={false}
         />
-      </TouchableOpacity>
-      {/* <Text>{editMode}{selectedAddress}</Text> */}
-      {/* <Text>{userName}</Text> */}
       <View style={{ flexDirection: 'row', justifyContent: 'space-between'}}>
           <TouchableOpacity
             style={{

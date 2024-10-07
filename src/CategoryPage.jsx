@@ -82,16 +82,17 @@ const CategoryPage = ({navigation}) => {
     setCurrentPageIndex,
   } = useLoginContext();
   const {
-    FilteredDataArray,
+    filteredDataArray,
     setFilteredDataArray,
     showActivityIndicator,
     setShowActivityIndicator,
     setProductIds,
+    setPLPData
   } = useCartContext();
   useEffect(() => {
-    setFilteredDataArray(products);
+  
     //  setProductIds(products.map(product=>product.id));
-  }, [FilteredDataArray]);
+  }, [filteredDataArray]);
 
   // Create a Map with integer keys and Map values
   const outerMap = new Map();
@@ -124,7 +125,8 @@ const CategoryPage = ({navigation}) => {
 
     const navigateToMainPlp = (page, itemId,name) => {
       
-      filterProductData('Women Kurta');
+ 
+      filterProductData(name);
       if (
         currentPage &&
         currentPage.length > 0 &&
@@ -165,7 +167,7 @@ const CategoryPage = ({navigation}) => {
     return mapContent;
   };
 
-  const {products, setProducts} = useCartContext();
+  const {setProducts,setSelectedPLPCatgeory} = useCartContext();
   const {ip, token, setLoginUserId, setCurrentPage} = useLoginContext();
 
   // Ref for flatlist
@@ -295,8 +297,10 @@ const CategoryPage = ({navigation}) => {
     dataOne = data2;
   }
 
+  const[prp,setPrp]=useState([]);
   //filter the product data based on the Fashion tile
   const filterProductData = async(category) => {
+
     let response;
     try {
       if (category) {
@@ -308,7 +312,8 @@ const CategoryPage = ({navigation}) => {
             },
           },
         );
-        setFilteredDataArray(response.data);
+   
+            // Alert.alert(JSON.stringify(response.data));
       }else{
         response = axios.get(
           `http://${ip}:5454/api/admin/products/getProductByTopCategory?category=clothes`,
@@ -320,6 +325,7 @@ const CategoryPage = ({navigation}) => {
         );
         setProducts(response.data);
       }
+      setPLPData(response.data);
     } catch (error) {
       console.log(
         'getting error in the homeBar.jsx in filterProductData' + error,

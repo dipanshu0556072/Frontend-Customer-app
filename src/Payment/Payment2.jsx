@@ -19,6 +19,8 @@ import amazon  from '../PlpScreen/images/amazon.png'
 import plus from '../PlpScreen/images/plus.png'
 import { useLoginContext } from '../Login/LoginCartProvider';
 import axios from 'axios';
+import TopBar from '../PlpScreen/TopBar';
+
 export default function Payment2({navigation})
 {
   const { userName, streetaddress1, city, state, pinCode, mobile,orderId,setOrderId,deliveryOption,filteredData,
@@ -218,14 +220,12 @@ const payThroughWallet = () => {
     return (
         <View style={{backgroundColor:'white'}}>
           <View style={{padding:12,flexDirection:'row',alignItems:'center',justifyContent:'space-between'}}>
-            <TouchableOpacity onPress={()=>{forNavigate('mainHome')
-                                           setDisableAction(true);
-            }}>
-             <Image
-                   source={{ uri: 'https://shorturl.at/ckGU2' }}
-                   style={{ width: 100, height: 100 }}                
-              />
-            </TouchableOpacity>    
+          <TopBar
+          navigation={navigation}
+          showCartLogo={false}
+          showWishListLogo={false}
+          showSearchLogo={false}
+        />  
             <Text style={{textAlign:'center',color:'black'}}>Wallet Amount{'\n'}
               <Text style={{fontWeight:'700'}}>₹{walletBalance?walletBalance:' 0.00'}</Text>
             </Text>      

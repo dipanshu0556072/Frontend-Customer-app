@@ -7,6 +7,7 @@ import {
   ScrollView,
   TextInput,
   Modal,
+  Alert,
   ActivityIndicator,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
@@ -23,21 +24,12 @@ import axios from 'axios';
 import {useRoute} from '@react-navigation/native';
 import {Rating, AirbnbRating} from 'react-native-elements';
 import {useFocusEffect} from '@react-navigation/native';
-import BottomNavigation from '../BottomNavigation';
-import {Alert} from 'react-native';
-import RNHTMLtoPDF from 'react-native-html-to-pdf';
-import {
-  useColorScheme,
-  SafeAreaView,
-  StatusBar,
-  Dimensions,
-  Platform,
-} from 'react-native';
-import {Colors} from 'react-native/Libraries/NewAppScreen';
+import TopBar from '../PlpScreen/TopBar';
+import {Dimensions} from 'react-native';
 import Progress from '../Progress';
-import {color} from 'react-native-elements/dist/helpers';
 import CheckBox from '@react-native-community/checkbox';
 import {RadioButton} from 'react-native-paper';
+
 
 const OrderStatus = ({navigation}) => {
   const {
@@ -45,9 +37,7 @@ const OrderStatus = ({navigation}) => {
     deliveryOption,
     setReceiptData,
     setProducts,
-    modifyStorePickUp,
     setModifyStorePickUp,
-    storeProductWithSizeAndQuantity,
     setStoreProductWithSizeAndQuantity,
     setSelectedStoreId,
     setSearch,
@@ -78,6 +68,7 @@ const OrderStatus = ({navigation}) => {
     OrderDate,
     setOrderDate,
     changeOrderStatus,
+    loginUserId
   } = useLoginContext();
 
   const [isModalVisible, setModalVisible] = useState(false);
@@ -127,7 +118,6 @@ const OrderStatus = ({navigation}) => {
   useEffect(() => {
     getData();
     getOrderExchangeReason();
-    
   }, [isChecked]);
   useEffect(() => {
     if (
@@ -151,7 +141,7 @@ const OrderStatus = ({navigation}) => {
       setCurrentPage('mainHome');
       navigation.navigate('mainHome');
     } else {
-      console.log(page + ' ' + currentPage[currentPage.length - 1]);
+
       if (currentPage && currentPage[currentPage.length - 1] !== page) {
         pushToStack(page);
         navigation.navigate(page);
@@ -262,19 +252,17 @@ const OrderStatus = ({navigation}) => {
         orderItems: filteredOrderItems,
       }));
     }
-    console.log(JSON.stringify());
   };
-  const checkedProduct1 = (itemId) => {
+  const checkedProduct1 = itemId => {
     if (orderStatus && orderStatus.orderItems) {
-      const filteredOrderItems = orderStatus.orderItems.filter(item =>
-        item.id===itemId
+      const filteredOrderItems = orderStatus.orderItems.filter(
+        item => item.id === itemId,
       );
       setOrderStatus(prevStatus => ({
         ...prevStatus,
         orderItems: filteredOrderItems,
       }));
     }
-    console.log(JSON.stringify());
   };
   const fetchProduct = async () => {
     try {
@@ -317,7 +305,7 @@ const OrderStatus = ({navigation}) => {
     }, [getOrderStatus]),
   );
   const [userRating, setUserRating] = useState(0);
-  const [productRatings, setProductRatings] = useState({});
+  const [productRatings, setProductRatings] = useState(0.0);
 
   const [getOrderStatus, setGetOrderStatus] = useState([]);
 
@@ -325,14 +313,14 @@ const OrderStatus = ({navigation}) => {
   const orderId = route.params?.orderId;
 
   const ratingCompleted = (rating, productId) => {
-    postRatingToBackend(productId, rating);
-    getProductRating(productId);
+     postRatingToBackend(productId, rating);
+     getProductRating(productId);
   };
   useEffect(() => {
     // Fetch initial ratings when the component mounts
     if (getOrderStatus && getOrderStatus.orderItems) {
       getOrderStatus.orderItems.forEach(item => {
-        getProductRating(item.product.id);
+      getProductRating(item.product.id);
       });
     }
     setChangeOrderStatus(getOrderStatus.orderStatus);
@@ -362,7 +350,7 @@ const OrderStatus = ({navigation}) => {
         },
       );
 
-      console.log('Review submitted successfully:', response.data);
+
       // Handle any additional actions after submitting the review
       // ...
 
@@ -373,11 +361,13 @@ const OrderStatus = ({navigation}) => {
   };
 
   const postRatingToBackend = async (prodId, rate) => {
-    console.log(`Product ID: ${prodId}, Rating: ${rate}`);
+
 
     const dataAdd = {
+      givenRatingByUser: rate,
+      comment: '',
+      userId: loginUserId,
       productId: prodId,
-      rating: rate,
     };
 
     try {
@@ -390,8 +380,6 @@ const OrderStatus = ({navigation}) => {
           },
         },
       );
-      console.log('\n\n\nRating' + JSON.stringify(response.data));
-      // Check the response from the backend
       console.log('Rating posted successfully:', response.data);
     } catch (error) {
       console.error('Error posting rating to backend:', error.message);
@@ -401,28 +389,35 @@ const OrderStatus = ({navigation}) => {
   const getProductRating = async productId => {
     try {
       const response = await axios.get(
-        `http://${ip}:5454/api/ratings/product/${productId}`,
+        `http://${ip}:5454/api/ratings/user/${loginUserId}`, // Adjusted to use productId instead of userId
         {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        },
+        }
       );
-
-      // Update the productRatings state with the received rating
-      setProductRatings(prevRatings => ({
-        ...prevRatings,
-        [productId]: response.data.rating, // Assuming the API returns a property called 'rating'
-      }));
-
-      console.log(`Rating for product ${productId}: ${response.data.rating}`);
+      
+      // If the API returns data, set the rating
+      if (response.data && response.data.length > 0) {
+        setProductRatings(response.data[0].givenRating);
+      } else {
+        // If no rating data is available, set a default value
+        setProductRatings(0); // or any other default value you prefer
+      }
+  
+      console.log(`Rating for product: ${JSON.stringify(response.data)}`);
     } catch (error) {
-      console.error(
-        `Error fetching rating for product ${productId}:`,
-        error.message,
-      );
+      // If it's a 404 error, handle it gracefully by setting a default value
+      if (error.response && error.response.status === 404) {
+        setProductRatings(0); // Default to 0 if no rating exists
+      } else {
+        // Handle other types of errors
+        console.error(`Error fetching rating for product ${productId}:`, error.message);
+      }
     }
   };
+  
+  
 
   //modify the storePickUp Time for that storing OrderItems
   function getProductData() {
@@ -475,7 +470,7 @@ const OrderStatus = ({navigation}) => {
       ? getOrderStatus.totalDiscountedPrice
       : 0;
 
-  console.log(JSON.stringify(getOrderStatus));
+
 
   function DownloadingInvoice() {
     handlePress2();
@@ -655,7 +650,7 @@ const OrderStatus = ({navigation}) => {
         response = await axios.put(url, dataToExchange, config);
       }
 
-      console.log('Exchange successful:', response.data);
+      
       setTimeout(() => {
         setShowActivityIndicator(false);
         Alert.alert('', 'Order exchanged successfully', [
@@ -739,15 +734,12 @@ const OrderStatus = ({navigation}) => {
         </View>
       ) : (
         <ScrollView showsVerticalScrollIndicator={false} style={{flex: 1}}>
-          <TouchableOpacity
-            onPress={() => {
-              forNavigate('mainHome');
-            }}>
-            <Image
-              source={{uri: 'https://shorturl.at/ckGU2'}}
-              style={{width: 100, height: 100, marginLeft: '4%'}}
-            />
-          </TouchableOpacity>
+          <TopBar
+            navigation={navigation}
+            showCartLogo={false}
+            showWishListLogo={false}
+            showSearchLogo={false}
+          />
           <TouchableOpacity
             onPress={() => {
               popFromStack(navigation);
@@ -757,9 +749,7 @@ const OrderStatus = ({navigation}) => {
                 <Image source={back} style={{marginLeft: 12}} />
               </View>
               <View style={{marginLeft: '4%'}}>
-                <Text style={{color: 'black'}}>
-                  Track Order
-                </Text>
+                <Text style={{color: 'black'}}>Track Order</Text>
               </View>
             </View>
           </TouchableOpacity>
@@ -960,9 +950,7 @@ const OrderStatus = ({navigation}) => {
                     source={cancel}
                     style={{width: 20, height: 20, alignSelf: 'center'}}
                   />
-                  <Text style={styles.cancelText}>
-                    Return / Exchange
-                  </Text>
+                  <Text style={styles.cancelText}>Return / Exchange</Text>
                 </TouchableOpacity>
               ) : (
                 changeOrderStatus !== 'CANCELLED' && (
@@ -1069,7 +1057,6 @@ const OrderStatus = ({navigation}) => {
                       <View style={{marginLeft: '27%'}}>
                         <Text style={{color: '#00338D', fontWeight: '500'}}>
                           {item.product.brand}
-                          
                         </Text>
                         <Text
                           style={{
@@ -1133,12 +1120,12 @@ const OrderStatus = ({navigation}) => {
                           <Rating
                             style={{marginTop: '7%'}}
                             ratingCount={5}
-                            showRating={false}
+                            showRating={true}
                             imageSize={20}
                             onFinishRating={rating =>
                               ratingCompleted(rating, item.product.id)
                             }
-                            startingValue={productRatings[item.product.id] || 0}
+                            startingValue={productRatings|| 0}
                           />
                         )}
                     </View>
@@ -1248,8 +1235,7 @@ const OrderStatus = ({navigation}) => {
                                 onFinishRating={rating =>
                                   ratingCompleted(rating, item.product.id)
                                 }
-                                startingValue={
-                                  productRatings[item.product.id] || 0
+                                startingValue={productRatings|| 0
                                 }
                               />
                               <Text
@@ -1355,14 +1341,14 @@ const OrderStatus = ({navigation}) => {
               marginLeft: '4%',
               marginTop: '4%',
             }}>
-            Payment Summary
+            Payment Summary{productRatings}
           </Text>
 
           <View style={styles.wrapper}>
             <View style={styles.row}>
               <Text style={styles.label}>Sub Total</Text>
               <Text style={styles.value}>
-                ₹{(getOrderStatus.totalPrice?getOrderStatus.totalPrice:0)}
+                ₹{getOrderStatus.totalPrice ? getOrderStatus.totalPrice : 0}
               </Text>
             </View>
             <View style={styles.row}>
@@ -1375,11 +1361,25 @@ const OrderStatus = ({navigation}) => {
             </View>
             <View style={styles.row}>
               <Text style={styles.label}>Promotion Discount</Text>
-              <Text style={styles.charge}>- ₹{(getOrderStatus.promotionDiscount?getOrderStatus.promotionDiscount:0)}</Text>
+              <Text style={styles.charge}>
+                ₹
+
+                 {getOrderStatus.promotionDiscount
+                  ? getOrderStatus.promotionDiscount
+                  : 0}
+              </Text>
             </View>
             <View style={styles.row}>
               <Text style={styles.label}>Total Saving</Text>
-              <Text style={styles.value}>₹ {(getOrderStatus.discounte?((getOrderStatus.discounte)-(getOrderStatus.promotionDiscount?getOrderStatus.promotionDiscount:0)):0)}</Text>
+              <Text style={styles.value}>
+                ₹{' '}
+                {getOrderStatus.discounte
+                  ? getOrderStatus.discounte -
+                    (getOrderStatus.promotionDiscount
+                      ? getOrderStatus.promotionDiscount
+                      : 0)
+                  : 0}
+              </Text>
             </View>
             <View style={styles.row}>
               <Text style={styles.label}>Total Paid Amount</Text>

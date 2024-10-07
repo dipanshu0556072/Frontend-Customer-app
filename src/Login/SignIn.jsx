@@ -16,6 +16,7 @@ import eye1 from '../Login/images/view2.png';
 import eye2 from '../Login/images/view1.png';
 import axios from 'axios';
 
+
 const SignIn = ({navigation}) => {
   const {
     ip,
@@ -26,6 +27,9 @@ const SignIn = ({navigation}) => {
     setToken,
     setUserLogin,
   } = useLoginContext();
+
+
+
   const [seePassword, setSeePassword] = useState(true);
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
@@ -44,6 +48,9 @@ const SignIn = ({navigation}) => {
     setEmailError('');
     return true;
   };
+
+
+
 
   // Function to handle form submission
   const handleSubmit = async () => {
@@ -69,6 +76,7 @@ const SignIn = ({navigation}) => {
           setTimeout(() => {
             navigation.navigate('mainHome');
           }, 3500);
+        
         } else if (
           response &&
           (response.data.error === 'password not match' ||
@@ -114,6 +122,8 @@ const SignIn = ({navigation}) => {
       throw error;
     }
   };
+
+
 
   // Effect to update button color based on field validity
   useEffect(() => {

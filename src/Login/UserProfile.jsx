@@ -54,9 +54,7 @@ const UserProfile = ({navigation}) => {
       setEditAlternativeMobilePen(true);
     }
   }, [editMobilePen, editAlternativeMobilePen]);
-  const {mobileNumber, emailId, gender, userName, setUserName, loginUserId} =
-    useLoginContext();
-  [];
+  const {mobileNumber, emailId, gender, userName, setUserName,setCheckMobile, loginUserId} =useLoginContext();
 
   const {
     ip,

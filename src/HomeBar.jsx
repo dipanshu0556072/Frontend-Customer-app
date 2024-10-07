@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   StyleSheet,
   Text,
@@ -6,6 +6,7 @@ import {
   ScrollView,
   TouchableOpacity,
   Image,
+  ActivityIndicator,
 } from 'react-native';
 import axios from 'axios';
 import {useLoginContext} from './Login/LoginCartProvider';
@@ -32,65 +33,86 @@ const HomeBar = ({navigation}) => {
     setWishListData,
     setAllSavedAddress,
     setBannerComponentName,
+    setProductRatings,
+    setWishListProductId,
+    setCartProductId
   } = useCartContext();
 
   const {ip, token, setLoginUserId, pushToStack, currentPage, popFromStack} =
     useLoginContext();
-
-  useEffect(async () => {
-    try {
-      // Define all fetch requests
-      const wishListRequest = axios.get(`http://${ip}:5454/api/wishlist/`, {
-        headers: {Authorization: `Bearer ${token}`},
-      });
-
-      const profileDataRequest = axios.get(
-        `http://${ip}:5454/api/users/profile`,
-        {
-          headers: {Authorization: `Bearer ${token}`},
-        },
-      );
-
-      const productsDataRequest = axios.get(
-        `http://${ip}:5454/api/admin/products/all`,
-        {
-          headers: {Authorization: `Bearer ${token}`},
-        },
-      );
-
-      const cartDataRequest = axios.get(`http://${ip}:5454/api/cart/`, {
-        headers: {Authorization: `Bearer ${token}`},
-      });
-
-      const orderDataRequest = axios.get(`http://${ip}:5454/api/orders/user`, {
-        headers: {Authorization: `Bearer ${token}`},
-      });
-
-      // Wait for all fetch requests to complete
-      const [
-        wishListResponse,
-        profileDataResponse,
-        productsResponse,
-        cartDataResponse,
-        orderDataResponse,
-      ] = await Promise.all([
-        wishListRequest,
-        profileDataRequest,
-        productsDataRequest,
-        cartDataRequest,
-        orderDataRequest,
-      ]);
-
-      // Process the responses
-      setWishListData(wishListResponse.data);
-      setProfileAddress(profileDataResponse.data);
-      setAllSavedAddress(profileDataResponse.data.addresses);
-      setProducts(productsResponse.data);
-      setCartItem(cartDataResponse.data);
-    } catch (error) {
-      console.error('Error fetching data:', error);
-    }
-  }, []);
+    useEffect(() => {
+      const fetchData = async () => {
+        try {
+          // Define all fetch requests
+          const wishListRequest = axios.get(`http://${ip}:5454/api/wishlist/`, {
+            headers: {Authorization: `Bearer ${token}`},
+          });
+    
+          const profileDataRequest = axios.get(
+            `http://${ip}:5454/api/users/profile`,
+            {
+              headers: {Authorization: `Bearer ${token}`},
+            },
+          );
+    
+          const productsDataRequest = axios.get(
+            `http://${ip}:5454/api/admin/products/all`,
+            {
+              headers: {Authorization: `Bearer ${token}`},
+            },
+          );
+    
+          const cartDataRequest = axios.get(`http://${ip}:5454/api/cart/`, {
+            headers: {Authorization: `Bearer ${token}`},
+          });
+    
+          const orderDataRequest = axios.get(`http://${ip}:5454/api/orders/user`, {
+            headers: {Authorization: `Bearer ${token}`},
+          });
+    
+          // Wait for all fetch requests to complete
+          const [
+            wishListResponse,
+            profileDataResponse,
+            productsResponse,
+            cartDataResponse,
+            orderDataResponse,
+          ] = await Promise.all([
+            wishListRequest,
+            profileDataRequest,
+            productsDataRequest,
+            cartDataRequest,
+            orderDataRequest,
+          ]);
+    
+          // Process the responses
+          setWishListData(wishListResponse.data);
+          setProfileAddress(profileDataResponse.data);
+          setAllSavedAddress(profileDataResponse.data.addresses);
+          setProducts(productsResponse.data);
+          setCartItem(cartDataResponse.data);
+    
+          // Store productId for fetch productRating
+          setProductRatings(productsResponse.data.map(product => product.id));
+    
+          // Store productId of wishList
+          setWishListProductId(
+            wishListResponse.data.wishlistItems.map(product => product.product.id),
+          );
+    
+          // Store productId of cart products
+          setCartProductId(
+            cartDataResponse.data.cartItems.map(item => item.product.id),
+          );
+    
+        } catch (error) {
+          console.error('Error fetching data:', error);
+        }
+      };
+    
+      fetchData();
+    }, []);
+    
 
   //filter the product data based on the Fashion tile
   const filterProductData = async () => {
@@ -125,13 +147,13 @@ const HomeBar = ({navigation}) => {
   setLoginUserId(profileAddress.id);
 
   //tabs on the home page
-  const Tab = ({page, title,image}) => {
+  const Tab = ({page, title, image}) => {
     return (
       <View style={styles.imageContainer}>
         <TouchableOpacity
           onPress={() => {
             if (page) {
-              Fashion(page); 
+              Fashion(page);
             }
           }}>
           <Image source={image} style={styles.mainTabImage} />
@@ -140,6 +162,26 @@ const HomeBar = ({navigation}) => {
       </View>
     );
   };
+
+  //show buffering on the page
+  const [showActivityIndicator, setShowActivityIndicator] = useState(false);
+  if (showActivityIndicator) {
+    return (
+      <>
+        <View style={styles.activityIndicatorContainer}>
+          <ActivityIndicator size="large" color="#00338D" />
+        </View>
+      </>
+    );
+  }
+  useEffect(() => {
+    // Show the ActivityIndicator for 2 seconds
+    const timer = setTimeout(() => {
+      setShowActivityIndicator(false);
+    }, 4000); // 2000ms = 2 seconds
+
+    return () => clearTimeout(timer); // Clear the timeout if the component unmounts
+  }, []);
 
   return (
     <>
@@ -290,5 +332,15 @@ const styles = StyleSheet.create({
   },
   cashbackImage: {
     width: 395,
+  },
+  activityIndicatorContainer: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255,255,255,0.7)', // Semi-transparent background
   },
 });

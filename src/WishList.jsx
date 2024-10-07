@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   ScrollView,
   TouchableWithoutFeedback,
+  Alert,
 } from 'react-native';
 import 'react-native-gesture-handler';
 import TopBar from './PlpScreen/TopBar';
@@ -19,8 +20,14 @@ import {useLoginContext} from './Login/LoginCartProvider';
 import add from './PlpScreen/images/add.png';
 
 export default function WishList({navigation}) {
-  const {wishListData, setWishListData, setCartItem, setLovedItems} =
-    useCartContext();
+  const {
+    wishListData,
+    setWishListData,
+    setCartItem,
+    setLovedItems,
+    wishListProductId,
+    setWishListProductId,
+  } = useCartContext();
   const {ip, token, popFromStack, pushToStack, currentPage} = useLoginContext();
 
   // Notification for moving product to bag
@@ -78,7 +85,7 @@ export default function WishList({navigation}) {
 
   useEffect(() => {
     getWishlistData();
-  }, [token]);
+  }, [token, wishListProductId]);
 
   // Memoize and sort wishlist items
   const sortedWishlist = useMemo(
@@ -89,14 +96,14 @@ export default function WishList({navigation}) {
     [wishListData],
   );
 
-  const removeBagItem = async itemId => {
+  const removeBagItem = async (itemId, productId) => {
     try {
       await axios.delete(`http://${ip}:5454/api/wishlist_items/${itemId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-
+      setWishListProductId(wishListProductId.filter(id => id != productId));
       getWishlistData();
     } catch (error) {
       console.log('Error:', error);
@@ -162,7 +169,7 @@ export default function WishList({navigation}) {
 
   return (
     <>
-      <View style={{flex:1, backgroundColor:'white'}}>
+      <View style={{flex: 1, backgroundColor: 'white'}}>
         <TopBar
           navigation={navigation}
           showKPMGLogo={true}
@@ -218,7 +225,8 @@ export default function WishList({navigation}) {
                         </Text>
                       </View>
                     </View>
-                    <TouchableOpacity onPress={() => removeBagItem(item.id)}>
+                    <TouchableOpacity
+                      onPress={() => removeBagItem(item.id, item.product.id)}>
                       <Image source={cross} style={styles.removeImage} />
                     </TouchableOpacity>
                   </View>
@@ -387,10 +395,7 @@ const styles = {
     fontSize: 10,
   },
   exchangeContainer: {
-    flexDirection: 'row',
     alignItems: 'center',
-    padding: 5,
-    justifyContent: 'space-between',
   },
   exchangeImage: {
     width: 20,
@@ -399,7 +404,6 @@ const styles = {
   exchangeText: {
     fontSize: 11,
     color: '#484848',
-    padding: 5,
   },
   removeImage: {
     width: 13,

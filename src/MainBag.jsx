@@ -76,11 +76,7 @@ const lastViewData = [
 const MainBag = ({navigation}) => {
   const [bagGetData, setBagGetData] = useState([]);
   const {
-    selectedBagItem,
-    dataArray,
-    DeleteBagItem,
-    MoveToWishList,
-    products,
+
     decreaseTotalAmount,
     setDecreaseTotalAmount,
     cartItem,
@@ -94,7 +90,6 @@ const MainBag = ({navigation}) => {
     setWishListData,
     allSavedAddress,
     setAllSavedAddress,
-    isItForPlacbeOrder,
     setIsItForPlaceOrder,
     deliveryOption,
     setDeliveryOption,

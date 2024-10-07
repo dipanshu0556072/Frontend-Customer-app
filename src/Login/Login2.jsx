@@ -18,12 +18,11 @@ const Login2 = ({navigation, route}) => {
   // Getting context values
   const {
     setMobileNumber,
-    checkMobile,
-    setCheckMobile,
     loginUserId,
     ip,
     token,
     updateMobileName,
+    setUpdateMobileName,
     profileData,
     AlternativeMobileNumber,
   } = useLoginContext();
@@ -62,9 +61,9 @@ const Login2 = ({navigation, route}) => {
   const handleBtn = () => {
     if (otp === '000000') {
       storeMobileNumber();
-      setMobileNumber(checkMobile);
+      setMobileNumber(updateMobileName);
       setOtp('');
-      setCheckMobile('');
+      setUpdateMobileName('');
       navigation.navigate('mobileVerify');
     } else {
       setError2(true);
@@ -105,12 +104,7 @@ const Login2 = ({navigation, route}) => {
     }
   }
 
-  // Set the mobile number on initial render
-  useEffect(() => {
-    if (mob) {
-      setCheckMobile(mob);
-    }
-  }, [mob]);
+
 
   return (
     <View style={styles.container}>
@@ -119,7 +113,7 @@ const Login2 = ({navigation, route}) => {
       <View style={styles.row2}>
         <Text style={styles.title}>Verify Mobile</Text>
         <Text style={styles.subtitle}>
-          Enter the 6-digit OTP sent to ******{checkMobile.slice(-4)}
+          Enter the 6-digit OTP sent to ******{updateMobileName.slice(-4)}
         </Text>
 
         <TextInput

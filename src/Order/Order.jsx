@@ -10,6 +10,7 @@ import RNHTMLtoPDF from 'react-native-html-to-pdf';
 import { useColorScheme, SafeAreaView, StatusBar, Dimensions, Platform } from 'react-native';
 import { Colors } from 'react-native/Libraries/NewAppScreen';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import TopBar from '../PlpScreen/TopBar';
 
 const Tab = createBottomTabNavigator();
 import HomeBar from '../HomeBar';
@@ -124,9 +125,12 @@ const Order = ({ navigation }) => {
 
   return (
     <View style={{ flex: 1, backgroundColor: 'white' }}>
-      <TouchableOpacity onPress={() => navigation.navigate('Home')}>
-        <Image source={{ uri: 'https://shorturl.at/ckGU2' }} style={{ width: 100, height: 100, marginLeft: '4%' }} />
-      </TouchableOpacity>
+          <TopBar
+            navigation={navigation}
+            showCartLogo={false}
+            showWishListLogo={false}
+            showSearchLogo={false}
+          />
 
       {
         getUserOrderHistory && getUserOrderHistory.length <= 0 ? (

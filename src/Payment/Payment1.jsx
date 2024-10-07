@@ -14,7 +14,7 @@ import { useLoginContext } from '../Login/LoginCartProvider';
 import axios from 'axios';
 import wallet2 from '../PlpScreen/images/wallet.png';
 import Geolocation from '@react-native-community/geolocation';
-
+import TopBar from '../PlpScreen/TopBar';
 
 
 const paymentMethod={
@@ -245,24 +245,13 @@ export default function Payment1({navigation})
     return( 
         <>
      <View style={{ flex: 1, backgroundColor: 'white' }}>
-{/*    
-     <View>
-      <Button title="Get Location" onPress={getLocation} />
-      {location.latitude && location.longitude ? (
-        <Text>Latitude: {location.latitude}, Longitude: {location.longitude}</Text>
-      ) : (
-        <Text>No location data</Text>
-      )}
-    </View> */}
 
-     <TouchableOpacity  onPress={() => {naviGating('Home')
-                                       setDisableAction(true)
-     }}>
-        <Image
-          source={{ uri: 'https://shorturl.at/ckGU2' }}
-          style={{ width: 100, height: 100, marginLeft: '4%',}}
-        />
-      </TouchableOpacity>   
+     <TopBar
+          navigation={navigation}
+          showCartLogo={false}
+          showWishListLogo={false}
+          showSearchLogo={false}
+        />  
      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3%' }}>
 
     <TouchableOpacity  style={{ flexDirection: 'row', alignItems: 'center' }} onPress={() => popFromStack(navigation)}>
@@ -381,31 +370,6 @@ export default function Payment1({navigation})
 
                    <View style={{alignItems:'center',marginBottom:'12%'}}>
        
-                   {/* <View style={{flexDirection:'row',justifyContent:'center',marginTop:'5%'}}>                
-                  <View style={styles.offers}>
-                    <View style={{flexDirection:'row',alignItems:'center'}}>
-                      <Image source={{uri:'https://shorturl.at/iqtA4'}} style={{width:40,height:28,marginRight:'4%'}}/>
-                       <Text style={styles.offerText}>Gift Card / e-Voucher</Text>
-                     </View>
-                     <View>
-                       <Image source={upperArrow} style={{width:22,height:12,transform: [{rotate:'-90deg'}],marginTop:'10%'}}/>
-                     </View>
-                  </View>
-                </View> */}
-
-                {/* <TouchableOpacity style={{flexDirection:'row',justifyContent:'center',marginTop:'2%'}}>                
-                  <TouchableOpacity style={styles.offers}>
-                     <TouchableOpacity style={{flexDirection:'row',alignItems:'center'}} 
-                      onPress={()=>{forNavigate('paymentSuccess')}}>
-                        <Image source={{uri:'https://shorturl.at/cdUW6'}} style={{width:52,height:32,marginRight:'4%'}}/>
-                        <Text style={styles.offerText}>Cash on Delivery</Text>
-                    </TouchableOpacity>
-                     <TouchableOpacity>
-                       <Image source={upperArrow} style={{width:22,height:12,transform: [{rotate:'-90deg'}],marginTop:'45%'}}/>
-                     </TouchableOpacity>
-                  </TouchableOpacity>
-                </TouchableOpacity> */}
-
                 <View style={{flexDirection:'row',justifyContent:'center',marginTop:'2%'}}>                
                   <TouchableOpacity style={styles.offers} activeOpacity={1}
                     onPress={() => {
