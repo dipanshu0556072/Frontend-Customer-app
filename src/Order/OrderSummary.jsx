@@ -309,20 +309,7 @@ const OrderSummary = ({navigation}) => {
             }}>
             Select a delivery address
           </Text>
-          {/* <TextInput
-  style={{
-    width: 360,
-    height: 40,
-    marginLeft: '6%',
-    marginBottom: '4%',
-    borderBottomColor: '#00338D',  // Set the bottom border color to #00338D
-    borderBottomWidth: 0.6,          // You can adjust the borderWidth as needed
-    paddingLeft: 5,  
-    backgroundColor:'white'              // Add some padding to the left for better appearance
-  }}
-  onChangeText={handleChange}
-  placeholder="Search Address"
-/> */}
+
 
           {allSavedAddress && allSavedAddress.length <= 0 && (
             <>

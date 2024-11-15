@@ -11,9 +11,7 @@ import LoginTop from './LoginTop1';
 import {useLoginContext} from './LoginCartProvider';
 import axios from 'axios';
 
-const Login2 = ({navigation, route}) => {
-  // Destructuring parameters from route
-  const {mob} = route.params;
+const Login2 = ({navigation}) => {
 
   // Getting context values
   const {

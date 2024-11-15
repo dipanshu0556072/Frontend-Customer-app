@@ -57,16 +57,8 @@ import womendata2 from './PlpScreen/images/womendata2.png';
 import womenKurta from './PlpScreen/images/womenKurta.png';
 import menJacket from './PlpScreen/images/manJacket.png';
 import axios from 'axios';
-import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-const Tab = createBottomTabNavigator();
-import HomeBar from './HomeBar';
-import ProfileBar from './ProfileBar';
-import Home1 from './Fashion';
-import bell1 from './PlpScreen/images/bell1.png';
-import categories1 from './PlpScreen/images/category1.png';
-import home1 from './PlpScreen/images/home1.png';
-import user1 from './PlpScreen/images/user1.png';
-import BannerCarousel from './Components/BannerCarousel';
+import BottomNavigator from './Components/BottomNavigator';
+
 
 const CategoryPage = ({navigation}) => {
   // Use the context to get the currentIndex
@@ -87,10 +79,9 @@ const CategoryPage = ({navigation}) => {
     showActivityIndicator,
     setShowActivityIndicator,
     setProductIds,
-    setPLPData
+    setPLPData,
   } = useCartContext();
   useEffect(() => {
-  
     //  setProductIds(products.map(product=>product.id));
   }, [filteredDataArray]);
 
@@ -123,9 +114,7 @@ const CategoryPage = ({navigation}) => {
       return <Text>No data found for currentIndex: {currentPageIndex}</Text>;
     }
 
-    const navigateToMainPlp = (page, itemId,name) => {
-      
- 
+    const navigateToMainPlp = (page, itemId, name) => {
       filterProductData(name);
       if (
         currentPage &&
@@ -144,7 +133,7 @@ const CategoryPage = ({navigation}) => {
             setShowActivityIndicator(true);
             setCurrentPageIndexCategory(name);
             setSelectedItemIndex(innerKey); // Store the selected index
-            navigateToMainPlp('mainPlp', selectedItemIndex,name);
+            navigateToMainPlp('mainPlp', selectedItemIndex, name);
           }}>
           {image && (
             <Image
@@ -167,7 +156,7 @@ const CategoryPage = ({navigation}) => {
     return mapContent;
   };
 
-  const {setProducts,setSelectedPLPCatgeory} = useCartContext();
+  const {setProducts, setSelectedPLPCatgeory} = useCartContext();
   const {ip, token, setLoginUserId, setCurrentPage} = useLoginContext();
 
   // Ref for flatlist
@@ -229,7 +218,6 @@ const CategoryPage = ({navigation}) => {
     selectedCarousel = carouselData2;
   }
 
- 
   // Display Images
   const renderItem = ({item, index}) => (
     <View>
@@ -297,10 +285,9 @@ const CategoryPage = ({navigation}) => {
     dataOne = data2;
   }
 
-  const[prp,setPrp]=useState([]);
+  const [prp, setPrp] = useState([]);
   //filter the product data based on the Fashion tile
-  const filterProductData = async(category) => {
-
+  const filterProductData = async category => {
     let response;
     try {
       if (category) {
@@ -312,19 +299,9 @@ const CategoryPage = ({navigation}) => {
             },
           },
         );
-   
-            // Alert.alert(JSON.stringify(response.data));
-      }else{
-        response = axios.get(
-          `http://${ip}:5454/api/admin/products/getProductByTopCategory?category=clothes`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          },
-        );
-        setProducts(response.data);
-      }
+
+        // Alert.alert(JSON.stringify(response.data));
+      } 
       setPLPData(response.data);
     } catch (error) {
       console.log(
@@ -333,15 +310,13 @@ const CategoryPage = ({navigation}) => {
     }
   };
 
-  
-  //if back button pressed
-  const backButtonPressed = () => {
-    filterProductData();
-    popFromStack(navigation);
-  }
-  
 
-
+  const backButtonPressed = bannerName => {
+    setTimeout(() => {
+      popFromStack(navigation);
+ 
+    }, 100);  // Delay of 1 second (1000 milliseconds)
+  };
   return (
     <>
       <View style={{flex: 1, backgroundColor: 'white'}}>
@@ -356,7 +331,9 @@ const CategoryPage = ({navigation}) => {
           }}>
           <View>
             <TouchableOpacity
-              onPress={() => {backButtonPressed()}}
+              onPress={() => {
+                backButtonPressed();
+              }}
               style={{
                 flexDirection: 'row',
                 alignItems: 'center',
@@ -500,144 +477,14 @@ const CategoryPage = ({navigation}) => {
             </SafeAreaView>
           </View>
         </View>
-
-        {BottomNavigator()}
+        {/*show bottom navigator*/}
+        <BottomNavigator
+          style={styles.bottomNavigator}
+          navigation={navigation}
+        />
       </View>
     </>
   );
-  function BottomNavigator() {
-    return (
-      <Tab.Navigator
-        initialRouteName="Home"
-        tabBarOptions={{
-          activeTintColor: '#00338D',
-          showIcon: true,
-          labelStyle: {
-            margin: 1,
-            fontSize: 10,
-            marginBottom: 4,
-          },
-          tabStyle: {
-            height: 50,
-          },
-        }}>
-        <Tab.Screen
-          name="HomeBar"
-          component={HomeBar}
-          options={{
-            headerShown: false,
-            tabBarLabel: 'Home',
-            tabBarIcon: ({color, size}) => (
-              <Image
-                source={home1}
-                style={{
-                  width: 20,
-                  height: 20,
-                  tintColor: navigation.isFocused() ? 'grey' : color,
-                }}
-              />
-            ),
-            tabBarLabelStyle: {
-              // Add this property to change the label color
-              color: 'grey', // Change the color to whatever color you prefer
-              marginBottom: '3%',
-            },
-          }}
-          listeners={{
-            tabPress: () => {
-              navigation.navigate('mainHome');
-            },
-          }}
-        />
-        <Tab.Screen
-          name="Home1"
-          component={Home1}
-          options={{
-            headerShown: false,
-            tabBarLabel: 'Category',
-            tabBarIcon: ({color, size}) => (
-              <Image
-                source={categories1}
-                style={{
-                  width: 20,
-                  height: 20,
-                  tintColor: navigation.isFocused() ? 'grey' : color,
-                }}
-              />
-            ),
-            tabBarLabelStyle: {
-              // Add this property to change the label color
-              color: 'grey', // Change the color to whatever color you prefer
-              marginBottom: '3%',
-            },
-          }}
-          listeners={{
-            tabPress: () => {
-              navigation.navigate('Home1');
-              setCurrentPage(['mainHome', 'Home1']);
-            },
-          }}
-        />
-        <Tab.Screen
-          name="Notification"
-          component={Home1}
-          options={{
-            headerShown: false,
-            tabBarLabel: 'Notification',
-            tabBarIcon: ({color, size}) => (
-              <Image
-                source={bell1}
-                style={{
-                  width: 20,
-                  height: 20,
-                  tintColor: navigation.isFocused() ? 'grey' : color,
-                }}
-              />
-            ),
-            tabBarLabelStyle: {
-              // Add this property to change the label color
-              color: 'grey', // Change the color to whatever color you prefer
-              marginBottom: '3%',
-            },
-          }}
-          listeners={{
-            tabPress: () => {
-              // navigation.navigate('Notification');
-            },
-          }}
-        />
-        <Tab.Screen
-          name="Profile"
-          component={ProfileBar}
-          options={{
-            headerShown: false,
-            // tabBarLabel: userprofile?.firstName,
-            tabBarIcon: ({color, size}) => (
-              <Image
-                source={user1}
-                style={{
-                  width: 20,
-                  height: 20,
-                  tintColor: navigation.isFocused() ? 'grey' : color,
-                }}
-              />
-            ),
-            tabBarLabelStyle: {
-              // Add this property to change the label color
-              color: 'grey', // Change the color to whatever color you prefer
-              marginBottom: '3%',
-            },
-          }}
-          listeners={{
-            tabPress: () => {
-              navigation.navigate('mainHome');
-              setCurrentPage(['mainHome']);
-            },
-          }}
-        />
-      </Tab.Navigator>
-    );
-  }
 };
 
 export default CategoryPage;

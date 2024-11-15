@@ -28,18 +28,17 @@ import ProductDetails from './Components/ProductDetails';
 import SupplierModal from './Components/SupplierModal';
 import {ProgressBar, MD3Colors} from 'react-native-paper';
 import {useIsFocused} from '@react-navigation/native';
+import PromotionAndOfferCard from './Components/PromotionAndOfferCard';
+import RotationView from './Components/RotatingViews.jsx';
 
-const MainPdp = ({route, navigation}) => {
+const MainPdp = ({navigation}) => {
   const {
     showActivityIndicator,
     setShowActivityIndicator,
     setFilteredDataOnPLP,
-    popFromStack,
-    wishListProductId,
-    cartProductId
+    currentProductIdOnPDP
   } = useCartContext();
-  const {ip, token, loginUserId,} = useLoginContext();
-  const {productId} = route.params; // Ensure productId is passed from route params
+  const {ip, token, loginUserId, popFromStack} = useLoginContext();
   const [product, setProduct] = useState(null);
   const [isSupplierModalVisible, setSupplierModalVisible] = useState(false);
   const [pinCode, setPincode] = useState('');
@@ -94,7 +93,7 @@ const MainPdp = ({route, navigation}) => {
     };
     try {
       const response = await axios.get(
-        `http://${ip}:5454/api/admin/products/searchProductAvailable/productId=${product?.id}/pincode=${pinCode}`,
+        `http://${ip}:5454/api/admin/products/searchProductAvailable/productId=${currentProductIdOnPDP}/pincode=${pinCode}`,
         {headers: header},
       );
       setShowActivityIndicator(false);
@@ -106,13 +105,13 @@ const MainPdp = ({route, navigation}) => {
   };
 
   // Fetch product data based on productId
-  async function fetchProduct(productId) {
+  async function fetchProduct(currentProductIdOnPDP) {
     const header = {
       Authorization: `Bearer ${token}`,
     };
     try {
       const response = await axios.get(
-        `http://${ip}:5454/api/products/id/${productId}`,
+        `http://${ip}:5454/api/products/id/${currentProductIdOnPDP}`,
         {headers: header},
       );
       setProduct(response.data);
@@ -161,6 +160,10 @@ const MainPdp = ({route, navigation}) => {
       }
     }
   };
+  //onPress of back button
+  const onPressOfBackButton = () => {
+    popFromStack(navigation);
+  };
 
   // Function to render the rating people count text based on index
   const renderRatingText = (index, product) => {
@@ -194,7 +197,6 @@ const MainPdp = ({route, navigation}) => {
 
     return value.toString(); // For numbers less than 1000
   };
-
   // Utility function to format the created time
   const formatCreatedTime = createdAt => {
     const now = new Date();
@@ -243,16 +245,16 @@ const MainPdp = ({route, navigation}) => {
   const isFocused = useIsFocused(); // Checks if you're on the current page
 
   useEffect(() => {
-    if (isFocused && productId) {
+    if (isFocused && currentProductIdOnPDP) {
       // Call fetchProduct with productId after 1 second
       const timer = setTimeout(() => {
-        fetchProduct(productId);
-      }, 1000);
+        fetchProduct(currentProductIdOnPDP);
+      },10);
 
       // Clean up timer to avoid memory leaks
       return () => clearTimeout(timer);
     }
-  }, [isFocused, productId]); // Only run when productId or focus changes
+  }, [isFocused, currentProductIdOnPDP]); // Only run when productId or focus changes
 
   // Separate useEffect to update progressValues and productRating when product changes
   useEffect(() => {
@@ -291,7 +293,12 @@ const MainPdp = ({route, navigation}) => {
           <TopBar showSearchLogo={false} navigation={navigation} />
           <ScrollView style={styles.imageContainer}>
             {/* Back arrow in the top-left corner */}
-            <Image source={back} style={styles.backArrow} />
+            <TouchableOpacity
+              style={styles.backButton}
+              onPress={onPressOfBackButton}>
+              <Image source={back} style={styles.backArrow} />
+            </TouchableOpacity>
+
             {/* Product image carousel using FlatList */}
             <FlatList
               data={product.imageUrl}
@@ -330,7 +337,21 @@ const MainPdp = ({route, navigation}) => {
 
             {/*size bar */}
             <SizeSelection product={product} />
+            {/*check bogo eligibility*/}
+            {product?.eligibleForBogo && (
+              <>
+                <HorizontalLine />
+                <Text style={styles.eligibleBOGOContainer}>
+                  Eligble for BOGO
+                </Text>
+                <HorizontalLine />
+              </>
+            )}
 
+            {/*Promotion and Offer Card*/}
+            <View style={styles.promotionOfferContainer}>
+             <PromotionAndOfferCard title={'Promotion'} productId={currentProductIdOnPDP}/>
+            </View>
             <Text
               style={[
                 styles.productDetailMainHead,
@@ -570,13 +591,14 @@ const MainPdp = ({route, navigation}) => {
               </TouchableOpacity>
 
               <HorizontalLine2 />
-              <TouchableOpacity style={styles.rowContainer}
+              <TouchableOpacity
+                style={styles.rowContainer}
                 onPress={() => {
                   filterProductBasedOnBrand(
                     product.brand,
                     product?.category?.name,
-                  )}}
-              >
+                  );
+                }}>
                 <Text style={styles.filterOneOnBrand}>
                   More Products from this Brand
                 </Text>
@@ -592,12 +614,19 @@ const MainPdp = ({route, navigation}) => {
               img={heart}
               title={'WISHLIST'}
             />
-            <WishListAndBagButton product={product} img={bag} title={'ADD TO BAG'} />
+
+            <WishListAndBagButton
+              product={product}
+              img={bag}
+              title={'ADD TO BAG'}
+            />
           </View>
         </>
       ) : showActivityIndicator ? (
         <View style={styles.activityIndicatorContainer}>
-          <ActivityIndicator size="large" color="#00338D" />
+        {/* <ActivityIndicator size="large" color="#00338D" /> */}
+        <RotationView/>
+        
         </View>
       ) : (
         <Text>No product available.</Text>
@@ -616,6 +645,22 @@ const styles = StyleSheet.create({
   },
   imageContainer: {
     position: 'relative',
+  },
+  //back button container
+  backButton: {
+    marginBottom: '2%',
+    marginLeft: '1%',
+    height: 30,
+    width: 40,
+    alignItems: 'center',
+    padding: '2%',
+    justifyContent: 'center', // Optional: Centers the content vertically
+  },
+  backArrow: {
+    // Add any specific styles for your back arrow image here
+    width: 20, // Ensure it fits within the button
+    height: 12, // Maintain aspect ratio
+    resizeMode: 'contain', // Ensures the image scales appropriately
   },
   backArrow: {
     width: 20,
@@ -837,23 +882,12 @@ const styles = StyleSheet.create({
     width: 120,
   },
   //comment section
-  commentContainer: {
-    marginBottom: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
-    paddingBottom: 10,
-  },
-  ratingText: {
-    fontWeight: 'bold',
-  },
+
   commentText: {
     color: 'black',
     fontSize: 13,
     marginLeft: '5%',
     fontWeight: '300',
-  },
-  timeText: {
-    color: '#888',
   },
   commentItem: {
     justifyContent: 'space-between',
@@ -862,5 +896,14 @@ const styles = StyleSheet.create({
   },
   commentTime: {
     fontSize: 12,
+  },
+  //promotionAndOfferContainer
+  promotionOfferContainer: {flexDirection: 'row', marginTop: '4%'},
+  //eligible of BOGO
+  eligibleBOGOContainer: {
+    marginLeft: '4%',
+    marginTop: '3.3%',
+    fontWeight: '600',
+    color: '#A4343A',
   },
 });

@@ -180,7 +180,7 @@ const ApplyCoupon = ({navigation}) => {
     useState(false);
 
   useEffect(() => {
-    if (showPromotionCouponForAmountError ) {
+    if (showPromotionCouponForAmountError) {
       setTimeout(() => {
         setShowPromotionCouponAmountError(false);
       }, 16000);
@@ -374,9 +374,7 @@ const ApplyCoupon = ({navigation}) => {
           <Image source={back} style={{marginLeft: 12}} />
         </View>
         <View style={{marginLeft: '4%'}}>
-          <Text style={{color: 'black'}}>
-            APPLY COUPON
-          </Text>
+          <Text style={{color: 'black'}}>APPLY COUPON</Text>
         </View>
       </TouchableOpacity>
       <Text style={{fontSize: 12, marginLeft: '11%', fontSize: 10}}>
@@ -406,10 +404,12 @@ const ApplyCoupon = ({navigation}) => {
       )}
       {showPromotionCouponForAmountError && (
         <Text style={styles.invalidPromotionCode1}>
-             The offer is valid for orders with a minimum amount of 
-             <Text style={{fontWeight:'700'}}> ₹{targetAmount.minOrderValue}</Text>
-             
-              {'\n'}in the bag.
+          The offer is valid for orders with a minimum amount of
+          <Text style={{fontWeight: '700'}}>
+            {' '}
+            ₹{targetAmount.minOrderValue}
+          </Text>
+          {'\n'}in the bag.
         </Text>
       )}
 
@@ -652,7 +652,9 @@ const ApplyCoupon = ({navigation}) => {
           <Text style={{textAlign:'center',fontSize:12,color:'red',marginTop:'2%'}}>Coupon applied already!</Text>:
           <Text></Text>
          } */}
-          <Text style={styles.allOfferText}>All Offers</Text>
+          {getActiveOffers && getActiveOffers?.length > 0 && (
+            <Text style={styles.allOfferText}>All Offers</Text>
+          )}
           {getActiveOffers.map((item, index) => (
             <View style={styles.offerContainer} key={index}>
               <View style={styles.offerBox}>
@@ -829,7 +831,7 @@ const styles = StyleSheet.create({
     marginTop: '1%',
     color: '#9c2f2f',
   },
-    invalidPromotionCode1: {
+  invalidPromotionCode1: {
     fontSize: 11,
     marginLeft: '5%',
     marginTop: '1%',

@@ -186,12 +186,12 @@ const WalletHome = ({navigation}) => {
                   }}>
                   Wallet Balance
                 </Text>
-                <Text style={styles.walletBalance}>₹{walletBalance}.00</Text>
+                <Text style={styles.walletBalance}>₹{walletBalance}</Text>
               </View>
               <View style={styles.reservedBalance}>
                 <Text style={styles.reservedBalanceText}>Reserved Balance</Text>
                 <Text style={styles.reservedAmount}>
-                  ₹{freezeAmount ? freezeAmount : '0.00'}.00
+                  ₹{freezeAmount ? freezeAmount : '0.00'}
                 </Text>
               </View>
             </View>

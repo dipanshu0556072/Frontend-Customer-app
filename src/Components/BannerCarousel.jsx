@@ -27,6 +27,7 @@ import menFashion from '../PlpScreen/images/menFashion.png';
 import menFashion1 from '../PlpScreen/images/menFashion1.png';
 import { useCartContext } from '../Context/WomenContext';
 
+
 const BannerCarousel = () => {
 
   const{bannerComponentName}=useCartContext();
@@ -36,7 +37,7 @@ const BannerCarousel = () => {
   // Screen width for layout
   const screenWidth = Dimensions.get('window').width - 1;
 
-  // State for th`e active index of the carousel
+  // State for the active index of the carousel
   const [activeIndex, setActiveIndex] = useState(0);
 
   // Auto Scroll
@@ -134,6 +135,7 @@ const BannerCarousel = () => {
           renderItem={renderItem}
         />
       </SafeAreaView>
+
       <View style={styles.dotContainer}>{renderDotIndicators()}</View>
       <View style={styles.infoContainer}>
         <View style={styles.infoRow}>

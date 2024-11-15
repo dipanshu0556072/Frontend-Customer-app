@@ -1,16 +1,14 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   StyleSheet,
   Image,
   View,
-  Dimensions,
   Text,
   ScrollView,
   TouchableOpacity,
-  Alert,
+  ActivityIndicator,
 } from 'react-native';
 import cashback from './PlpScreen/images/cashback.png';
-
 import TopBar from './PlpScreen/TopBar';
 import beauty from './PlpScreen/images/beauty.webp';
 import gift from './PlpScreen/images/gift.png';
@@ -20,56 +18,30 @@ import back from './PlpScreen/images/back.png';
 import men from './PlpScreen/images/Men2.png';
 import kid from './PlpScreen/images/kid2.png';
 import {useLoginContext} from './Login/LoginCartProvider';
-import axios from 'axios';
 import Women from './PlpScreen/images/Womne.png';
 import BannerCarousel from './Components/BannerCarousel';
 import DealsOnBrands from './Components/DealsOnBrands';
 import BestSeller from './Components/BestSeller';
 import PlayAndEarn from './Components/PlayAndEarn';
+import RotationView from './Components/RotatingViews.jsx';
 
 export default function Home({navigation}) {
-  const {products,setProducts, setBannerComponentName} = useCartContext();
+  const {products, setProducts, setBannerComponentName} = useCartContext();
   const {ip, token} = useLoginContext();
   const {pushToStack, popFromStack, currentPage, setCurrentPageIndex} =
     useLoginContext();
 
-  //filter the product data based on the Fashion tile
-  const filterProductData = async category => {
-    let response;
-    try {
-      if (category) {
-        response = await axios.get(
-          `http://${ip}:5454/api/admin/products/getProductBySecondCategory?category=men`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          },
-        );
-          //      Alert.alert('Filtered by category'+category);
-      } else {
-        response = await axios.get(
-          `http://${ip}:5454/api/admin/products/getProductByTopCategory?category=clothes`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          },
-        );
-        //   Alert.alert('Filtered by top category');
-      }
-      setProducts([]);
-      setProducts(response.data);
-    } catch (error) {
-      console.log(
-        'getting error in the homeBar.jsx in filterProductData' + error,
-      );
-    }
-  };
+  const [showActivityIndicator, setShowActivityIndicator] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowActivityIndicator(false);
+    }, 800); // Hide ActivityIndicator after 2 seconds
+
+    return () => clearTimeout(timer); // Cleanup on unmount
+  }, []);
 
   const navigateToMainPlp = (page, itemId, category) => {
-    filterProductData(category);
-
     if (
       currentPage &&
       currentPage.length > 0 &&
@@ -81,7 +53,6 @@ export default function Home({navigation}) {
     }
   };
 
-  //tabs to navigate
   const Tab = ({image, page, title, value}) => {
     return (
       <View style={styles.categoryItem}>
@@ -96,21 +67,29 @@ export default function Home({navigation}) {
     );
   };
 
-  //if back button pressed
   const backButtonPressed = bannerName => {
-    filterProductData();
-    popFromStack(navigation), setBannerComponentName(bannerName);
+    setTimeout(() => {
+      popFromStack(navigation);
+      setBannerComponentName(bannerName);
+    }, 100);  // Delay of 1 second (1000 milliseconds)
   };
+  
+//show buffering on screen
+  if (showActivityIndicator) {
+    return (
+      <View style={styles.activityIndicatorContainer}>
+        {/* <ActivityIndicator size="large" color="#00338D" /> */}
+        <RotationView/>
+      </View>
+    );
+  }
 
   return (
     <>
       <View style={styles.mainContainer}>
-        {/*header*/}
         <TopBar navigation={navigation} />
         <ScrollView>
           <View style={styles.mainBox}>
-         
-            {/*backArrow Box*/}
             <View style={styles.backContainer}>
               <TouchableOpacity
                 onPress={() => {
@@ -137,24 +116,19 @@ export default function Home({navigation}) {
 
             <View style={styles.horizontalLine}></View>
 
-            {/*show Banners  */}
             <BannerCarousel />
-
-            {/*Deals on the brands */}
             <DealsOnBrands />
 
             <TouchableOpacity style={styles.bannerTouchableOpacity}>
               <Image source={banner1} style={styles.bannerImage} />
             </TouchableOpacity>
 
-            {/*Best Seller*/}
             <BestSeller />
 
             <View>
               <Image source={cashback} style={styles.cashBackBannerImage} />
             </View>
 
-            {/*Play and Earn */}
             <PlayAndEarn />
           </View>
         </ScrollView>
@@ -195,12 +169,10 @@ const styles = StyleSheet.create({
     marginTop: '4%',
     marginBottom: '2%',
   },
-
   categoryRow2: {
     flexDirection: 'row',
     margin: '3%',
   },
-
   categoryItem: {
     width: 120,
     height: 110,
@@ -226,18 +198,9 @@ const styles = StyleSheet.create({
     padding: '2%',
     color: '#00338D',
   },
-  spacingLeft: {
-    marginLeft: '4%',
-  },
-  spacingLeftSmall: {
-    marginLeft: '2.5%',
-  },
   spacingTop: {
     padding: '2%',
     marginTop: '3%',
-  },
-  spacingLeftLarge: {
-    marginLeft: '2%',
   },
   horizontalLine: {
     borderBottomWidth: 0.3,
@@ -254,8 +217,11 @@ const styles = StyleSheet.create({
   },
   cashBackBannerImage: {
     marginTop: '4%',
-  },
-  cashBackBannerImage: {
     width: 395,
+  },
+  activityIndicatorContainer: {
+    flex: 1,
+    // justifyContent: 'center',
+    // alignItems: 'center',
   },
 });

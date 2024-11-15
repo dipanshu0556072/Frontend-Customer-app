@@ -520,10 +520,11 @@ const ReturnPage1 = ({navigation}) => {
                             Qty: {item.quantity}
                           </Text>
                         </View>
-                        <Text>
-                          ₹{' '}
-                          {item.product.discountedPrice.toLocaleString('en-IN')}
-                        </Text>
+                        <Text>₹{
+                            item?.discountedPrice?
+                            item?.discountedPrice:
+                            item?.discountedPrice.toLocaleString('en-IN')
+                          }</Text>
                       </View>
                     </View>
                   </View>

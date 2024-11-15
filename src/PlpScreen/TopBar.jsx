@@ -15,7 +15,7 @@ export default function TopBar1({
   showSearchLogo=true 
 }) {
   const [isSearchVisible, setIsSearchVisible] = useState(false);
-  const { pushToStack, popFromStack, currentPage } = useLoginContext();
+  const { pushToStack, popFromStack, currentPage,setCurrentPage } = useLoginContext();
   const {setBannerComponentName,setProducts}=useCartContext();
 
   const handleTouchablePress = () => {
@@ -37,8 +37,15 @@ export default function TopBar1({
     forNavigate('mainHome');
     setBannerComponentName('homeBar');
     setProducts([]);
-
+    setCurrentPage(['mainHome']);
   }
+    //if bag button pressed
+    const onPressBag=(page)=>{
+      forNavigate(page);
+      setBannerComponentName(page);
+      setProducts([]);
+    
+    }
   return (
     <TouchableWithoutFeedback onPress={handleTouchablePress}>
       <View style={styles.container}>
@@ -55,12 +62,12 @@ export default function TopBar1({
               </TouchableOpacity>
             )}
             {showCartLogo && (
-              <TouchableOpacity onPress={() => forNavigate('mainBag')}>
+              <TouchableOpacity onPress={() => onPressBag('mainBag')}>
                 <Image source={bag} style={styles.bagIcon} />
               </TouchableOpacity>
             )}
             {showWishListLogo && (
-              <TouchableOpacity onPress={() => forNavigate('WishList')}>
+              <TouchableOpacity onPress={() => onPressBag('WishList')}>
                 <Image source={heart} style={styles.heartIcon} />
               </TouchableOpacity>
             )}

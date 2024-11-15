@@ -22,6 +22,7 @@ import FilterProductsModal from './Components/FilterProductsModal.jsx';
 import {useLoginContext} from './Login/LoginCartProvider.jsx';
 import PLPComponent from './Components/PLPComponent.jsx';
 import axios from 'axios';
+import RotationView from './Components/RotatingViews.jsx';
 
 const MainPlp = ({navigation}) => {
   //
@@ -33,7 +34,6 @@ const MainPlp = ({navigation}) => {
     filteredDataOnPLP,
     setFilteredDataOnPLP,
     setSelectedFilterData,
-    wishListProductId
   } = useCartContext();
   const {ip, token, popFromStack} = useLoginContext();
   //show the Modal of sort and filter
@@ -157,15 +157,16 @@ const MainPlp = ({navigation}) => {
   const backButtonPressed = () => {
     //  fetchData();
     popFromStack(navigation);
+    setFilteredDataOnPLP([]);
   };
 
   useEffect(() => {
-    // Show the ActivityIndicator for 2 seconds when component mounts
+    // Show the ActivityIndicator for 2.5 seconds when component mounts
     const timer = setTimeout(() => {
       setShowActivityIndicator(false);
-    }, 1000);
+    }, 2500);
 
-    // Clean up the timer when the component unmounts
+    // Clean up the timer when t  <BottomNavigator navigation={navigation}/>he component unmounts
     return () => clearTimeout(timer);
   }, []);
 
@@ -173,9 +174,11 @@ const MainPlp = ({navigation}) => {
     <View style={styles.mainContainer}>
       {/*-------------------------------------------show activity indicator-------------------------------------------------------------*/}
       {showActivityIndicator ? (
-        <View style={styles.activityIndicatorContainer}>
-          <ActivityIndicator size="large" color="#00338D" />
-        </View>
+           <View style={styles.wrapper}>
+      {/* <ActivityIndicator size="large" color="#00338D" /> */}
+      <RotationView/>
+      <Text style={styles.updateProdileText}>Shop till you drop...or until the wifi goes out!</Text>
+    </View>
       ) : (
         <>
           {/*header*/}
@@ -334,6 +337,17 @@ const styles = StyleSheet.create({
     padding: '1%',
   },
   filterContainer: {},
+  wrapper: {
+    height:100,
+    marginTop:'90%',
+    backgroundColor:'red',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+  },
+  updateProdileText:{
+    color:'black',fontWeight:'300'
+  },
   activityIndicatorContainer: {
     position: 'absolute',
     top: 0,

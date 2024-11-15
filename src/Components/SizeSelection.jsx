@@ -4,6 +4,7 @@ import {
   View,
   Dimensions,
   TouchableOpacity,
+  Alert,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import { useCartContext } from '../Context/WomenContext';
@@ -14,7 +15,7 @@ const SizeSelection = ({product}) => {
   const [selectedSizeQuantity, setSelectedSizeQuantity] = useState(null);
   const [allSizes, setAllSizes] = useState([]);
   const predefinedSize = ['S', 'M', 'L', 'XL', 'XXL'];
-  const {setSelectedSizes}=useCartContext();
+  const {selectedSizes,setSelectedSizes}=useCartContext();
 
   //check productQuantity
   const checkQuantity = size => {
@@ -34,7 +35,7 @@ const SizeSelection = ({product}) => {
       setSelectedSizeQuantity(checkQuantity(size));
     } else {
       // Handle the case where the size is not available
-      alert('This size is not available.');
+      Alert.alert('This size is not available.');
     }
   };
 

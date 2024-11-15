@@ -122,7 +122,13 @@ const SignIn = ({navigation}) => {
       throw error;
     }
   };
-
+  
+  //onPress of emailLink
+  const onPressOfEmailLink=()=>{
+   
+      navigation.navigate('EmailLogin')
+   
+  }
 
 
   // Effect to update button color based on field validity
@@ -182,7 +188,7 @@ const SignIn = ({navigation}) => {
         <View style={styles.signUpBox}>
           <View style={styles.signUpRow}>
             <Text style={styles.signUpBoxText1}>Sign Up using </Text>
-            <TouchableOpacity onPress={() => navigation.navigate('EmailLogin')}>
+            <TouchableOpacity onPress={() => onPressOfEmailLink()}>
               <Text style={styles.signUpBoxText2}>Email</Text>
             </TouchableOpacity>
           </View>

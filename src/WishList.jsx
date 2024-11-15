@@ -456,6 +456,7 @@ const styles = {
     height: 10,
     backgroundColor: '#00A3A1',
     borderRadius: 4,
+    marginTop:'20%'
   },
   emptyWishlistSmallBarMargin: {
     marginTop: '20%',

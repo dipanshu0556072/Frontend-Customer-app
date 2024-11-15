@@ -28,7 +28,8 @@ export default function WomenCartProvider({children}) {
   const [selectedFilter, setSelectedFilter] = useState('brand');
   //based on current filter on filter section show the data on filter modal
   const [selectedFilterData, setSelectedFilterData] = useState([]);
-
+  //canelledOrderItems array
+  const[cancelledOrderItems,setCancelledOrderItems]=useState([]);
   
 
 
@@ -50,6 +51,8 @@ export default function WomenCartProvider({children}) {
   const [cartProductId, setCartProductId] = useState([]);
   //add wishlistData
   const [wishListData, setWishListData] = useState([]);
+  //current ProductId on PDP
+  const[currentProductIdOnPDP,setCurrentProductIdOnPDP]=useState()
 
   //set user profile
   const [userprofile, setUserProfile] = useState([]);
@@ -132,6 +135,8 @@ export default function WomenCartProvider({children}) {
   const [scheduleSubscriptionOption, setScheduleSubscriptionOption] =
     useState('0');
 
+  //store userGender 
+  const [updateGender, setUpdateGender] = useState(null);  
   //selected address tile indes
   const [selectedAddressListIndex, setSelectedAddressListindex] = useState(0);
   const DeleteBagItem = (itemId, itemCategory) => {
@@ -152,7 +157,8 @@ export default function WomenCartProvider({children}) {
   const [selectedStorePickupDay, setSelectedStorePickupDay] = useState('');
   const [selectedStorePickupTime, setSelectedStorePickupTime] = useState('');
   const [filteredData, setFilteredData] = useState([]);
-
+  //store current order
+  const [getOrderStatus, setGetOrderStatus] = useState([]);
   //get all available points & Tier
   const [availablePoints, setAvailablePoints] = useState('');
   const [userLoyaltyTier, setUserLoyaltyTier] = useState('');
@@ -242,6 +248,11 @@ export default function WomenCartProvider({children}) {
     setSelectedBagItem(prevWishData => [...prevWishData, ...updatedBag]);
     console.log('After Bag ' + selectedBagItem);
   };
+
+
+
+
+  
   const contextvalue = {
     //selected bag items
     selectedBagItem,
@@ -254,6 +265,7 @@ export default function WomenCartProvider({children}) {
     //for Delete Bag Item
     DeleteBagItem,
     MoveToBag,
+    
 
     //for Move item to wishlist
     MoveToWishList,
@@ -459,7 +471,11 @@ export default function WomenCartProvider({children}) {
     filteredDataOnPLP,setFilteredDataOnPLP,
     selectedFilter, setSelectedFilter,
     selectedFilterData, setSelectedFilterData,
-    pt,setPt
+    pt,setPt,
+    currentProductIdOnPDP,setCurrentProductIdOnPDP,
+    updateGender, setUpdateGender,
+    cancelledOrderItems,setCancelledOrderItems,
+    getOrderStatus, setGetOrderStatus
   };
   return (
     <WomenContext.Provider value={contextvalue}>

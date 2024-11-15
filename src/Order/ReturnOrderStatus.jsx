@@ -25,6 +25,7 @@ import map from '../PlpScreen/images/map.png';
 import {RadioButton} from 'react-native-paper';
 import {SelectList} from 'react-native-dropdown-select-list';
 import ReturnOrderProgressBar from './ReturnOrderProgressBar';
+import TopBar from '../PlpScreen/TopBar';
 
 const ReturnOrderStatus = ({navigation}) => {
   const {
@@ -59,39 +60,6 @@ const ReturnOrderStatus = ({navigation}) => {
     changeOrderStatus,
   } = useLoginContext();
 
-  const {
-    subscribedSelectedDays,
-    setSubscribedSelectedDays,
-    subscriptionEndDate,
-    setSubscriptionEndDate,
-    subscribedGroceryProductId,
-    setWhichPageToNavigate,
-    addressList,
-    setAddressList,
-    selectedDate,
-    setSelectedDate,
-    userName,
-    setUserName,
-    pinCode,
-    setPinCode,
-    streetAddress,
-    setStreetAddress,
-    mobileNumber,
-    setMobileNumber,
-    houseNumber,
-    setHouseNumber,
-    state,
-    setState,
-    city,
-    setCity,
-    selectedAddress,
-    setSelectedAddress,
-    subscriptionTimeSlot,
-    setSubscriptionTimeSlot,
-    selectedDatesAsString,
-    setSelectedDatesAsString,
-    count,
-  } = useGroceryContext();
 
   //used for buffering icon
   const [showActivityIndicator, setShowActivityIndicator] = useState(true);
@@ -197,15 +165,12 @@ const ReturnOrderStatus = ({navigation}) => {
       ) : (
         <>
           <View style={styles.topContainer}>
-            <TouchableOpacity
-              onPress={() => {
-                forNavigate('mainHome');
-              }}>
-              <Image
-                source={{uri: 'https://shorturl.at/ckGU2'}}
-                style={{width: 100, height: 100, marginLeft: '4%'}}
-              />
-            </TouchableOpacity>
+          <TopBar
+            navigation={navigation}
+            showCartLogo={false}
+            showWishListLogo={false}
+            showSearchLogo={false}
+          />
 
             <TouchableOpacity
               onPress={() => {
@@ -252,10 +217,11 @@ const ReturnOrderStatus = ({navigation}) => {
                             Qty: {item.quantity}
                           </Text>
                         </View>
-                        <Text>
-                          ₹{' '}
-                          {item.product.discountedPrice.toLocaleString('en-IN')}
-                        </Text>
+                        <Text>₹{
+                            item?.discountedPrice?
+                            item?.discountedPrice:
+                            item?.discountedPrice.toLocaleString('en-IN')
+                          }</Text>
                       </View>
                     </View>
                   </View>
@@ -302,10 +268,10 @@ const ReturnOrderStatus = ({navigation}) => {
             <TouchableOpacity
               style={styles.backBTN}
               onPress={() => {
-                setCurrentPage('mainHome', 'order');
-                navigation.navigate('order');
+                setCurrentPage('mainHome');
+                navigation.navigate('mainHome');
               }}>
-              <Text style={styles.backBtnText}>BACK TO ORDERLIST</Text>
+              <Text style={styles.backBtnText}>BACK TO HOME</Text>
             </TouchableOpacity>
           </ScrollView>
         </>

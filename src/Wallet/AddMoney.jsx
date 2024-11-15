@@ -105,7 +105,7 @@ const AddMoney = ({navigation}) => {
             fontSize: 20,
             fontWeight: '700',
           }}>
-          ₹{walletBalance}.00
+          ₹{walletBalance}
         </Text>
       </View>
       <View style={{height: 0.4, backgroundColor: 'grey', marginTop: '4%'}} />

@@ -42,13 +42,12 @@ import Payment2 from './src/Payment/Payment2';
 import PaymentSuccess from './src/Payment/PaymentSuccess';
 import Address from './src/Address/Address';
 import AddressDetail from './src/Address/AddressDetail';
-import AddressList from './src/Address/AddressList';
+import OrderTile from './src/Components/OrderTile.jsx';
+
 import SavedAddress from './src/Address/SavedAddress';
 import OrderSummary from './src/Order/OrderSummary.jsx';
 import ShopTrack from './src/Order/ShopTrack.jsx';
 import Elastic from './src/Elastic.jsx';
-import EditProfile from './src/EditProfile.jsx';
-import Test from './src/Test.jsx';
 import OrderStatus from './src/Order/OrderStatus.jsx';
 import order from './src/Order/Order.jsx';
 import StarRating from './src/StarRating.jsx';
@@ -107,9 +106,10 @@ import DealsOnBrands from './src/Components/DealsOnBrands.jsx';
 import BestSeller from './src/Components/BestSeller.jsx';
 import PlayAndEarn from './src/Components/PlayAndEarn.jsx';
 import PLPComponent from './src/Components/PLPComponent.jsx';
+import BottomNavigator from './src/Components/BottomNavigator.jsx';
+import SelectGender from './src/Components/SelectGender.jsx';
 
 import Exp from './src/Exp.jsx';
-
 
 const App = () => {
   return (
@@ -142,13 +142,25 @@ const App = () => {
                 <Stack.Screen name="SignIn" component={SignIn} />
                 <Stack.Screen name="userLogin" component={userLogin} />
                 <Stack.Screen name="EmailLogin" component={EmailLogin} />
-                <Stack.Screen name="EmailLoginValid" component={EmailLoginValidation}/>
+                <Stack.Screen
+                  name="EmailLoginValid"
+                  component={EmailLoginValidation}
+                />
                 <Stack.Screen name="EmailVerify" component={EmailVerify} />
                 <Stack.Screen name="mobileVerify" component={MobileVerify} />
-                <Stack.Screen name="forgotPassword" component={ForgetPassword}/>
-                <Stack.Screen name="forgotChangePassword" component={ForgotChangePassword}/>
-                <Stack.Screen name="mobileNumberVerify" component={mobileNumberVerify}/>
-               
+                <Stack.Screen
+                  name="forgotPassword"
+                  component={ForgetPassword}
+                />
+                <Stack.Screen
+                  name="forgotChangePassword"
+                  component={ForgotChangePassword}
+                />
+                <Stack.Screen
+                  name="mobileNumberVerify"
+                  component={mobileNumberVerify}
+                />
+
                 {/*-------------------------------------HOME SECTION-----------------------------------------------------------------*/}
                 <Stack.Screen name="mainHome" component={MainHome} />
                 <Stack.Screen name="Fashion" component={Fashion} />
@@ -164,18 +176,22 @@ const App = () => {
                   name="paymentSuccess"
                   component={PaymentSuccess}
                 />
+                                <Stack.Screen
+                  name="selectGender"
+                  component={SelectGender}
+                />
                 <Stack.Screen name="cardPayment" component={CardPayment} />
                 <Stack.Screen name="Payment1" component={Payment1} />
                 <Stack.Screen name="Payment2" component={Payment2} />
-                <Stack.Screen name="AddressList" component={AddressList} />
                 <Stack.Screen name="savedAddress" component={SavedAddress} />
                 <Stack.Screen name="Address" component={Address} />
                 <Stack.Screen name="AddressDetail" component={AddressDetail} />
+                <Stack.Screen name="orderTile" component={OrderTile} />
                 <Stack.Screen name="orderSummary" component={OrderSummary} />
                 <Stack.Screen name="ShopTrack" component={ShopTrack} />
                 <Stack.Screen name="Elastic" component={Elastic} />
                 <Stack.Screen name="orderStatus" component={OrderStatus} />
-
+                <Stack.Screen name="bottomNavigator" component={BottomNavigator} />
                 <Stack.Screen name="order" component={order} />
                 <Stack.Screen name="starRating" component={StarRating} />
                 <Stack.Screen name="userProfile" component={userProfile} />

@@ -7,66 +7,21 @@ import kpmg from './PlpScreen/images/kpmglogo.png';
 import kpmg1 from './PlpScreen/images/kpmg56.jpeg';
 import profile1 from './Login/images/profile1.png';
 import { useLoginContext } from './Login/LoginCartProvider';
-import back from './PlpScreen/images/back.png';
-import grocery from './PlpScreen/images/grocery.jpeg';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import home1 from './PlpScreen/images/home1.png';
-import categories1 from './PlpScreen/images/category1.png';
-import bell1 from './PlpScreen/images/bell1.png';
-import user1 from './PlpScreen/images/user1.png';
-import discount from './PlpScreen/images/discount.png';
-import selfcheckout from './PlpScreen/images/selfcheckout.png';
-import pickup from './PlpScreen/images/pickup.png';
-import cashback from './PlpScreen/images/cashback.png';
-import playearn1 from './PlpScreen/images/playearn1.png';
-import playearn2 from './PlpScreen/images/playearn2.png';
-import fortune from './PlpScreen/images/fortune.png';
-import scrollarrow from './PlpScreen/images/scrollarrow.png';
 import plus1 from './PlpScreen/plus.png';
-import TopBar from './PlpScreen/TopBar';
-import quickshop from './PlpScreen/images/quickshop.jpeg';
-import beauty from './PlpScreen/images/beauty.webp';
-import add1 from './PlpScreen/images/add1.png';
-import add2 from './PlpScreen/images/add2.png';
-import add3 from './PlpScreen/images/add3.png';
-import add4 from './PlpScreen/images/add4.png';
-import add5 from './PlpScreen/images/add5.png';
-import banner1 from './PlpScreen/images/banner1.png';
-import banner2 from './PlpScreen/images/banner2.png';
-import brand1 from './PlpScreen/images/brand1.png';
-import brand2 from './PlpScreen/images/brand2.png';
-import brand3 from './PlpScreen/images/brand3.png';
-import brand4 from './PlpScreen/images/brand4.png';
-import brand5 from './PlpScreen/images/brand5.png';
-import brand6 from './PlpScreen/images/brand6.png';
-import bestSell1 from './PlpScreen/images/bestSell1.png';
-import bestSell2 from './PlpScreen/images/bestSell2.png';
-import bestSell3 from './PlpScreen/images/bestSell3.png';
-import bestSell4 from './PlpScreen/images/bestSell4.png';
-import bestSell5 from './PlpScreen/images/bestSell5.png';
-import bestSell6 from './PlpScreen/images/bestSell6.png';
-import fashion from './PlpScreen/images/fashion.jpeg';
 import { useCartContext } from './Context/WomenContext';
-import electronics from './PlpScreen/images/electronics.png';
 import referral from './copy.png'
-import Home1 from './Fashion';
 import Clipboard from '@react-native-clipboard/clipboard';
 import QRCode from 'react-native-qrcode-svg';
-import cross from './PlpScreen/images/close.png';
 
 export default function ProfileBar({navigation})
 {
-  const {ip,mobileNumber, 
-    emailId,gender,userName,
+  const {ip,userName,
     loginUserId} = useLoginContext();
     const {token,popFromStack,pushToStack,
-      currentPage, setCurrentPage,
-      currentPageIndex,setCurrentPageIndex,
-      currentPageIndexCategory,setCurrentPageIndexCategory,
-      updateUserName,setUpdateUserName,
-updateMobileName,setUpdateMobileName,
-updateEmail,setUpdateEmail,updateGender,setUpdateGender,
-updatePassword,setUpdatePassword}=useLoginContext();     
+      currentPage,
+      updateUserName,setUpdateUserName,setDOB,setDateOfAnniversary,
+updateMobileName,setUpdateMobileName,setUpdateGender,
+updateEmail,setUpdateEmail,}=useLoginContext();     
     const forNavigate=(page)=>{
      {
         console.log(page+" "+currentPage[currentPage.length-1]);
@@ -79,7 +34,7 @@ updatePassword,setUpdatePassword}=useLoginContext();
       }
     }
   const [logOut, setLogOut] = useState(false);
-  const {userprofile,setUserProfile,setUserName,mobile,setMobile,setIsItForPlaceOrder,setAllSavedAddress,
+  const {userprofile,setUserProfile,mobile,setMobile,setIsItForPlaceOrder,setAllSavedAddress,
     disableAction,setDisableAction
   }=useCartContext();
   const [sortModalVisible, setSortModalVisible] = useState(false);
@@ -92,7 +47,7 @@ updatePassword,setUpdatePassword}=useLoginContext();
     getData();
     getReferralCode();
     
-  },[token,mobile,userName]);
+  },[]);
   // console.log("userProfike"+JSON.stringify(userprofile.mobile));
   const getData = async () => {
     let profileData;
@@ -103,15 +58,16 @@ updatePassword,setUpdatePassword}=useLoginContext();
         },
       });
       profileData=response.data;
+      console.log(JSON.stringify(profileData));
       // Handle the response data
-      setUserProfile(response.data);
+      setUserProfile(profileData);
       setAllSavedAddress(response.data.addresses);
-      // setMobile(profileData.mobile);
-      // setUserName(profileData.firstName +" "+profileData.lastName);
-      // console.log(JSON.stringify("Profile:"+JSON.stringify(response.data.mobile))+"\n"+JSON.stringify(userprofile.mobile));
-      setUpdateMobileName(profileData.mobile);
-      setUpdateEmail(profileData.email);     
-      setUpdateUserName(profileData.firstName + (profileData.lastName ? ` ${profileData.lastName}` : ''));
+     setUpdateMobileName(profileData?.mobile);
+      setUpdateEmail(profileData?.email);     
+      setUpdateUserName(profileData?.firstName + (profileData.lastName ? ` ${profileData.lastName}` : ''));
+      setDOB(profileData?.dateOfBirth);
+      setDateOfAnniversary(profileData?.anniversaryDate);
+      setUpdateGender(profileData?.gender);
     } catch (error) {
       // Handle errors
       console.error('Error fetching data:', error);
@@ -126,11 +82,7 @@ updatePassword,setUpdatePassword}=useLoginContext();
   const {  homeIcon, setHomeIcon,setCategoryIcon,
          setBellIcon,setUserIcon} = useLoginContext();
  
-        const [password,setPassword]=useState("");
-        const [confirmPassword,setConfirmPassword]=useState("");  
-        const [seePassword,setSeePassword]=useState(true);
-        const [seePassword1,setSeePassword1]=useState(true);
-      
+  
         function homeFooter(){
           if(!homeIcon){
             setBellIcon(false);
@@ -186,6 +138,7 @@ updatePassword,setUpdatePassword}=useLoginContext();
       }, 100);
     };
    
+    useEffect(()=>{},[updateUserName]);
 
     return (
         <>
@@ -208,8 +161,8 @@ updatePassword,setUpdatePassword}=useLoginContext();
 
       <View style={{flexDirection:'row',marginTop:'3%',}}>
       <Image source={
-          userprofile.gender==="male"?profile1:
-          userprofile.gender==="emale"?profile1:profile1
+          userprofile?.gender==="male"?profile1:
+          userprofile?.gender==="emale"?profile1:profile1
         } style={{width:40,height:40,marginTop:'8%',marginRight:'5%'}}/>
 
         <View style={{marginTop:'8%'}}>

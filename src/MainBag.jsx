@@ -37,8 +37,9 @@ import couponDiscount from './PlpScreen/images/CouponDiscount.png';
 import ConfettiCannon from 'react-native-confetti-cannon';
 import animationImage from './PlpScreen/AnimationCoupon.json';
 import cropCheers from './PlpScreen/images/cropCheers.png';
-import { useIsFocused } from '@react-navigation/native';
+import {useIsFocused} from '@react-navigation/native';
 import TopBar from './PlpScreen/TopBar';
+import PromotionDropdown from './Components/PromotionDropdown';
 
 const lastViewData = [
   {
@@ -72,11 +73,10 @@ const lastViewData = [
     productName: 'Pink Blazer',
   },
 ];
+import ProductTile from './Components/ProductTile';
 
 const MainBag = ({navigation}) => {
-  const [bagGetData, setBagGetData] = useState([]);
   const {
-
     decreaseTotalAmount,
     setDecreaseTotalAmount,
     cartItem,
@@ -118,6 +118,10 @@ const MainBag = ({navigation}) => {
     setShowConfetti,
     checkIsPromotionCouponApplied,
     setCheckIsPromotionCouponApplied,
+    wishListProductId,
+    setWishListProductId,
+    cartProductId,
+    setCartProductId,
   } = useCartContext();
 
   const [redeemYouPointsError, setRedeemYourPointsError] = useState(false);
@@ -178,7 +182,7 @@ const MainBag = ({navigation}) => {
   //   }
   // };
 
-
+  useEffect(() => {}, [cartItem]);
   const isFocused = useIsFocused();
 
   useEffect(() => {
@@ -220,7 +224,6 @@ const MainBag = ({navigation}) => {
   };
 
   useEffect(() => {
-    getWishlistData();
     if (redeemYouPointsError) {
       setTimeout(() => {
         setRedeemYourPointsError(false);
@@ -238,14 +241,7 @@ const MainBag = ({navigation}) => {
         setRedeemYouPointIsMuch(false);
       }, 4000);
     }
-  }, [
-    token,
-    redeemYouPointsError,
-    redeemYouPointsNULLError,
-    redeemYouPointsGoodError,
-    redeemYouPoints,
-    redeemYouPointIsMuch,
-  ]);
+  }, []);
 
   useEffect(() => {
     checkIsPromotionCouponIsApplied();
@@ -275,11 +271,11 @@ const MainBag = ({navigation}) => {
     } catch (error) {
       console.error('Error fetching data:', error);
     }
-  }
+  };
 
+  useEffect(() => {}, [cartItem, totalAmount]);
   useEffect(() => {
     getCart();
-    amountCalculation();
   }, [
     couponCodeGoodError,
     token,
@@ -292,68 +288,17 @@ const MainBag = ({navigation}) => {
     if (itemQuantityId !== 0) {
       getIdQunatityToUpdateQuantity();
     }
-  }, [itemQuantity, itemQuantityId]);
+  }, []);
 
   useEffect(() => {}, [totalAmount]);
   useEffect(() => {
-    amountCalculation();
     if (cartItem && cartItem.cartItems && cartItem.cartItems.length <= 0) {
       setDataStore([]);
       setFilteredData([]);
       setPinCode('');
       setDeliveryOption('0');
     }
-    amountCalculation();
-  }, [cartItem, deliveryOption, redeemYouPoints]);
-
-  function amountCalculation() {
-    if (cartItem && cartItem.cartItems && cartItem.cartItems.length > 0) {
-      // cartItem.cartItems.forEach((item, index) => {
-      //   sm += item.product.discountedPrice * item.quantity;
-      // });
-      sm = cartItem.totalDiscountedPrice;
-      // Adjust totalAmount based on deliveryOption
-      // if (deliveryOption === '1') {
-      //   // Add 50 for Express Delivery
-      //   sm += 50;
-      // }
-      if (couponCodeGoodError) {
-        sm -= 1100;
-      }
-      if (
-        redeemYouPoints &&
-        redeemYouPoints <= AllAvailablePointsToRedeem &&
-        flag
-      ) {
-        sm -= redeemYouPoints;
-        // nowRedeemYourPointsManually();
-      } else if (
-        redeemYouPoints &&
-        redeemYouPoints > AllAvailablePointsToRedeem
-      ) {
-        setRedeemYouPointIsMuch(true);
-      }
-      if (pt) {
-        if (
-          redeemYouPoints &&
-          redeemYouPoints <= AllAvailablePointsToRedeem &&
-          flag
-        ) {
-          setTotalAmount(parseInt(pt) - redeemYouPoints);
-        } else {
-          setTotalAmount(pt);
-        }
-      } else {
-        setTotalAmount(sm);
-      }
-
-      setCartCount(cartItem.cartItems.length);
-    } else {
-      setTotalAmount(0);
-      setPt(0);
-      setCartCount(0);
-    }
-  }
+  }, []);
 
   async function getIdQunatityToUpdateQuantity() {
     try {
@@ -425,7 +370,7 @@ const MainBag = ({navigation}) => {
     if (couponCodeGoodError) {
       setCouponCodeError(false);
     }
-  }, [token, remove1, couponCodeError, totalAmount]);
+  }, []);
 
   const [flag, setFlag] = useState(false);
 
@@ -483,6 +428,7 @@ const MainBag = ({navigation}) => {
       })
       .then(response => {
         // console.log("\n\n\nID To Be Deleted\n\n\n"+price)
+        setCartProductId(productId => productId.filter(id => id == itemId));
         setCartCount(cartCount - 1);
         getCart();
       })
@@ -611,7 +557,7 @@ const MainBag = ({navigation}) => {
   const closeModal = () => {
     getIdQunatityToUpdateQuantity();
     getCart();
-    amountCalculation();
+
     setModalVisible(false);
   };
   const closeModal1 = () => {
@@ -658,7 +604,7 @@ const MainBag = ({navigation}) => {
   }
   useEffect(() => {
     seeAllAvailablePointsToRedeem();
-  }, [AllAvailablePointsToRedeem, redeemYouPoints]);
+  }, []);
   const renderItem1 = (item, index) => {
     const isSelected = selectedItem === item;
 
@@ -730,22 +676,6 @@ const MainBag = ({navigation}) => {
   // console.log("\n\nCartItem"+JSON.stringify(cartItem));
   const [wishlistStatus, setWishlistStatus] = useState({});
 
-  useEffect(() => {
-    // Assuming wishListData is accessible in your component
-    const checkWishlistStatus = () => {
-      const updatedWishlistStatus = {};
-      cartItem?.cartItems?.forEach(cartItem => {
-        const isInWishlist = wishListData?.wishlistItems?.some(
-          wishlistItem => wishlistItem.product.id === cartItem.product.id,
-        );
-        updatedWishlistStatus[cartItem.product.id] = isInWishlist;
-      });
-      setWishlistStatus(updatedWishlistStatus);
-    };
-
-    checkWishlistStatus();
-  }, [cartItem]);
-
   //show applied promotion coupon Animation
   const [
     showPromotionAppliedCouponAnimation,
@@ -774,7 +704,7 @@ const MainBag = ({navigation}) => {
     if (filteredData && filteredData.length > 0) {
       setDeliveryOption('2');
     }
-  }, [filteredData]);
+  }, []);
 
   function RedeemYourPointsFn() {
     setRedeemYourPoints(AllAvailablePointsToRedeem);
@@ -818,7 +748,7 @@ const MainBag = ({navigation}) => {
 
   useEffect(() => {
     getRewardHistoryBurnedPoints();
-  }, [getRewardHistoryUsedPoint]);
+  }, []);
 
   //get date as format 26 May,2024
   const addDays = (date, days) => {
@@ -872,7 +802,7 @@ const MainBag = ({navigation}) => {
     setShowActivityIndicator(true);
     setTimeout(() => {
       setShowActivityIndicator(false);
-    }, 100);
+    }, 300);
     const data = {
       expressDelivery: true,
     };
@@ -895,7 +825,7 @@ const MainBag = ({navigation}) => {
     setShowActivityIndicator(true);
     setTimeout(() => {
       setShowActivityIndicator(false);
-    }, 100);
+    }, 300);
     try {
       const response = await axios.delete(
         `http://${ip}:5454/api/cart/${loginUserId}/express-delivery`,
@@ -949,14 +879,13 @@ const MainBag = ({navigation}) => {
   }, []);
   return (
     <View style={{flex: 1, backgroundColor: 'white'}}>
-
-<TopBar
-          navigation={navigation}
-          showKPMGLogo={true}
-          showSearchLogo={false}
-          showCartLogo={false}
-          showWishListLogo={true}
-        />
+      <TopBar
+        navigation={navigation}
+        showKPMGLogo={true}
+        showSearchLogo={false}
+        showCartLogo={false}
+        showWishListLogo={true}
+      />
       <View style={{flexDirection: 'row', alignItems: 'center'}}>
         <TouchableOpacity
           onPress={() => {
@@ -973,7 +902,12 @@ const MainBag = ({navigation}) => {
         </TouchableOpacity>
       </View>
       {/* <Text>{currentPage}</Text> */}
+      {/* 
+{
+  cartItem && cartItem?.cartItems && cartItem?.cartItems?.length>0 ?
+  <ProductTile/>:
 
+} */}
       <ScrollView ref={scrollViewRef} showsVerticalScrollIndicator={false}>
         {cartItem && cartItem.cartItems && cartItem.cartItems.length <= 0 && (
           <>
@@ -1083,13 +1017,13 @@ const MainBag = ({navigation}) => {
                 style={{
                   color: 'black',
                   marginLeft: '7%',
-                  fontSize: 17,
+                  fontSize: 15,
                   marginTop: '3%',
                   fontWeight: '500',
                 }}>
                 Delivery option available{' '}
               </Text>
-              <Text style={{marginLeft: '7%', fontSize: 15}}>
+              <Text style={{marginLeft: '7%', fontSize: 12}}>
                 Please select delivery option
               </Text>
               <View
@@ -1133,6 +1067,9 @@ const MainBag = ({navigation}) => {
                 <Text style={{color: 'black'}}>Express Store{'\n'}Pick Up</Text>
               </View>
             </View>
+
+            <ProductTile />
+
             {filteredData &&
               filteredData.length > 0 &&
               deliveryOption === '2' && (
@@ -1330,347 +1267,20 @@ const MainBag = ({navigation}) => {
               </TouchableWithoutFeedback>
             </Modal>
 
-            {/* {
-                    sortedWishlist.length > 0 ? (
-                     <>
-                     <View style={{ height: 1, backgroundColor: '#00338D', marginTop: '4%', marginBottom: '4%' }} />
-                      {sortedWishlist.map((item) => (
-                       <View key={item.id}>
-                      </View>
-                     ))}
-                    </>
-                    ) : (
-                     <>
-                     </>
-                    )
-                   } */}
-
-            {cartItem.cartItems.map((item, index) => (
-              <>
-                <View key={index + 8}>
-                  <View style={{height: 1, backgroundColor: '#00338D'}} />
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      padding: 14,
-                      marginTop: '4%',
-                    }}>
-                    <Image
-                      source={{uri: item.product.imageUrl[0]}}
-                      style={{width: 130, height: 150, borderRadius: 12}}
-                    />
-
-                    <View style={{padding: 7, marginLeft: '5%'}}>
-                      <Text style={{fontWeight: 'bold', color: 'black'}}>
-                        {item.product.brand}
-                      </Text>
-                      <Text
-                        style={{color: 'black', fontSize: 10, padding: '1%'}}>
-                        {item.product.title}
-                      </Text>
-                      <View
-                        style={{flexDirection: 'row', alignItems: 'center'}}>
-                        <Text style={{color: 'black', padding: '1%'}}>
-                          ₹{item.product.discountedPrice} / ₹{' '}
-                        </Text>
-                        <Text
-                          style={{
-                            color: 'black',
-                            textDecorationLine: 'line-through',
-                          }}>
-                          {item.product.price}
-                        </Text>
-                        {item.discountPercent > 0 ? (
-                          <Text
-                            style={{
-                              color: '#A4343A',
-                              marginLeft: '1%',
-                              fontSize: 10,
-                            }}>
-                            {' '}
-                            {item.discountPercent}% OFF
-                          </Text>
-                        ) : (
-                          <Text></Text>
-                        )}
-                      </View>
-
-                      <View
-                        style={{
-                          flexDirection: 'row',
-                          alignItems: 'center',
-                          padding: 5,
-                          justifyContent: 'space-between',
-                        }}>
-                        <TouchableOpacity
-                          style={{
-                            flexDirection: 'row',
-                            alignItems: 'center',
-                            backgroundColor: '#D3D3D3',
-                            padding: '3%',
-                            borderRadius: 12,
-                          }}
-                          onPress={() => handlePress1(item.id)}>
-                          <Text
-                            style={{
-                              marginRight: 5,
-                              fontWeight: '900',
-                              color: 'black',
-                              fontSize: 14,
-                            }}>
-                            Size:
-                          </Text>
-                          <Text style={{color: 'black', fontWeight: '400'}}>
-                            {item.size}
-                          </Text>
-                          <Image
-                            source={down}
-                            style={{width: 13, height: 17}}
-                          />
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                          style={{
-                            flexDirection: 'row',
-                            alignItems: 'center',
-                            backgroundColor: '#D3D3D3',
-                            padding: '3%',
-                            borderRadius: 14,
-                          }}
-                          onPress={() => handlePress(item.id)}>
-                          <Text
-                            style={{
-                              color: 'black',
-                              marginLeft: '1%',
-                              fontSize: 14,
-                              fontWeight: '700',
-                              color: 'black',
-                            }}>
-                            Qty:
-                          </Text>
-                          <Text style={{color: 'black', fontWeight: '400'}}>
-                            {' '}
-                            {item.quantity}
-                          </Text>
-                          {/* {
-                    cartItem && cartItem.cartItems && cartItem.cartItems.length>0 && (<>
-                    {
-                    cartItem.cartItems.map((item, index) => (
-                    <Text key={index}>{}</Text>
-                    ))
-                   }
-                  </>)
-                  } */}
-
-                          <Image
-                            source={down}
-                            style={{width: 13, height: 17}}
-                          />
-                        </TouchableOpacity>
-                      </View>
-                      <Modal
-                        visible={isModalVisible}
-                        animationType="slide"
-                        transparent={true}
-                        onRequestClose={closeModal}>
-                        <TouchableWithoutFeedback>
-                          <View style={styles.modalContainer}>
-                            <View style={styles.modalContent}>
-                              <ScrollView
-                                horizontal
-                                showsHorizontalScrollIndicator={false}>
-                                <View
-                                  style={{
-                                    flexDirection: 'row',
-                                    width: 470,
-                                    padding: '4%',
-                                  }}>
-                                  {[1, 2, 3, 4, 5, 6, 7, 8].map((item, index) =>
-                                    renderItem1(item, index),
-                                  )}
-                                </View>
-                              </ScrollView>
-                              <TouchableOpacity
-                                onPress={() => {
-                                  closeModal();
-                                }}
-                                style={{backgroundColor: '#00338D'}}>
-                                <Text
-                                  style={{
-                                    textAlign: 'center',
-                                    color: 'white',
-                                    padding: '1.8%',
-                                    fontSize: 13,
-                                    fontWeight: '500',
-                                  }}>
-                                  CLOSE
-                                </Text>
-                              </TouchableOpacity>
-                            </View>
-                          </View>
-                        </TouchableWithoutFeedback>
-                      </Modal>
-                      <Modal
-                        visible={isModalSizeVisible}
-                        animationType="slide"
-                        transparent={true}
-                        onRequestClose={closeModal1}>
-                        <TouchableWithoutFeedback>
-                          <View style={styles.modalContainer}>
-                            <View style={styles.modalContent}>
-                              <ScrollView
-                                horizontal
-                                showsHorizontalScrollIndicator={false}>
-                                <View
-                                  style={{
-                                    flexDirection: 'row',
-                                    width: 470,
-                                    padding: '4%',
-                                  }}>
-                                  {['S', 'M', 'L'].map((item, index) =>
-                                    renderItem2(item, index),
-                                  )}
-                                </View>
-                              </ScrollView>
-                              <TouchableOpacity
-                                onPress={() => {
-                                  closeModal1();
-                                }}
-                                style={{backgroundColor: '#00338D'}}>
-                                <Text
-                                  style={{
-                                    textAlign: 'center',
-                                    color: 'white',
-                                    padding: '1.4%',
-                                    fontSize: 13,
-                                    fontWeight: '500',
-                                  }}>
-                                  CLOSE
-                                </Text>
-                              </TouchableOpacity>
-                            </View>
-                          </View>
-                        </TouchableWithoutFeedback>
-                      </Modal>
-
-                      <View
-                        style={{
-                          flexDirection: 'row',
-                          alignItems: 'center',
-                          marginTop: '3%',
-                        }}>
-                        <Image
-                          source={{uri: 'https://shorturl.at/cktvN'}}
-                          style={{width: 20, height: 20}}
-                        />
-                        <Text
-                          style={{fontSize: 11, color: '#484848', padding: 5}}>
-                          15 days store exchange available
-                        </Text>
-                      </View>
-                      <View style={styles.container1}>
-                        <Image source={check} style={styles.deliveryStatus} />
-                        <Text style={styles.deliveryStatusText}>
-                          Delivery by
-                          <Text style={{fontWeight: '700'}}>
-                            {' '}
-                            {formatDate(addDays(new Date(), 3))}
-                          </Text>
-                        </Text>
-                      </View>
-                    </View>
-
-                    <TouchableOpacity
-                      onPress={() => {
-                        removeBagItem(item.id, item.product.discountedPrice);
-                        setIsCouponApplied(false);
-                      }}>
-                      <Image source={cross} style={{width: 13, height: 14}} />
-                    </TouchableOpacity>
-                  </View>
-                  <View style={{flexDirection: 'row'}}>
-                    <TouchableOpacity
-                      style={{
-                        width: '50%',
-                        padding: 12,
-                        marginTop: '1%',
-                        borderWidth: 0.5,
-                        borderRightWidth: 0,
-                      }}
-                      onPress={() => {
-                        {
-                          removeBagItem(item.id, item.product.discountedPrice);
-                          setIsCouponApplied(false);
-                        }
-                      }}>
-                      <Text
-                        style={{
-                          textAlign: 'center',
-                          fontSize: 16,
-                          color: '#000000',
-                        }}>
-                        Remove
-                        {/* {item.product.discountedPrice}{item.product.category.name} */}
-                      </Text>
-                    </TouchableOpacity>
-
-                    {/* const data={
-    productId:itemId,
-    size:'M',
-    quantity:1,
-    category:"Men formal",
-    color:'blue'
- } */}
-
-                    <TouchableOpacity
-                      key={item.product.id}
-                      style={{
-                        width: '50%',
-                        padding: 12,
-                        borderWidth: 0.5,
-                        marginTop: '1%',
-                      }}
-                      onPress={() => {
-                        if (!wishlistStatus[item.product.id]) {
-                          // Handle logic to move item to wishlist
-                          addToWish(
-                            item.product.id,
-                            'M',
-                            1,
-                            item.product.category.name,
-                            item.id,
-                            item.product.discountedPrice,
-                          );
-                          // Update state to reflect the change
-                          setWishlistStatus(prevStatus => ({
-                            ...prevStatus,
-                            [item.product.id]: true,
-                          }));
-                        }
-                        setIsCouponApplied(false);
-                      }}>
-                      <Text
-                        style={{
-                          textAlign: 'center',
-                          fontSize: 16,
-                          color: wishlistStatus[item.product.id]
-                            ? '#00338D'
-                            : '#00338D',
-                        }}>
-                        {wishlistStatus[item.product.id]
-                          ? 'WishListed'
-                          : 'Move to Wishlist'}
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
-                </View>
-              </>
-            ))}
-
             <View style={{padding: 12}}>
               <View style={{marginTop: '4%'}}>
                 <Text style={styles.heading}>Offers & Benefits</Text>
-                {checkIsPromotionCouponApplied <= 0 && (
-                  <>
+
+                {cartItem &&
+                  cartItem.cartItems &&
+                  cartItem.promoCode &&
+                  Object.keys(cartItem.promoCode).length > 0 && (
+                    <PromotionDropdown />
+                  )}
+                {cartItem &&
+                  cartItem.cartItems &&
+                  cartItem.promoCode &&
+                  Object.keys(cartItem.promoCode).length === 0 && ( // Check if promoCode is not empty
                     <TouchableOpacity
                       style={{
                         flexDirection: 'row',
@@ -1690,57 +1300,7 @@ const MainBag = ({navigation}) => {
                       <Text style={{color: 'black'}}>Apply Coupon</Text>
                       <Image source={arrow1} style={{width: 10, height: 10}} />
                     </TouchableOpacity>
-                  </>
-                )}
-                {checkIsPromotionCouponApplied > 0 && (
-                  <>
-                    <View
-                      style={{
-                        backgroundColor: '#d3d3d3',
-                        height: 0.2,
-                        marginTop: '5%',
-                      }}
-                    />
-                    <View style={styles.removePromotionCoupon}>
-                      <View>
-                        <View style={styles.couponImage}>
-                          <Image
-                            source={couponDiscount}
-                            style={{height: 30, width: 30, marginTop: '4.5%'}}
-                          />
-                          <View>
-                            <Text style={styles.appliedCouponRemoveText1}>
-                              Coupon applied
-                              <Text style={styles.appliedCouponRemoveText2}>
-                                {' '}
-                                {inputPromotionCoupon.toUpperCase()}
-                              </Text>
-                            </Text>
-                            <Text style={styles.promtionRemoveCouponText}>
-                              Coupon Saving ₹
-                              {Math.ceil(checkIsPromotionCouponApplied)}
-                            </Text>
-                          </View>
-                        </View>
-                      </View>
-                      <TouchableOpacity
-                        onPress={() => {
-                          removePromotionCouponFn();
-                        }}>
-                        <Text style={styles.removePromotionCouponBtn}>
-                          Remove
-                        </Text>
-                      </TouchableOpacity>
-                    </View>
-                    <View
-                      style={{
-                        backgroundColor: '#d3d3d3',
-                        height: 0.2,
-                        marginTop: '5%',
-                      }}
-                    />
-                  </>
-                )}
+                  )}
 
                 {couponCodeError ? (
                   <Text
@@ -1950,64 +1510,7 @@ const MainBag = ({navigation}) => {
                         padding: '1%',
                         color: 'rgba(0,0,0,0.7)',
                       }}>
-                      ₹
-                      {deliveryOption === '1'
-                        ? isCouponApplied
-                          ? userLoyaltyTier === 'SILVER'
-                            ? totalAmount +
-                              decreaseTotalAmount +
-                              Math.ceil(
-                                totalAmount + decreaseTotalAmount / 0.97,
-                              ) -
-                              (totalAmount + decreaseTotalAmount) -
-                              50
-                            : userLoyaltyTier === 'GOLD'
-                            ? totalAmount +
-                              decreaseTotalAmount +
-                              Math.ceil(
-                                totalAmount + decreaseTotalAmount / 0.92,
-                              ) -
-                              totalAmount +
-                              decreaseTotalAmount -
-                              50
-                            : userLoyaltyTier === 'PLATINUM'
-                            ? totalAmount +
-                              decreaseTotalAmount +
-                              Math.ceil(
-                                totalAmount + decreaseTotalAmount / 0.88,
-                              ) -
-                              totalAmount +
-                              decreaseTotalAmount -
-                              50
-                            : totalAmount + decreaseTotalAmount - 100
-                          : totalAmount + decreaseTotalAmount - 100
-                        : isCouponApplied
-                        ? userLoyaltyTier === 'SILVER'
-                          ? totalAmount +
-                            decreaseTotalAmount +
-                            Math.ceil(
-                              totalAmount + decreaseTotalAmount / 0.97,
-                            ) -
-                            totalAmount +
-                            decreaseTotalAmount
-                          : userLoyaltyTier === 'GOLD'
-                          ? totalAmount +
-                            decreaseTotalAmount +
-                            Math.ceil(
-                              totalAmount + decreaseTotalAmount / 0.92,
-                            ) -
-                            totalAmount +
-                            decreaseTotalAmount
-                          : userLoyaltyTier === 'PLATINUM'
-                          ? totalAmount +
-                            decreaseTotalAmount +
-                            Math.ceil(
-                              totalAmount + decreaseTotalAmount / 0.88,
-                            ) -
-                            totalAmount +
-                            decreaseTotalAmount
-                          : totalAmount + decreaseTotalAmount - 100
-                        : totalAmount + decreaseTotalAmount}
+                      ₹{cartItem?.totalPrice}
                     </Text>
                   </View>
                   <View
@@ -2027,41 +1530,36 @@ const MainBag = ({navigation}) => {
                         flexDirection: 'row',
                         justifyContent: 'flex-end',
                       }}>
-                      {couponCodeGoodError ? (
-                        <Text style={{color: '#388E3C'}}>
-                          - ₹{decreaseTotalAmount-Math.ceil(cartItem.promotion_discount)}
-                        </Text>
-                      ) : (
-                        <Text style={{color: '#388E3C'}}>
-                          - ₹{decreaseTotalAmount-Math.ceil(cartItem.promotion_discount)}
-                        </Text>
-                      )}
+                      <Text style={{color: '#388E3C'}}>
+                        - ₹{cartItem?.discounte}
+                      </Text>
                     </View>
                   </View>
-                  {checkIsPromotionCouponApplied > 0 && (
-                    <View
-                      style={{
-                        flexDirection: 'row',
-                        padding: 5,
-                        justifyContent: 'space-between',
-                      }}>
-                      <View>
-                        <Text style={{color: 'rgba(0,0,0,0.7)'}}>
-                          Promotion Discount
-                        </Text>
-                      </View>
-
+                  {cartItem?.promotion_discount != null &&
+                    cartItem.promotion_discount > 0 && (
                       <View
                         style={{
                           flexDirection: 'row',
-                          justifyContent: 'flex-end',
+                          padding: 5,
+                          justifyContent: 'space-between',
                         }}>
-                        <Text style={{color: '#388E3C'}}>
-                          - ₹{Math.ceil(cartItem.promotion_discount)}
-                        </Text>
+                        <View>
+                          <Text style={{color: 'rgba(0,0,0,0.7)'}}>
+                            Promotion Discount
+                          </Text>
+                        </View>
+
+                        <View
+                          style={{
+                            flexDirection: 'row',
+                            justifyContent: 'flex-end',
+                          }}>
+                          <Text style={{color: '#388E3C'}}>
+                            - ₹{Math.ceil(cartItem.promotion_discount)}
+                          </Text>
+                        </View>
                       </View>
-                    </View>
-                  )}
+                    )}
 
                   <View
                     style={{
@@ -2095,16 +1593,7 @@ const MainBag = ({navigation}) => {
                       </Text>
                     )}
                   </View>
-                  {/* <View style={{flexDirection:'row',justifyContent:'space-between'}}>
-                   <Text style={{padding:"1%",fontWeight:'500',color:'#aba9a9'}}>Offer discount</Text>
-                   {
-  couponCodeGoodError ?
-    <Text style={{ padding: "1%", fontWeight: '500', color: '#00A3A1' }}>₹ {decreaseTotalAmount}</Text>
-    :
-    <Text style={{ padding: "1%", fontWeight: '500', color: '#00A3A1' }}>₹ 0</Text>  
-}
 
-                  </View> */}
                   <View
                     style={{
                       flexDirection: 'row',
@@ -2178,7 +1667,7 @@ const MainBag = ({navigation}) => {
               </View>
               <View style={{flexDirection: 'row', justifyContent: 'flex-end'}}>
                 <Text style={{fontWeight: '600', color: 'black'}}>
-                  ₹ {totalAmount}
+                  ₹ {cartItem?.totalDiscountedPrice}
                 </Text>
               </View>
             </View>
@@ -2198,26 +1687,30 @@ const MainBag = ({navigation}) => {
                 {/* <Text style={{color:'#00A3A1',marginLeft:'72%'}}>₹{totalDiscount}</Text> */}
               </View>
             </View>
-            <View
-              style={{
-                flexDirection: 'row',
-                borderWidth: 0.3,
-                marginTop: '4%',
-                width: '85%',
-                marginLeft: '4%',
-                marginBottom: '6%',
-                backgroundColor: '#f0eded',
-              }}>
-              <View style={{}}>
-                <Image source={point} />
+            {totalAmount > 0 && (
+              <View
+                style={{
+                  flexDirection: 'row',
+                  borderWidth: 0.3,
+                  marginTop: '4%',
+                  width: '85%',
+                  marginLeft: '4%',
+                  marginBottom: '6%',
+                  backgroundColor: '#f0eded',
+                }}>
+                <View style={{}}>
+                  <Image source={point} />
+                </View>
+                <View style={{marginLeft: '25%', alignItems: 'center'}}>
+                  <Text style={{textAlign: 'center'}}>
+                    You’ll earn {Math.floor(totalAmount / 2)} reward points{' '}
+                    {'\n'}
+                    from this order
+                  </Text>
+                </View>
               </View>
-              <View style={{marginLeft: '25%', alignItems: 'center'}}>
-                <Text style={{textAlign: 'center'}}>
-                  You’ll earn {Math.floor(totalAmount / 2)} reward points {'\n'}
-                  from this order
-                </Text>
-              </View>
-            </View>
+            )}
+
             <View style={{padding: 8}}>
               <Text style={styles.heading}>Add from Last Viewed</Text>
               <SafeAreaView>
@@ -2252,7 +1745,10 @@ const MainBag = ({navigation}) => {
                 scrollViewRef.current.scrollToEnd({animated: true});
               }}>
               <Text style={{fontSize: 30, color: '#00338D'}}>
-                ₹{totalAmount}
+                ₹
+                {cartItem?.totalDiscountedPrice
+                  ? cartItem?.totalDiscountedPrice
+                  : '0.0'}
               </Text>
               <Text style={{textDecorationLine: 'underline'}}>
                 View Details

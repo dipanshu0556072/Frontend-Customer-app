@@ -21,23 +21,24 @@ const WishListAndBagButton = ({product, img, title}) => {
     setCartProductId,
     wishListProductId,
     setWishListProductId,
+    currentProductIdOnPDP
   } = useCartContext();
   const {ip, token} = useLoginContext();
   const navigation = useNavigation(); // Use this to navigate to other components
-  const productId = product?.id;
+
 
   // Function to handle button click based on title (WISHLIST or CART)
   const handleButtonPress = async () => {
     if (title === 'WISHLIST') {
-      if (wishListProductId.includes(productId)) {
+      if (wishListProductId.includes(currentProductIdOnPDP)) {
         // If product is already in the wishlist, navigate to the Wishlist component
-        navigation.navigate('Wishlist');
+        navigation.navigate('WishList');
       } else {
         // Add the product to the wishlist
         await addProductToWishlist();
       }
     } else {
-      if (cartProductId.includes(productId)) {
+      if (cartProductId.includes(currentProductIdOnPDP)) {
         // If product is already in the cart, navigate to the Cart component
         navigation.navigate('mainBag');
       } else {
@@ -50,12 +51,13 @@ const WishListAndBagButton = ({product, img, title}) => {
   // Function to add product to wishlist
   const addProductToWishlist = async () => {
     const cartProduct = {
-      productId: productId,
+      productId: currentProductIdOnPDP,
       size: selectedSizes[0],
-      quantity: 1,
+      quantity: product?.eligibleForBogo ? 2 : 1, // Sets quantity to 2 if eligible for BOGO, otherwise 1
       category: product?.category?.parentCategory?.parentCategory?.name,
       color: product?.color,
     };
+    
 
     const header = {Authorization: `Bearer ${token}`};
     try {
@@ -64,7 +66,7 @@ const WishListAndBagButton = ({product, img, title}) => {
         cartProduct,
         {headers: header},
       );
-      setWishListProductId([...wishListProductId, productId]); // Add product to wishlist
+      setWishListProductId([...wishListProductId, currentProductIdOnPDP]); // Add product to wishlist
       console.log('Product added to wishlist successfully!');
     } catch (error) {
       console.log('Error adding product to wishlist:', error);
@@ -74,7 +76,7 @@ const WishListAndBagButton = ({product, img, title}) => {
   // Function to add product to cart
   const addProductToCart = async () => {
     const cartProduct = {
-      productId: productId,
+      productId: currentProductIdOnPDP,
       size: selectedSizes[0],
       quantity: 1,
       category: product?.category?.parentCategory?.parentCategory?.name,
@@ -89,7 +91,7 @@ const WishListAndBagButton = ({product, img, title}) => {
         cartProduct,
         {headers: header},
       );
-      setCartProductId([...cartProductId, productId]); // Add product to cart
+      setCartProductId([...cartProductId, currentProductIdOnPDP]); // Add product to cart
       console.log('Product added to cart successfully!');
     } catch (error) {
       console.log('Error adding product to cart:', error);
@@ -105,12 +107,13 @@ const WishListAndBagButton = ({product, img, title}) => {
       onPress={handleButtonPress}>
       <View style={styles.wisListIconContainer}>
         <Image source={img} style={styles.wisListIcon} />
+        
         <Text style={styles.wishListText}>
           {title === 'WISHLIST'
-            ? wishListProductId.includes(productId)
+            ? wishListProductId.includes(currentProductIdOnPDP)
               ? 'WISHLISTED'
               : 'WISHLIST'
-            : cartProductId.includes(productId)
+            : cartProductId.includes(currentProductIdOnPDP)
             ? 'Go to Bag'
             : 'Add to Bag'}
         </Text>

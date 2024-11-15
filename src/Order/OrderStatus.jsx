@@ -13,8 +13,6 @@ import {
 import React, {useEffect, useState} from 'react';
 import {useCartContext} from '../Context/WomenContext';
 import back from '../PlpScreen/images/back.png';
-import confirm1 from './confirm1.png';
-import confirm2 from './confirm2.png';
 import pdf from './pdf.png';
 import next from '../PlpScreen/images/next.png';
 import cancel from '../PlpScreen/images/cancel.png';
@@ -29,7 +27,6 @@ import {Dimensions} from 'react-native';
 import Progress from '../Progress';
 import CheckBox from '@react-native-community/checkbox';
 import {RadioButton} from 'react-native-paper';
-
 
 const OrderStatus = ({navigation}) => {
   const {
@@ -56,6 +53,8 @@ const OrderStatus = ({navigation}) => {
     setShowReturnedProductStatus,
     checkIsPromotionCouponApplied,
     setCheckIsPromotionCouponApplied,
+    setCancelledOrderItems,
+    getOrderStatus, setGetOrderStatus,receiptData
   } = useCartContext();
   const {
     ip,
@@ -68,7 +67,7 @@ const OrderStatus = ({navigation}) => {
     OrderDate,
     setOrderDate,
     changeOrderStatus,
-    loginUserId
+    loginUserId,
   } = useLoginContext();
 
   const [isModalVisible, setModalVisible] = useState(false);
@@ -141,7 +140,6 @@ const OrderStatus = ({navigation}) => {
       setCurrentPage('mainHome');
       navigation.navigate('mainHome');
     } else {
-
       if (currentPage && currentPage[currentPage.length - 1] !== page) {
         pushToStack(page);
         navigation.navigate(page);
@@ -307,20 +305,20 @@ const OrderStatus = ({navigation}) => {
   const [userRating, setUserRating] = useState(0);
   const [productRatings, setProductRatings] = useState(0.0);
 
-  const [getOrderStatus, setGetOrderStatus] = useState([]);
+
 
   const route = useRoute();
   const orderId = route.params?.orderId;
 
   const ratingCompleted = (rating, productId) => {
-     postRatingToBackend(productId, rating);
-     getProductRating(productId);
+    postRatingToBackend(productId, rating);
+    getProductRating(productId);
   };
   useEffect(() => {
     // Fetch initial ratings when the component mounts
     if (getOrderStatus && getOrderStatus.orderItems) {
       getOrderStatus.orderItems.forEach(item => {
-      getProductRating(item.product.id);
+        getProductRating(item.product.id);
       });
     }
     setChangeOrderStatus(getOrderStatus.orderStatus);
@@ -350,7 +348,6 @@ const OrderStatus = ({navigation}) => {
         },
       );
 
-
       // Handle any additional actions after submitting the review
       // ...
 
@@ -361,8 +358,6 @@ const OrderStatus = ({navigation}) => {
   };
 
   const postRatingToBackend = async (prodId, rate) => {
-
-
     const dataAdd = {
       givenRatingByUser: rate,
       comment: '',
@@ -394,9 +389,9 @@ const OrderStatus = ({navigation}) => {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
-      
+
       // If the API returns data, set the rating
       if (response.data && response.data.length > 0) {
         setProductRatings(response.data[0].givenRating);
@@ -404,7 +399,7 @@ const OrderStatus = ({navigation}) => {
         // If no rating data is available, set a default value
         setProductRatings(0); // or any other default value you prefer
       }
-  
+
       console.log(`Rating for product: ${JSON.stringify(response.data)}`);
     } catch (error) {
       // If it's a 404 error, handle it gracefully by setting a default value
@@ -412,12 +407,33 @@ const OrderStatus = ({navigation}) => {
         setProductRatings(0); // Default to 0 if no rating exists
       } else {
         // Handle other types of errors
-        console.error(`Error fetching rating for product ${productId}:`, error.message);
+        console.error(
+          `Error fetching rating for product ${productId}:`,
+          error.message,
+        );
       }
     }
   };
-  
-  
+
+  //filter OrderItemsBased on selected checkBox
+  const filterProductBasedOnCheckBox = async () => {
+    try {
+      const response = await axios.post(
+        `http://${ip}:5454/api/admin/orders/${trackCurrentOrderId}/filter`,
+        isChecked,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+      setCancelledOrderItems(response.data);
+      getOrderStatus1();
+    } catch (error) {
+      // Handle errors
+      console.error('Error fetching orderCanellationReason', error);
+    }
+  };
 
   //modify the storePickUp Time for that storing OrderItems
   function getProductData() {
@@ -435,31 +451,31 @@ const OrderStatus = ({navigation}) => {
       setStoreProductWithSizeAndQuantity(s1);
     }
   }
+  const getOrderStatus1 = async () => {
+    try {
+      const response = await axios.get(
+        `http://${ip}:5454/api/orders/${trackCurrentOrderId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      //make falses how activityIndicator
+
+      // Handle the response data
+
+      setGetOrderStatus(response.data);
+      setReceiptData(response.data);
+    } catch (error) {
+      // Handle errors
+      setShowActivityIndicator(false);
+      console.error('Error fetching Placed1Orderdata:', error);
+    }
+  };
   useEffect(() => {
     //get Order Data
-    const getOrderStatus1 = async () => {
-      try {
-        const response = await axios.get(
-          `http://${ip}:5454/api/orders/${trackCurrentOrderId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          },
-        );
-
-        //make falses how activityIndicator
-
-        // Handle the response data
-
-        setGetOrderStatus(response.data);
-        setReceiptData(response.data);
-      } catch (error) {
-        // Handle errors
-        setShowActivityIndicator(false);
-        console.error('Error fetching Placed1Orderdata:', error);
-      }
-    };
     getProductData();
     getOrderStatus1();
   }, []);
@@ -470,15 +486,13 @@ const OrderStatus = ({navigation}) => {
       ? getOrderStatus.totalDiscountedPrice
       : 0;
 
-
-
   function DownloadingInvoice() {
     handlePress2();
     setTimeout(() => {
       closeModal2();
     }, 2000);
     setTimeout(() => {
-      navigation.navigate('exportPdf');
+      navigation.navigate('exportPdf', {pageName: 'orderStatus'});
     }, 3000);
   }
 
@@ -536,6 +550,9 @@ const OrderStatus = ({navigation}) => {
   const [selectedSizeInReturn, setSelectedSizeInReturn] = useState('');
 
   const storeCheckBoxId = itemId => {
+    if (getOrderStatus && getOrderStatus?.length == 1) {
+      setSelectAllCheckBox(true);
+    }
     if (isChecked.includes(itemId)) {
       const pt = isChecked.filter(val => val !== itemId);
       setChecked(pt);
@@ -573,6 +590,7 @@ const OrderStatus = ({navigation}) => {
     }
   }, [isSelectAllCheckBoxEnable, isChecked]);
 
+  //check all checkbox
   const handleSelectAllCheckBox = () => {
     if (isSelectAllCheckBoxEnable) {
       setIsSelectAllCheckBoxEnable(false);
@@ -582,6 +600,7 @@ const OrderStatus = ({navigation}) => {
       //  setTimeout(()=>{
       //    handlePress3();
       //  },1000);
+
       setChecked(selectAllCheckBox);
     }
   };
@@ -591,7 +610,7 @@ const OrderStatus = ({navigation}) => {
     if (isChecked.length === 0) {
       Alert.alert(
         '',
-        'Please select products that you want to return or exchange.',
+        'Please select products that you want to cancel/return or exchange.',
         [
           {text: 'OK', onPress: () => console.log('OK Pressed')}, // You can add onPress functionality here if needed
         ],
@@ -605,7 +624,8 @@ const OrderStatus = ({navigation}) => {
         checkedProduct();
         handlePress3();
       } else {
-        checkedProduct();
+       // checkedProduct();
+        filterProductBasedOnCheckBox();
         forNavigate('orderCancel');
       }
     }
@@ -650,7 +670,6 @@ const OrderStatus = ({navigation}) => {
         response = await axios.put(url, dataToExchange, config);
       }
 
-      
       setTimeout(() => {
         setShowActivityIndicator(false);
         Alert.alert('', 'Order exchanged successfully', [
@@ -749,7 +768,7 @@ const OrderStatus = ({navigation}) => {
                 <Image source={back} style={{marginLeft: 12}} />
               </View>
               <View style={{marginLeft: '4%'}}>
-                <Text style={{color: 'black'}}>Track Order</Text>
+                <Text style={{color: 'black'}}>Track Order{JSON.stringify(receiptData?.totalDiscountedPrice.toFixed(2))}</Text>
               </View>
             </View>
           </TouchableOpacity>
@@ -765,7 +784,10 @@ const OrderStatus = ({navigation}) => {
             </View>
             <View>
               <Text style={styles.label}>TOTAL</Text>
-              <Text style={styles.totalValue}>₹ {totalDiscountedPrice}</Text>
+
+              <Text style={styles.totalValue}>
+                ₹ {totalDiscountedPrice ? totalDiscountedPrice : '0'}
+              </Text>
             </View>
           </View>
           <Text style={{color: '#00338D', marginLeft: '8%'}}>PLACED ON</Text>
@@ -971,6 +993,7 @@ const OrderStatus = ({navigation}) => {
                 )
               ))}
           </View>
+
           <View
             style={{height: 0.3, backgroundColor: '#00338D', marginTop: '4%'}}
           />
@@ -1025,7 +1048,7 @@ const OrderStatus = ({navigation}) => {
               <>
                 {getOrderStatus.orderItems.map((item, index) => (
                   <View
-                    key={index}
+                    key={index+1}
                     style={{
                       padding: '3%',
                       marginTop: '1%',
@@ -1080,7 +1103,9 @@ const OrderStatus = ({navigation}) => {
                         </View>
                         <Text>
                           ₹{' '}
-                          {item.product.discountedPrice.toLocaleString('en-IN')}
+                          {item?.discountedPrice
+                            ? item?.discountedPrice
+                            : item?.discountedPrice.toLocaleString('en-IN')}
                         </Text>
                         {item.cancelStatus && (
                           <Text style={styles.cancelTag}>
@@ -1125,7 +1150,7 @@ const OrderStatus = ({navigation}) => {
                             onFinishRating={rating =>
                               ratingCompleted(rating, item.product.id)
                             }
-                            startingValue={productRatings|| 0}
+                            startingValue={productRatings || 0}
                           />
                         )}
                     </View>
@@ -1174,7 +1199,7 @@ const OrderStatus = ({navigation}) => {
                           {getOrderStatus && getOrderStatus.orderItems && (
                             <>
                               {getOrderStatus.orderItems.map((item, index) => (
-                                <View key={index} style={{margin: '1%'}}>
+                                <View key={index+2} style={{margin: '1%'}}>
                                   {item.product.id === selectedItemId && (
                                     <>
                                       <View style={{flexDirection: 'row'}}>
@@ -1235,8 +1260,7 @@ const OrderStatus = ({navigation}) => {
                                 onFinishRating={rating =>
                                   ratingCompleted(rating, item.product.id)
                                 }
-                                startingValue={productRatings|| 0
-                                }
+                                startingValue={productRatings || 0}
                               />
                               <Text
                                 style={{
@@ -1314,7 +1338,9 @@ const OrderStatus = ({navigation}) => {
                 onPress={() => {
                   goForAction();
                 }}>
-                <Text style={styles.buttonText}>Continue</Text>
+                <Text style={styles.buttonText}>
+                  Continue
+                </Text>
               </TouchableOpacity>
             </View>
           ) : (
@@ -1341,7 +1367,7 @@ const OrderStatus = ({navigation}) => {
               marginLeft: '4%',
               marginTop: '4%',
             }}>
-            Payment Summary{productRatings}
+            Payment Summary
           </Text>
 
           <View style={styles.wrapper}>
@@ -1363,12 +1389,12 @@ const OrderStatus = ({navigation}) => {
               <Text style={styles.label}>Promotion Discount</Text>
               <Text style={styles.charge}>
                 ₹
-
-                 {getOrderStatus.promotionDiscount
+                {getOrderStatus.promotionDiscount
                   ? getOrderStatus.promotionDiscount
                   : 0}
               </Text>
             </View>
+
             <View style={styles.row}>
               <Text style={styles.label}>Total Saving</Text>
               <Text style={styles.value}>
@@ -1381,9 +1407,12 @@ const OrderStatus = ({navigation}) => {
                   : 0}
               </Text>
             </View>
+
             <View style={styles.row}>
               <Text style={styles.label}>Total Paid Amount</Text>
-              <Text style={styles.total}>₹ {totalDiscountedPrice}</Text>
+              <Text style={styles.total}>
+                ₹ {totalDiscountedPrice ? totalDiscountedPrice : '0'}
+              </Text>
             </View>
           </View>
           <View
@@ -1560,6 +1589,14 @@ const OrderStatus = ({navigation}) => {
                         style={styles.imageSize1}
                       />
                       <View style={{margin: '4%'}}>
+                        <View
+                          style={{
+                            width: 25,
+                            height: 25,
+                            backgroundColor: item.product.color,
+                            borderRadius: 12,
+                          }}
+                        />
                         <Text style={styles.mainExchangeHeading}>
                           Available sizes in the color
                         </Text>
@@ -2062,5 +2099,8 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 10,
     padding: '1.5%',
+  },
+  bottomBar: {
+    marginTop: '4%',
   },
 });

@@ -31,6 +31,7 @@ import next from './PlpScreen/images/next.png';
 import correct from './PlpScreen/images/correct.png';
 import {useLoginContext} from './Login/LoginCartProvider';
 
+
 const Tab1 = createMaterialTopTabNavigator();
 
 const Tab = createBottomTabNavigator();

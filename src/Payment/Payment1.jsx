@@ -213,7 +213,7 @@ export default function Payment1({navigation})
    {
           if (allSavedAddress && allSavedAddress.length > 0) {
             const selected = allSavedAddress[selectedAddress]; // Use index to find the selected address
-            Alert.alert(JSON.stringify(selected));
+            // Alert.alert(JSON.stringify(selected));
             if (selected) {
               setUserName(`${selected.firstName} ${selected.lastName}`);
               setStreetAddress1(selected.streetAddress);
