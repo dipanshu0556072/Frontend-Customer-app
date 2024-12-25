@@ -103,7 +103,10 @@ export default function WishList({navigation}) {
           Authorization: `Bearer ${token}`,
         },
       });
-      setWishListProductId(wishListProductId.filter(id => id != productId));
+      setWishListProductId(prevWishList =>
+        prevWishList.filter(id => id !== productId)
+    );
+    
       getWishlistData();
     } catch (error) {
       console.log('Error:', error);
@@ -233,7 +236,7 @@ export default function WishList({navigation}) {
                   <View style={styles.buttonContainer}>
                     <TouchableOpacity
                       style={styles.removeButton}
-                      onPress={() => removeBagItem(item.id)}>
+                      onPress={() => removeBagItem(item.id, item.product.id)}>
                       <Text style={styles.removeButtonText}>Remove</Text>
                     </TouchableOpacity>
                     <TouchableOpacity

@@ -121,6 +121,16 @@ export default function AddressDetail({ navigation}) {
    }  
    getProfileData(); 
    }
+   
+   const forNavigate = page => {
+    // console.log(page+" "+currentPage[currentPage.length-1]);
+    if (currentPage && currentPage[currentPage.length - 1] !== page) {
+      pushToStack(page);
+      navigation.navigate(page);
+    } else {
+      popFromStack(navigation);
+    }
+  };
 
   function NowUpdate(){
     if (profileAddress && profileAddress.addresses && profileAddress.addresses.length > 0) {
@@ -420,7 +430,7 @@ useEffect(()=>{
               alignItems: 'center',
               alignItems: 'center',
             }}
-          onPress={() => navigation.navigate('orderSummary')}>
+          onPress={() => popFromStack(navigation)}>
                 <Image source={back} style={{ marginLeft: 12 }} />
 
               <Text style={{ paddingLeft: 10, color: 'black', textAlign: 'center' }}>

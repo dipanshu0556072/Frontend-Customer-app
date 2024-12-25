@@ -1,22 +1,20 @@
-import { StyleSheet, Text, View,TouchableOpacity,Image, ScrollView,TextInput,Modal,TouchableWithoutFeedback,ActivityIndicator,} from 'react-native'
+import { StyleSheet, Text, View,TouchableOpacity,Image, ScrollView,TextInput,Modal,TouchableWithoutFeedback,ActivityIndicator, Alert,} from 'react-native'
 import React,{useEffect, useState} from 'react'
 import { useCartContext } from './Context/WomenContext'
 import { useLoginContext } from './Login/LoginCartProvider'
 import back from './PlpScreen/images/back.png';
 import axios from 'axios';
+import TopBar from './PlpScreen/TopBar';
 
 const ChooseStorePincode = ({navigation}) => {
 
     const {ip,token,popFromStack,pushToStack,
-        currentPage, setCurrentPage,
-        currentPageIndex,setCurrentPageIndex,
-        currentPageIndexCategory,setCurrentPageIndexCategory,
-        currentPageIndexCategory1,setCurrentPageIndexCategory1}=useLoginContext();  
+        currentPage}=useLoginContext();  
 
     const [showActivityIndicator, setShowActivityIndicator] = useState(false);
 
     const [sortModalVisible, setSortModalVisible] = useState(false);
-    const {pinCode,setPinCode,setSelectedStoreId,setDataStore,setSearch}=useCartContext();    
+    const {cartItem,pinCode,setPinCode,setSelectedStoreId,setDataStore,setSearch,setStoreProductWithSizeAndQuantity}=useCartContext();    
     const [fetechedStoreBasedOnPinCode,setFetechedStoreBasedOnPinCode]=useState([]);
     const forNavigate=(page)=>{
         console.log(page+" "+currentPage[currentPage.length-1]);
@@ -55,6 +53,16 @@ const ChooseStorePincode = ({navigation}) => {
     //     console.error('Error fetching data:', error);
     //   }
     // }
+
+    const getStoreProductWithSizeAndQuantity = () => {
+      setStoreProductWithSizeAndQuantity();
+      if (cartItem && cartItem.cartItems && cartItem.cartItems.length > 0) {
+        const s1 = cartItem.cartItems.map(item => {
+          return item.product.id + item.size + item.quantity;
+        });
+        setStoreProductWithSizeAndQuantity(s1);
+      }
+    };
 
      async function searchStoreBasedOnPincode(){
       if(pinCode.length>1 && pinCode.length<6){
@@ -106,7 +114,9 @@ const ChooseStorePincode = ({navigation}) => {
     function getStoreId(storeId){
     //  Alert.alert(JSON.stringify(storeId));
      setSelectedStoreId(storeId); 
+    //  Alert.alert(JSON.stringify(storeId));
      setShowActivityIndicator(true);
+     getStoreProductWithSizeAndQuantity();
      setTimeout(()=>{
       forNavigate('scheduleStore');
       setShowActivityIndicator(false);
@@ -138,9 +148,13 @@ const ChooseStorePincode = ({navigation}) => {
     return (
     <View style={{flex:1,backgroundColor:'white'}}>
        <View style={{ padding: 12, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-         <TouchableOpacity onPress={() => forNavigate('mainHome')}>
-           <Image source={{ uri: 'https://shorturl.at/ckGU2' }} style={{ width: 100, height: 100 }} />
-         </TouchableOpacity>
+       <TopBar
+        navigation={navigation}
+        showKPMGLogo={true}
+        showSearchLogo={false}
+        showCartLogo={false}
+        showWishListLogo={false}
+      />
        </View>   
        <View style={{flexDirection:'row',alignItems:'center',}}> 
          <TouchableOpacity     

@@ -16,7 +16,7 @@ export default function TopBar1({
 }) {
   const [isSearchVisible, setIsSearchVisible] = useState(false);
   const { pushToStack, popFromStack, currentPage,setCurrentPage } = useLoginContext();
-  const {setBannerComponentName,setProducts}=useCartContext();
+  const {setBannerComponentName,setProducts,setRecommendedSeeMoreBtn}=useCartContext();
 
   const handleTouchablePress = () => {
     Keyboard.dismiss();
@@ -30,11 +30,14 @@ export default function TopBar1({
     } else {
       popFromStack(navigation);
     }
+    setRecommendedSeeMoreBtn(false);
+
   }
 
   //if home button pressed
   const onPressHome=()=>{
     forNavigate('mainHome');
+    setRecommendedSeeMoreBtn(false);
     setBannerComponentName('homeBar');
     setProducts([]);
     setCurrentPage(['mainHome']);
@@ -42,6 +45,7 @@ export default function TopBar1({
     //if bag button pressed
     const onPressBag=(page)=>{
       forNavigate(page);
+      setRecommendedSeeMoreBtn(false);
       setBannerComponentName(page);
       setProducts([]);
     

@@ -374,7 +374,7 @@ export default function Payment1({navigation})
                   <TouchableOpacity style={styles.offers} activeOpacity={1}
                     onPress={() => {
                       forNavigate('Payment2');
-                      
+                      setDisableAction(false);
                     }}
                     >
                     <View style={{flexDirection:'row',alignItems:'center',alignContent:'center'}}>

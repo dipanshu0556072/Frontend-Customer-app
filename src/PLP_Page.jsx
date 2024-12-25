@@ -34,6 +34,8 @@ const MainPlp = ({navigation}) => {
     filteredDataOnPLP,
     setFilteredDataOnPLP,
     setSelectedFilterData,
+    setRecommendedSeeMoreBtn,
+    recommenedSeeMoreBtn,
   } = useCartContext();
   const {ip, token, popFromStack} = useLoginContext();
   //show the Modal of sort and filter
@@ -103,7 +105,7 @@ const MainPlp = ({navigation}) => {
   //SortAndFilter
   const SortAndFilter = ({img, title, fun}) => {
     return (
-      <TouchableOpacity onPress={fun} style={styles.sortContainer}>
+      <TouchableOpacity onPress={fun} style={[styles.sortContainer,{borderRightWidth:!recommenedSeeMoreBtn?1:0,}]}>
         <Image source={img} style={styles.sortImage} />
         <Text style={styles.sortImageText}>{title}</Text>
       </TouchableOpacity>
@@ -156,6 +158,7 @@ const MainPlp = ({navigation}) => {
   //if back button pressed
   const backButtonPressed = () => {
     //  fetchData();
+    setRecommendedSeeMoreBtn(false);
     popFromStack(navigation);
     setFilteredDataOnPLP([]);
   };
@@ -174,11 +177,13 @@ const MainPlp = ({navigation}) => {
     <View style={styles.mainContainer}>
       {/*-------------------------------------------show activity indicator-------------------------------------------------------------*/}
       {showActivityIndicator ? (
-           <View style={styles.wrapper}>
-      {/* <ActivityIndicator size="large" color="#00338D" /> */}
-      <RotationView/>
-      <Text style={styles.updateProdileText}>Shop till you drop...or until the wifi goes out!</Text>
-    </View>
+        <View style={styles.wrapper}>
+          {/* <ActivityIndicator size="large" color="#00338D" /> */}
+          <RotationView />
+          <Text style={styles.updateProdileText}>
+            Shop till you drop...or until the wifi goes out!
+          </Text>
+        </View>
       ) : (
         <>
           {/*header*/}
@@ -192,7 +197,7 @@ const MainPlp = ({navigation}) => {
               style={styles.buttonWrapper}>
               <View style={styles.rowLayout}>
                 <Image source={back} />
-                <Text style={styles.categoryLabel}>{productCategory}</Text>
+                <Text style={styles.categoryLabel}>{recommenedSeeMoreBtn?'Recommended For You':productCategory}</Text>
               </View>
               <Text style={styles.itemsCountLabel}>
                 {filteredDataOnPLP && filteredDataOnPLP?.length
@@ -225,11 +230,14 @@ const MainPlp = ({navigation}) => {
                 {top: screenHeight - 240},
               ]}>
               <SortAndFilter img={filter} title="SORT" fun={handleSortPress} />
-              <SortAndFilter
-                img={filter}
-                title="FILTER"
-                fun={handleFilterPress}
-              />
+              {/*added a condition, if showing recommended product, then do not show filter option*/}
+              {!recommenedSeeMoreBtn && (
+                <SortAndFilter
+                  img={filter}
+                  title="FILTER"
+                  fun={handleFilterPress}
+                />
+              )}
             </View>
           </View>
           {/* Sort Modal */}
@@ -262,6 +270,7 @@ const MainPlp = ({navigation}) => {
           </Modal>
 
           {/*filter modal*/}
+
           <FilterProductsModal
             visible={filterModalVisible}
             closeModal={handleFilterModalClose}
@@ -321,7 +330,7 @@ const styles = StyleSheet.create({
 
   sortContainer: {
     width: '50%',
-    borderRightWidth: 1,
+
     borderColor: '#888888',
     justifyContent: 'center',
     alignItems: 'center',
@@ -338,15 +347,16 @@ const styles = StyleSheet.create({
   },
   filterContainer: {},
   wrapper: {
-    height:100,
-    marginTop:'90%',
-    backgroundColor:'red',
+    height: 100,
+    marginTop: '90%',
+    backgroundColor: 'red',
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#fff',
   },
-  updateProdileText:{
-    color:'black',fontWeight:'300'
+  updateProdileText: {
+    color: 'black',
+    fontWeight: '300',
   },
   activityIndicatorContainer: {
     position: 'absolute',

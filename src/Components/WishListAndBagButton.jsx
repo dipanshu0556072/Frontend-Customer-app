@@ -117,6 +117,7 @@ const WishListAndBagButton = ({product, img, title}) => {
             ? 'Go to Bag'
             : 'Add to Bag'}
         </Text>
+
       </View>
     </TouchableOpacity>
   );

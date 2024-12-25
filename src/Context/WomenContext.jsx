@@ -30,7 +30,12 @@ export default function WomenCartProvider({children}) {
   const [selectedFilterData, setSelectedFilterData] = useState([]);
   //canelledOrderItems array
   const[cancelledOrderItems,setCancelledOrderItems]=useState([]);
-  
+  //searchData in the search Bar
+  const [searchData, setSearchData] = useState([]);
+  //is filterApplied for searchData in filterModal
+  const [isAppliedFilterFromSearch,setIsAppliedFilterFromSearch]=useState(false);
+  //isLoyalty coupon applied 
+  const [isLoyaltyCouponApplied, setIsLoyaltyCouponApplied] = useState(false);
 
 
 
@@ -107,7 +112,7 @@ export default function WomenCartProvider({children}) {
   const [isCouponApplied, setIsCouponApplied] = useState(false);
 
   //
-  const [redeemYouPoints, setRedeemYourPoints] = useState('');
+  const [redeemYouPoints, setRedeemYourPoints] = useState(0);
 
   //
   const [productIds, setProductIds] = useState([]);
@@ -160,6 +165,7 @@ export default function WomenCartProvider({children}) {
   //store current order
   const [getOrderStatus, setGetOrderStatus] = useState([]);
   //get all available points & Tier
+  const [flag, setFlag] = useState(false);
   const [availablePoints, setAvailablePoints] = useState('');
   const [userLoyaltyTier, setUserLoyaltyTier] = useState('');
 
@@ -224,6 +230,9 @@ export default function WomenCartProvider({children}) {
 
   //store product ratings
   const [productRatings, setProductRatings] = useState([]);
+
+  //if the see more (Recoommended for you) is pressed then 
+  const [recommenedSeeMoreBtn,setRecommendedSeeMoreBtn]=useState(false);
 
   const DeleteWishItem = (itemId, itemCategory) => {
     console.log('here ' + itemId + ' ' + itemCategory);
@@ -318,6 +327,7 @@ export default function WomenCartProvider({children}) {
     setHouseNo,
     DefaultAddress,
     setDefaultAddres,
+    isLoyaltyCouponApplied, setIsLoyaltyCouponApplied,
 
     // stored all saved addresses
     allSavedAddress,
@@ -475,7 +485,12 @@ export default function WomenCartProvider({children}) {
     currentProductIdOnPDP,setCurrentProductIdOnPDP,
     updateGender, setUpdateGender,
     cancelledOrderItems,setCancelledOrderItems,
-    getOrderStatus, setGetOrderStatus
+    getOrderStatus, setGetOrderStatus,
+    searchData, setSearchData,
+    isAppliedFilterFromSearch,setIsAppliedFilterFromSearch,
+    recommenedSeeMoreBtn,setRecommendedSeeMoreBtn,
+    flag, setFlag
+    
   };
   return (
     <WomenContext.Provider value={contextvalue}>

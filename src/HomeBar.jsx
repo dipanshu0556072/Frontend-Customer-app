@@ -7,6 +7,8 @@ import {
   TouchableOpacity,
   Image,
   ActivityIndicator,
+  FlatList,
+  Alert,
 } from 'react-native';
 import axios from 'axios';
 import {useLoginContext} from './Login/LoginCartProvider';
@@ -35,84 +37,102 @@ const HomeBar = ({navigation}) => {
     setBannerComponentName,
     setProductRatings,
     setWishListProductId,
-    setCartProductId
+    setCartProductId,
+    setCurrentProductIdOnPDP,
+    setRecommendedSeeMoreBtn,
+    setPLPData
   } = useCartContext();
 
-  const {ip, token, setLoginUserId, pushToStack, currentPage, popFromStack} =
+  const {ip, token,loginUserId, setLoginUserId, pushToStack, currentPage, popFromStack} =
     useLoginContext();
-    useEffect(() => {
-      const fetchData = async () => {
-        try {
-          // Define all fetch requests
-          const wishListRequest = axios.get(`http://${ip}:5454/api/wishlist/`, {
+
+  const [searchData, setSearchData] = useState([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Define all fetch requests
+        const wishListRequest = axios.get(`http://${ip}:5454/api/wishlist/`, {
+          headers: {Authorization: `Bearer ${token}`},
+        });
+
+        const profileDataRequest = axios.get(
+          `http://${ip}:5454/api/users/profile`,
+          {
             headers: {Authorization: `Bearer ${token}`},
-          });
-    
-          const profileDataRequest = axios.get(
-            `http://${ip}:5454/api/users/profile`,
-            {
-              headers: {Authorization: `Bearer ${token}`},
-            },
-          );
-    
-          const productsDataRequest = axios.get(
-            `http://${ip}:5454/api/admin/products/all`,
-            {
-              headers: {Authorization: `Bearer ${token}`},
-            },
-          );
-    
-          const cartDataRequest = axios.get(`http://${ip}:5454/api/cart/`, {
+          },
+        );
+
+        const productsDataRequest = axios.get(
+          `http://${ip}:5454/api/admin/products/all`,
+          {
             headers: {Authorization: `Bearer ${token}`},
-          });
-    
-          const orderDataRequest = axios.get(`http://${ip}:5454/api/orders/user`, {
+          },
+        );
+
+        const cartDataRequest = axios.get(`http://${ip}:5454/api/cart/`, {
+          headers: {Authorization: `Bearer ${token}`},
+        });
+
+        const orderDataRequest = axios.get(
+          `http://${ip}:5454/api/orders/user`,
+          {
             headers: {Authorization: `Bearer ${token}`},
-          });
-    
-          // Wait for all fetch requests to complete
-          const [
-            wishListResponse,
-            profileDataResponse,
-            productsResponse,
-            cartDataResponse,
-            orderDataResponse,
-          ] = await Promise.all([
-            wishListRequest,
-            profileDataRequest,
-            productsDataRequest,
-            cartDataRequest,
-            orderDataRequest,
-          ]);
-    
-          // Process the responses
-          setWishListData(wishListResponse.data);
-          setProfileAddress(profileDataResponse.data);
-          setAllSavedAddress(profileDataResponse.data.addresses);
-          setProducts(productsResponse.data);
-          setCartItem(cartDataResponse.data);
-    
-          // Store productId for fetch productRating
-          setProductRatings(productsResponse.data.map(product => product.id));
-    
-          // Store productId of wishList
-          setWishListProductId(
-            wishListResponse.data.wishlistItems.map(product => product.product.id),
-          );
-    
-          // Store productId of cart products
-          setCartProductId(
-            cartDataResponse.data.cartItems.map(item => item.product.id),
-          );
-    
-        } catch (error) {
-          console.error('Error fetching data:', error);
-        }
-      };
-    
-      fetchData();
-    }, []);
-    
+          },
+        );
+        const searchDataRequest = axios.get(
+          `http://${ip}:5454/api/getSuggestedItems`,
+          {
+            headers: {Authorization: `Bearer ${token}`},
+          },
+        );
+
+        // Wait for all fetch requests to complete
+        const [
+          wishListResponse,
+          profileDataResponse,
+          productsResponse,
+          cartDataResponse,
+          orderDataResponse,
+          searchDataResponse,
+        ] = await Promise.all([
+          wishListRequest,
+          profileDataRequest,
+          productsDataRequest,
+          cartDataRequest,
+          orderDataRequest,
+          searchDataRequest,
+        ]);
+
+        // Process the responses
+        setWishListData(wishListResponse.data);
+        setProfileAddress(profileDataResponse.data);
+        setAllSavedAddress(profileDataResponse.data.addresses);
+        setProducts(productsResponse.data);
+        setCartItem(cartDataResponse.data);
+        setSearchData(searchDataResponse.data);
+
+        // Store productId for fetch productRating
+        setProductRatings(productsResponse.data.map(product => product.id));
+
+        // Store productId of wishList
+        setWishListProductId(
+          wishListResponse.data.wishlistItems.map(
+            product => product.product.id,
+          ),
+        );
+
+        // Store productId of cart products
+        setCartProductId(
+          cartDataResponse.data.cartItems.map(item => item.product.id),
+        );
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   //filter the product data based on the Fashion tile
   const filterProductData = async () => {
@@ -174,6 +194,46 @@ const HomeBar = ({navigation}) => {
       </>
     );
   }
+
+    // If the image is touched
+    const onPressOfImage = productId => {
+     
+      // Alert.alert(JSON.stringify(productId));
+       setCurrentProductIdOnPDP(productId);
+      navigation.navigate('mainPDP'); // Pass productId only
+    };
+
+      //filter the product data based on the Fashion tile
+  const filterProductDataOnPLP = async () => {
+    let response;
+    try {
+          response = await axios.get(
+            `http://${ip}:5454/api/getSuggestedItems`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            },
+          );
+  
+          // Alert.alert(JSON.stringify(response.data));
+  
+        setPLPData(response.data);
+      
+    } catch (error) {
+      console.log(
+        'getting error in the homeBar.jsx in filterProductData' + error,
+      );
+    }
+    setRecommendedSeeMoreBtn(true);
+    navigation.navigate('mainPlp');
+  };
+  //if the see more (Recoommended for you) is pressed then 
+  const onPressOfSeeMore=()=>{
+    filterProductDataOnPLP();
+
+  }
+
   useEffect(() => {
     // Show the ActivityIndicator for 2 seconds
     const timer = setTimeout(() => {
@@ -182,6 +242,7 @@ const HomeBar = ({navigation}) => {
 
     return () => clearTimeout(timer); // Clear the timeout if the component unmounts
   }, []);
+  
 
   return (
     <>
@@ -235,6 +296,41 @@ const HomeBar = ({navigation}) => {
               <Image source={cashback} style={styles.cashbackImage} />
             </View>
 
+            {/*Recent search history*/}
+            <View>
+              <View style={{flexDirection:'row',justifyContent:'space-between',alignItems:'center',margin:'3%'}}>
+              <Text style={[styles.sectionHeader, {margin: '3%'}]}>
+                RECOMMENDED FOR YOU
+              </Text>
+              <TouchableOpacity onPress={()=>{onPressOfSeeMore()}}>
+              <Text style={{textDecorationLine:'underline',color:'#00338D',fontSize:12,fontWeight:'500'}}>See More</Text>
+              </TouchableOpacity>
+              </View>
+               <FlatList
+                data={searchData}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                keyExtractor={(item, index) => index.toString()}
+                renderItem={({item}) => (
+                  <View style={styles.flatListSearchData}>
+                    <TouchableOpacity onPress={() => onPressOfImage(item.id)}>
+                      <Image
+                        source={{uri: item.imageUrl[0]}}
+                        style={styles.flatListImg}
+                      />
+                    </TouchableOpacity>
+                    <Text style={{fontSize:10,color:'black',fontWeight:'600',width:60,textAlign:'center',marginTop:'3%'}}>{item.title}</Text>
+                  </View>
+                )}
+                contentContainerStyle={{
+                  paddingHorizontal: 10, // Ensure spacing on left and right
+                }}
+                style={{
+                  maxHeight: 100, // Restrict FlatList height to avoid overflowing
+                }}
+              />
+            </View>
+
             {/* Play & Earn section */}
             <PlayAndEarn />
           </View>
@@ -245,7 +341,6 @@ const HomeBar = ({navigation}) => {
 };
 
 export default HomeBar;
-
 const styles = StyleSheet.create({
   mainContainer: {
     flexDirection: 'column',
@@ -300,7 +395,7 @@ const styles = StyleSheet.create({
   sectionHeader: {
     color: '#00338D',
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: '600',
     marginBottom: '3%',
   },
 
@@ -342,5 +437,27 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'rgba(255,255,255,0.7)', // Semi-transparent background
+  },
+
+  //recentSearchContainer
+  recentSearchContainer: {
+    margin: '1%',
+    backgroundColor: 'red',
+    width: '100%',
+    minHeight: 100,
+  },
+  flatListSearchData: {
+    flexDirection: 'column', // Stack image and text vertically
+    width: 100,
+    justifyContent: 'center',
+    alignItems: 'center', // Center both image and text horizontally
+    marginTop: '4%',
+    marginBottom: 10, // Add space between items if needed
+  },
+
+  flatListImg: {
+    width: 63,
+    height: 63,
+    borderRadius: 50,
   },
 });

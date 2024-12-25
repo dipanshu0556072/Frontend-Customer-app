@@ -115,7 +115,10 @@ useEffect(()=>{
            
            <TouchableOpacity style={{ width: 380, height: 240, margin: 5, borderRadius: 12, borderWidth: 0.6, borderColor: 'grey' }}
       
-           onPress={() => scheduleScreen(item.id)}>
+           onPress={() => {
+            scheduleScreen(item.id)}
+            
+           }>
             {/* <Text style={{ alignSelf: 'center', padding: '4%', color: '#00338D', textDecorationLine: 'underline', fontWeight: '500' }}>
                {item.store.name.includes("KPMG") ? 
             <Text>

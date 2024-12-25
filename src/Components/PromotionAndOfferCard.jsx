@@ -107,7 +107,7 @@ const PromotionAndOfferCard = ({title, productId}) => {
           )}
 
           {/* Show more options if promotions are available */}
-          {title !== 'Best Deal' && promotionData.length > 0 && (
+          {title !== 'Best Deal' && promotionData.length > 1 && (
             <TouchableOpacity
               style={styles.moreOfferOption}
               onPress={onPressShowModal}>

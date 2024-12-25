@@ -759,7 +759,7 @@ const GroceryPdpPage = ({navigation}) => {
                        {
                        selectedImage.map((item) => (
                        <View key={item.id}>
-                        {item.sizes.map((pro, id) => (
+                        {item.size.map((pro, id) => (
                        //  <Text key={id}>{pro.name}</Text>
                             <>
                             </>
@@ -771,7 +771,7 @@ const GroceryPdpPage = ({navigation}) => {
         {selectedImage.map(product => (
           <>
             {
-            product?.sizes.find(size => size.name === "50")?.quantity > 0 ? (
+            product?.size.find(size => size.name === "50")?.quantity > 0 ? (
               <>   
                               <TouchableOpacity
                               style={{
@@ -844,7 +844,7 @@ const GroceryPdpPage = ({navigation}) => {
             )}
   
   
-            {product?.sizes.find(size => size.name === "100")?.quantity > 0 ? (
+            {product?.size.find(size => size.name === "100")?.quantity > 0 ? (
               <>   
                               <TouchableOpacity
                               style={{
@@ -916,7 +916,7 @@ const GroceryPdpPage = ({navigation}) => {
               </>
             )}
   
-  {product?.sizes.find(size => size.name === "250")?.quantity > 0 ? (
+  {product?.size.find(size => size.name === "250")?.quantity > 0 ? (
     <>   
       <TouchableOpacity
         style={{

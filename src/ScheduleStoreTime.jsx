@@ -79,7 +79,7 @@ const ScheduleStoreTime = ({navigation}) => {
             selectedStorePickupDay,setSelectedStorePickupDay,cartItem,
             selectedStorePickupTime,setSelectedStorePickupTime,filteredData, setFilteredData,setDisableAction,
             storeProductWithSizeAndQuantity,setStoreProductWithSizeAndQuantity,showStorePickUpName,setShowStorePickUpName,
-            modifyStorePickUp,setModifyStorePickUp} = useCartContext();
+            modifyStorePickUp,setModifyStorePickUp,setDeliveryOption} = useCartContext();
 
         const [isLoading, setIsLoading] = useState(false); 
         const [slot1,setSlot1]=useState("2024-02-14T09:00:00");
@@ -264,12 +264,13 @@ const formattedDateTime = `${year}-${month}-${day}T${startTime}:00:00`
             },
           });
           setDisableAction(true);
+          setDeliveryOption('2');
           forNavigate('mainBag');
         } catch (error) {
           console.error('Error Posting nowRedeemYourPointsManually data:', error);
         }
        }
-      }
+      } 
     }
  // Calculate the minDate to disable dates before the current date
  const currentDate = moment().toDate(); // Get the current date
@@ -290,6 +291,7 @@ const formattedDateTime = `${year}-${month}-${day}T${startTime}:00:00`
    inputStrings.forEach((item) => {
      const match = item.match(/(\d+)([A-Z])(\d+)/);
      if (match) {
+      // Alert.alert(JSON.stringify(storeProductWithSizeAndQuantity+" "+match));
        const [, productId, sizeName, quantity] = match;
        newProductIds.push(Number(productId));
        newSizeNames.push(sizeName);
@@ -329,7 +331,7 @@ const formattedDateTime = `${year}-${month}-${day}T${startTime}:00:00`
       <Text>Quantities: {JSON.stringify(quantities)}</Text> */}
     </View>
             <View style={{ marginLeft: '10%' }}>
-              <Text style={{ color: 'black' }}>Schedule Pickup{JSON.stringify(selectedStoreId)}</Text>
+              <Text style={{ color: 'black' }}>Schedule Pickup</Text>
               {/* <Text>Today, {today.format('D MMM YYYY')}</Text>
       <Text>{firstDate.format('dddd')}, {firstDate.format('D MMM YYYY')}</Text>
       <Text>{secondDate.format('dddd')}, {secondDate.format('D MMM YYYY')}</Text> */}

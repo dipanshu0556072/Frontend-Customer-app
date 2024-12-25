@@ -111,8 +111,9 @@ const ProductTile = ({navigation}) => {
       };
     }
 
-    console.log(JSON.stringify(data));
+    console.log(JSON.stringify("Update value in cart:"+JSON.stringify(data)));
     try {
+      // Alert.alert(JSON.stringify(data));
       const response = await axios.put(
         `http://${ip}:5454/api/cart_items/${selectedCartItemId}`,
         data,

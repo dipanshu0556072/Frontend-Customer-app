@@ -1829,7 +1829,7 @@ const handleSortModalClose = () => {
                 <Text style={{fontSize:13}}>Subscription Start Date</Text>
                 <Text style={{fontSize:15,color:'black',fontWeight:'500'}}>{formatDate2(selectedDate)}</Text>
               </View>
-              <Image source={dropDownArrow}  style={{height:17,width:12,marginLeft:'40%',marginTop:'9%'}}/>
+              <Image source={dropDownArrow}  style={{height:17,width:12,marginLeft:'35%',marginTop:'9%'}}/>
            </TouchableOpacity>
            <TouchableOpacity style={styles.subscribedDates} onPress={closeWeekly}>
               <Text style={{textAlign:'center',color:'white',fontSize:15,fontWeight:'500'}}>Submit</Text>

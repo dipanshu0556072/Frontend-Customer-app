@@ -768,7 +768,7 @@ const OrderStatus = ({navigation}) => {
                 <Image source={back} style={{marginLeft: 12}} />
               </View>
               <View style={{marginLeft: '4%'}}>
-                <Text style={{color: 'black'}}>Track Order{JSON.stringify(receiptData?.totalDiscountedPrice.toFixed(2))}</Text>
+                <Text style={{color: 'black'}}>Track Order</Text>
               </View>
             </View>
           </TouchableOpacity>

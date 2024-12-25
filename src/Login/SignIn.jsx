@@ -130,6 +130,22 @@ const SignIn = ({navigation}) => {
    
   }
 
+  //store loginUserId
+  async function getLoginUserId() {
+    const header = {
+      Authorization: `Bearer ${token}`,
+    };
+
+    try {
+      const response = await axios.get(
+        `http://${ip}:5454/api/tiers/${loginUserId}`,
+        {headers: header},
+      );
+      setUserLoyaltyTier(response.data);
+    } catch (error) {
+      console.log('Error fetching Loyalty applycoupon.jsx:', error);
+    }
+  }
 
   // Effect to update button color based on field validity
   useEffect(() => {

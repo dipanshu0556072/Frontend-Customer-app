@@ -60,7 +60,10 @@ const addToWish = async (item) => {
         headers: header,
       });
 
-      setCartProductId([cartProductId,item?.product?.id]);
+      setCartProductId(productId =>
+        productId.filter(id => id !== productId)
+    );
+      
       setModified(true); // Set modification flag
       console.log("Removed cart item successfully!");
     } catch (error) {

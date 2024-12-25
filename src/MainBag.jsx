@@ -122,6 +122,10 @@ const MainBag = ({navigation}) => {
     setWishListProductId,
     cartProductId,
     setCartProductId,
+    flag,
+    setFlag,
+    isLoyaltyCouponApplied,
+    setIsLoyaltyCouponApplied
   } = useCartContext();
 
   const [redeemYouPointsError, setRedeemYourPointsError] = useState(false);
@@ -182,14 +186,21 @@ const MainBag = ({navigation}) => {
   //   }
   // };
 
-  useEffect(() => {}, [cartItem]);
+  useEffect(() => {}, [cartItem, flag]);
   const isFocused = useIsFocused();
 
   useEffect(() => {
+    if (cartItem && cartItem?.totalDiscountedPrice) {
+      setTotalAmount(
+        flag
+          ? cartItem?.totalDiscountedPrice - redeemYouPoints
+          : cartItem?.totalDiscountedPrice,
+      );
+    }
     if (isFocused) {
       checkIsPromotionCouponIsApplied();
     }
-  }, [isFocused]);
+  }, [isFocused, cartItem]);
 
   //get user Loyalty Tier
   async function getUserTier() {
@@ -273,7 +284,36 @@ const MainBag = ({navigation}) => {
     }
   };
 
-  useEffect(() => {}, [cartItem, totalAmount]);
+  // Check if coupon is applied already or not
+  const checkIsCouponApplied = async () => {
+    try {
+      const response = await axios.get(`http://${ip}:5454/api/users/profile`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      // Log the response data for debugging
+      console.log('Response Data:', response.data);
+
+      // Check if `discountApplied` is true or "true"
+      if (
+        response.data?.discountApplied === true ||
+        response.data?.discountApplied === 'true'
+      ) {
+     //  Alert.alert('Hi', 'Coupon is applied');
+        setIsLoyaltyCouponApplied(true); // Coupon is applied
+      } else {
+    //   Alert.alert('Bye', 'Coupon is not applied');
+        setIsLoyaltyCouponApplied(false); // Coupon is not applied
+      }
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
+
+
+  useEffect(() => {}, [cartItem, totalAmount, flag]);
   useEffect(() => {
     getCart();
   }, [
@@ -298,6 +338,7 @@ const MainBag = ({navigation}) => {
       setPinCode('');
       setDeliveryOption('0');
     }
+    checkIsCouponApplied();
   }, []);
 
   async function getIdQunatityToUpdateQuantity() {
@@ -372,21 +413,25 @@ const MainBag = ({navigation}) => {
     }
   }, []);
 
-  const [flag, setFlag] = useState(false);
-
   const handleApplyRedeemPoints = () => {
-    if (!redeemYouPoints) {
-      setRedeemYourPointsNULLError(true);
-    } else if (
-      redeemYouPoints &&
-      redeemYouPoints > AllAvailablePointsToRedeem
-    ) {
+    if (flag) {
       setRedeemYouPointIsMuch(true);
-      setRedeemYourPoints('');
     } else {
-      // nowRedeemYourPointsManually();
-      setFlag(true);
-      getCart();
+      if (!redeemYouPoints) {
+        setRedeemYourPointsNULLError(true);
+      } else if (
+        redeemYouPoints &&
+        totalAmount >= totalAmount &&
+        redeemYouPoints > AllAvailablePointsToRedeem
+      ) {
+        setRedeemYouPointIsMuch(true);
+        setRedeemYourPoints('');
+      } else {
+        //nowRedeemYourPointsManually();
+        setTotalAmount(cartItem?.totalDiscountedPrice - redeemYouPoints);
+        setFlag(true);
+        getCart();
+      }
     }
   };
 
@@ -428,7 +473,8 @@ const MainBag = ({navigation}) => {
       })
       .then(response => {
         // console.log("\n\n\nID To Be Deleted\n\n\n"+price)
-        setCartProductId(productId => productId.filter(id => id == itemId));
+        
+      
         setCartCount(cartCount - 1);
         getCart();
       })
@@ -483,11 +529,13 @@ const MainBag = ({navigation}) => {
         }
       };
       if (filteredData && filteredData.length > 0) {
+        // Alert.alert(JSON.stringify("ih"));
         forNavigate('Payment1');
       } else {
         forNavigate('orderSummary');
       }
     } else if (filteredData && filteredData.length > 0) {
+      // Alert.alert(JSON.stringify("hi"));
       forNavigate('Payment1');
     } else {
       const forNavigate = page => {
@@ -666,6 +714,7 @@ const MainBag = ({navigation}) => {
 
   function forNavigate(page) {
     // console.log(page+" "+currentPage[currentPage.length-1]);
+    setShowActivityIndicator(false);
     if (currentPage && currentPage[currentPage.length - 1] !== page) {
       pushToStack(page);
       navigation.navigate(page);
@@ -791,14 +840,14 @@ const MainBag = ({navigation}) => {
         setShowActivityIndicator(false);
       }, 2000);
       setCheckIsPromotionCouponApplied(0);
-      setTotalAmount(0);
+      // setTotalAmount(0);
     } catch (error) {
       console.error('Error Posting nowRedeemYourPointsManually data:', error);
     }
   };
   //add extra amount to totalAmount for express delivery
   const addExpressDeliveryCharge = async () => {
-    setTotalAmount(0);
+    // setTotalAmount(0);
     setShowActivityIndicator(true);
     setTimeout(() => {
       setShowActivityIndicator(false);
@@ -816,6 +865,12 @@ const MainBag = ({navigation}) => {
           },
         },
       );
+      setTotalAmount(
+        flag
+          ? cartItem?.totalDiscountedPrice + 100 - redeemYouPoints
+          : cartItem?.totalDiscountedPrice + 100,
+      );
+      getCart();
     } catch (error) {
       console.error('Error Posting expressDeliveryCharge:', error);
     }
@@ -838,6 +893,11 @@ const MainBag = ({navigation}) => {
       console.log(
         'Express delivery charge removed successfully:',
         response.data,
+      );
+      setTotalAmount(
+        flag
+          ? cartItem?.totalDiscountedPrice - 100 - redeemYouPoints
+          : cartItem?.totalDiscountedPrice - 100,
       );
       return response.data; // Return the response data if needed
     } catch (error) {
@@ -984,7 +1044,7 @@ const MainBag = ({navigation}) => {
                     fontWeight: '500',
                     textDecorationLine: 'underline',
                   }}>
-                  Choose Your Location
+                  Choose Your Location{JSON.stringify(isLoyaltyCouponApplied)}
                 </Text>
                 <TouchableOpacity
                   style={{
@@ -1051,6 +1111,7 @@ const MainBag = ({navigation}) => {
                     setDeliveryOption('1');
                     setFilteredData([]);
                     addExpressDeliveryCharge();
+                    getCart();
                   }}
                 />
                 <Text style={{color: 'black'}}>Express{'\n'}Delivery</Text>
@@ -1067,8 +1128,6 @@ const MainBag = ({navigation}) => {
                 <Text style={{color: 'black'}}>Express Store{'\n'}Pick Up</Text>
               </View>
             </View>
-
-            <ProductTile />
 
             {filteredData &&
               filteredData.length > 0 &&
@@ -1134,13 +1193,13 @@ const MainBag = ({navigation}) => {
                   </View>
                 </>
               )}
-
+            <ProductTile />
             <Modal
               animationType="slide"
               transparent={true}
               visible={sortModalVisible}
               onRequestClose={handleSortModalClose}>
-              <TouchableWithoutFeedback onPress={handleSortModalClose}>
+              {/* <TouchableWithoutFeedback onPress={handleSortModalClose}> */}
                 <View style={styles.modalContainer}>
                   <View style={styles.modalContent1}>
                     <View>
@@ -1149,6 +1208,7 @@ const MainBag = ({navigation}) => {
                           flexDirection: 'row',
                           alignItems: 'center',
                           justifyContent: 'space-between',
+                          
                         }}>
                         <Text
                           style={{
@@ -1203,7 +1263,7 @@ const MainBag = ({navigation}) => {
                     </View>
                   </View>
                 </View>
-              </TouchableWithoutFeedback>
+              {/* </TouchableWithoutFeedback> */}
             </Modal>
 
             <Modal
@@ -1418,7 +1478,7 @@ const MainBag = ({navigation}) => {
                       textAlign: 'center',
                       marginTop: '2%',
                       color: 'red',
-                      fontSize: 12,
+                      fontSize: 10,
                     }}>
                     Insufficient points to redeem!
                   </Text>
@@ -1593,29 +1653,56 @@ const MainBag = ({navigation}) => {
                       </Text>
                     )}
                   </View>
-
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      justifyContent: 'space-between',
-                    }}>
-                    <Text
+                  {flag && (
+                    <View
                       style={{
-                        padding: '1%',
-                        color: 'rgba(0,0,0,0.7)',
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
                       }}>
-                      Redeemed Points
-                    </Text>
+                      <Text
+                        style={{
+                          padding: '1%',
+                          color: 'rgba(0,0,0,0.7)',
+                        }}>
+                        Redeemed Points
+                      </Text>
 
-                    <Text
+                      <Text
+                        style={{
+                          padding: '1%',
+                          fontWeight: '500',
+                          color: '#388E3C',
+                        }}>
+                        {redeemYouPoints && flag ? `-${redeemYouPoints}` : '0'}
+                      </Text>
+                    </View>
+                  )}
+
+{isLoyaltyCouponApplied&& (
+                    <View
                       style={{
-                        padding: '1%',
-                        fontWeight: '500',
-                        color: '#388E3C',
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
                       }}>
-                      {redeemYouPoints && flag ? redeemYouPoints : '0'}
-                    </Text>
-                  </View>
+                      <Text
+                        style={{
+                          padding: '1%',
+                          color: 'rgba(0,0,0,0.7)',
+                        }}>
+                        Coupon applied
+                      </Text>
+
+                      <Text
+                        style={{
+                          padding: '1%',
+                          fontWeight: '500',
+                          color: '#388E3C',
+                        }}>
+                        
+                      </Text>
+                    </View>
+                  )}
+
                   {isCouponApplied && (
                     <View
                       style={{
@@ -1667,7 +1754,7 @@ const MainBag = ({navigation}) => {
               </View>
               <View style={{flexDirection: 'row', justifyContent: 'flex-end'}}>
                 <Text style={{fontWeight: '600', color: 'black'}}>
-                  ₹ {cartItem?.totalDiscountedPrice}
+                  ₹{totalAmount}
                 </Text>
               </View>
             </View>
@@ -1745,10 +1832,7 @@ const MainBag = ({navigation}) => {
                 scrollViewRef.current.scrollToEnd({animated: true});
               }}>
               <Text style={{fontSize: 30, color: '#00338D'}}>
-                ₹
-                {cartItem?.totalDiscountedPrice
-                  ? cartItem?.totalDiscountedPrice
-                  : '0.0'}
+                ₹{totalAmount}
               </Text>
               <Text style={{textDecorationLine: 'underline'}}>
                 View Details

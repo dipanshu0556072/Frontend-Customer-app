@@ -40,7 +40,11 @@ export default function Payment2({navigation}) {
     totalAmount,
     redeemYouPoints,
     isCouponApplied,
-    cartItem
+    cartItem,
+    flag,
+    setFlag,
+    setDisableAction,
+    selectedStoreId
   } = useCartContext();
 
 
@@ -142,12 +146,23 @@ export default function Payment2({navigation}) {
  };
 
   //call backend api to call createOrder
-  const createOrder = () => {
-    if (redeemYouPoints && redeemYouPoints.length > 0) {
-      nowRedeemYourPointsManually();
+  const performOrderCreation = async () => {
+    if (flag) {
+      // Ensure nowRedeemYourPointsManually is asynchronous and await its completion
+      await nowRedeemYourPointsManually();
     }
+  
+    // Reset the flag after redeem points task is complete
+    setFlag(false);
+  
+    // Call createOrder after completing the above task
+    createOrder();
+  };
+  
+  const createOrder = () => {
 
-    //if user choosed storePickUp
+
+    // if user choosed storePickUp
     if (deliveryOption == '2') {
       axios
         .post(
@@ -228,8 +243,9 @@ export default function Payment2({navigation}) {
       } else {
         // Proceed with your logic
         console.log('All fields are filled out correctly. Proceeding...');
+        setDisableAction(true);
         //create order
-        createOrder();
+        performOrderCreation();
       }
     };
   //payment through wallet
@@ -292,9 +308,9 @@ export default function Payment2({navigation}) {
   
   }, []);
 useEffect(()=>{
-if(cartItem && cartItem?.totalDiscountedPrice){
- setTotalAmount(cartItem?.totalDiscountedPrice?cartItem?.totalDiscountedPrice:0);
-}
+// if(cartItem && cartItem?.totalDiscountedPrice){
+//  setTotalAmount(cartItem?.totalDiscountedPrice?cartItem?.totalDiscountedPrice:0);
+// }
 },[]);
 
   return (

@@ -30,6 +30,8 @@ const FilterProductsModal = ({visible, closeModal}) => {
   const [sliderValues, setSliderValues] = useState([200, 1000]);
   const {
     PLPData,
+    searchData,
+    setSearchData,
     setPLPData,
     filteredDataOnPLP,
     setFilteredDataOnPLP,
@@ -42,7 +44,7 @@ const FilterProductsModal = ({visible, closeModal}) => {
   const {ip, token} = useLoginContext();
 
   //get product Category
-  const productCategory = PLPData && PLPData[0]?.category?.name;
+  const productCategory = searchData && searchData.length>0? searchData && searchData[0]?.category?.name:PLPData && PLPData[0]?.category?.name;
 
   //call filter API for filter data from backend
   const filterProductFromAPI = async (category, data) => {
@@ -81,6 +83,7 @@ const FilterProductsModal = ({visible, closeModal}) => {
 
   //apply multiFilter on PDP based on selected filters
   const MultiFilterOnPdpAPI = async val => {
+    Alert.alert(JSON.stringify(productCategory));
     const filterData = {
       brand: selectedBrands,
       color: selectedColors,

@@ -19,7 +19,7 @@ const LoginCartProvider = ({children}) => {
   const [profileData,setProfileData]=useState([]);
   const[otp,setOtp]=useState('');
 
-// Determines whether to navigate to the main home page or the forgot password page
+// Determines whether to navigate to the main home page or thec forgot password page
 const [navigationDestination, setNavigationDestination] = useState(0);
 
   //get all user list 
