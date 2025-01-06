@@ -36,6 +36,8 @@ const MainPlp = ({navigation}) => {
     setSelectedFilterData,
     setRecommendedSeeMoreBtn,
     recommenedSeeMoreBtn,
+    showGroceryProductOnPLP,
+    setShowGroceryProductOnPLP,
   } = useCartContext();
   const {ip, token, popFromStack} = useLoginContext();
   //show the Modal of sort and filter
@@ -105,7 +107,18 @@ const MainPlp = ({navigation}) => {
   //SortAndFilter
   const SortAndFilter = ({img, title, fun}) => {
     return (
-      <TouchableOpacity onPress={fun} style={[styles.sortContainer,{borderRightWidth:!recommenedSeeMoreBtn?1:0,}]}>
+      <TouchableOpacity
+        onPress={fun}
+        style={[
+          styles.sortContainer,
+          {
+            borderRightWidth: !(
+              recommenedSeeMoreBtn === false && showGroceryProductOnPLP === true
+            )
+              ? 1
+              : 0,
+          },
+        ]}>
         <Image source={img} style={styles.sortImage} />
         <Text style={styles.sortImageText}>{title}</Text>
       </TouchableOpacity>
@@ -159,6 +172,7 @@ const MainPlp = ({navigation}) => {
   const backButtonPressed = () => {
     //  fetchData();
     setRecommendedSeeMoreBtn(false);
+    setShowGroceryProductOnPLP(false);
     popFromStack(navigation);
     setFilteredDataOnPLP([]);
   };
@@ -197,7 +211,11 @@ const MainPlp = ({navigation}) => {
               style={styles.buttonWrapper}>
               <View style={styles.rowLayout}>
                 <Image source={back} />
-                <Text style={styles.categoryLabel}>{recommenedSeeMoreBtn?'Recommended For You':productCategory}</Text>
+                <Text style={styles.categoryLabel}>
+                  {recommenedSeeMoreBtn
+                    ? 'Recommended For You'
+                    : productCategory}
+                </Text>
               </View>
               <Text style={styles.itemsCountLabel}>
                 {filteredDataOnPLP && filteredDataOnPLP?.length
@@ -231,7 +249,10 @@ const MainPlp = ({navigation}) => {
               ]}>
               <SortAndFilter img={filter} title="SORT" fun={handleSortPress} />
               {/*added a condition, if showing recommended product, then do not show filter option*/}
-              {!recommenedSeeMoreBtn && (
+              {!(
+                recommenedSeeMoreBtn === false &&
+                showGroceryProductOnPLP === true
+              ) && (
                 <SortAndFilter
                   img={filter}
                   title="FILTER"

@@ -40,11 +40,18 @@ const HomeBar = ({navigation}) => {
     setCartProductId,
     setCurrentProductIdOnPDP,
     setRecommendedSeeMoreBtn,
-    setPLPData
+    setPLPData,
   } = useCartContext();
 
-  const {ip, token,loginUserId, setLoginUserId, pushToStack, currentPage, popFromStack} =
-    useLoginContext();
+  const {
+    ip,
+    token,
+    loginUserId,
+    setLoginUserId,
+    pushToStack,
+    currentPage,
+    popFromStack,
+  } = useLoginContext();
 
   const [searchData, setSearchData] = useState([]);
 
@@ -195,31 +202,26 @@ const HomeBar = ({navigation}) => {
     );
   }
 
-    // If the image is touched
-    const onPressOfImage = productId => {
-     
-      // Alert.alert(JSON.stringify(productId));
-       setCurrentProductIdOnPDP(productId);
-      navigation.navigate('mainPDP'); // Pass productId only
-    };
+  // If the image is touched
+  const onPressOfImage = productId => {
+    // Alert.alert(JSON.stringify(productId));
+    setCurrentProductIdOnPDP(productId);
+    navigation.navigate('mainPDP'); // Pass productId only
+  };
 
-      //filter the product data based on the Fashion tile
+  //filter the product data based on the Fashion tile
   const filterProductDataOnPLP = async () => {
     let response;
     try {
-          response = await axios.get(
-            `http://${ip}:5454/api/getSuggestedItems`,
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            },
-          );
-  
-          // Alert.alert(JSON.stringify(response.data));
-  
-        setPLPData(response.data);
-      
+      response = await axios.get(`http://${ip}:5454/api/getSuggestedItems`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      // Alert.alert(JSON.stringify(response.data));
+
+      setPLPData(response.data);
     } catch (error) {
       console.log(
         'getting error in the homeBar.jsx in filterProductData' + error,
@@ -228,11 +230,10 @@ const HomeBar = ({navigation}) => {
     setRecommendedSeeMoreBtn(true);
     navigation.navigate('mainPlp');
   };
-  //if the see more (Recoommended for you) is pressed then 
-  const onPressOfSeeMore=()=>{
+  //if the see more (Recoommended for you) is pressed then
+  const onPressOfSeeMore = () => {
     filterProductDataOnPLP();
-
-  }
+  };
 
   useEffect(() => {
     // Show the ActivityIndicator for 2 seconds
@@ -242,7 +243,6 @@ const HomeBar = ({navigation}) => {
 
     return () => clearTimeout(timer); // Clear the timeout if the component unmounts
   }, []);
-  
 
   return (
     <>
@@ -297,39 +297,44 @@ const HomeBar = ({navigation}) => {
             </View>
 
             {/*Recent search history*/}
-            <View>
-              <View style={{flexDirection:'row',justifyContent:'space-between',alignItems:'center',margin:'3%'}}>
-              <Text style={[styles.sectionHeader, {margin: '3%'}]}>
-                RECOMMENDED FOR YOU
-              </Text>
-              <TouchableOpacity onPress={()=>{onPressOfSeeMore()}}>
-              <Text style={{textDecorationLine:'underline',color:'#00338D',fontSize:12,fontWeight:'500'}}>See More</Text>
-              </TouchableOpacity>
+            {searchData && searchData?.length > 0 && (
+              <View>
+                <View style={styles.mainSearchContainer}>
+                  <Text style={[styles.sectionHeader, {margin: '3%'}]}>
+                    RECOMMENDED FOR YOU
+                  </Text>
+                  <TouchableOpacity
+                    onPress={() => {
+                      onPressOfSeeMore();
+                    }}>
+                    <Text style={styles.seeMoreText}>See More</Text>
+                  </TouchableOpacity>
+                </View>
+                <FlatList
+                  data={searchData}
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  keyExtractor={(item, index) => index.toString()}
+                  renderItem={({item}) => (
+                    <View style={styles.flatListSearchData}>
+                      <TouchableOpacity onPress={() => onPressOfImage(item.id)}>
+                        <Image
+                          source={{uri: item.imageUrl[0]}}
+                          style={styles.flatListImg}
+                        />
+                      </TouchableOpacity>
+                      <Text style={styles.searchTitle}>{item.title}</Text>
+                    </View>
+                  )}
+                  contentContainerStyle={{
+                    paddingHorizontal: 10, // Ensure spacing on left and right
+                  }}
+                  style={{
+                    maxHeight: 100, // Restrict FlatList height to avoid overflowing
+                  }}
+                />
               </View>
-               <FlatList
-                data={searchData}
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                keyExtractor={(item, index) => index.toString()}
-                renderItem={({item}) => (
-                  <View style={styles.flatListSearchData}>
-                    <TouchableOpacity onPress={() => onPressOfImage(item.id)}>
-                      <Image
-                        source={{uri: item.imageUrl[0]}}
-                        style={styles.flatListImg}
-                      />
-                    </TouchableOpacity>
-                    <Text style={{fontSize:10,color:'black',fontWeight:'600',width:60,textAlign:'center',marginTop:'3%'}}>{item.title}</Text>
-                  </View>
-                )}
-                contentContainerStyle={{
-                  paddingHorizontal: 10, // Ensure spacing on left and right
-                }}
-                style={{
-                  maxHeight: 100, // Restrict FlatList height to avoid overflowing
-                }}
-              />
-            </View>
+            )}
 
             {/* Play & Earn section */}
             <PlayAndEarn />
@@ -440,6 +445,12 @@ const styles = StyleSheet.create({
   },
 
   //recentSearchContainer
+  mainSearchContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    margin: '3%',
+  },
   recentSearchContainer: {
     margin: '1%',
     backgroundColor: 'red',
@@ -454,7 +465,20 @@ const styles = StyleSheet.create({
     marginTop: '4%',
     marginBottom: 10, // Add space between items if needed
   },
-
+  seeMoreText: {
+    textDecorationLine: 'underline',
+    color: '#00338D',
+    fontSize: 12,
+    fontWeight: '500',
+  },
+  searchTitle: {
+    fontSize: 10,
+    color: 'black',
+    fontWeight: '600',
+    width: 60,
+    textAlign: 'center',
+    marginTop: '3%',
+  },
   flatListImg: {
     width: 63,
     height: 63,

@@ -12,19 +12,27 @@ import {useCartContext} from '../Context/WomenContext.jsx';
 import {useLoginContext} from '../Login/LoginCartProvider.jsx';
 import wishlistImage1 from '../PlpScreen/images/love2.png';
 import wishlistImage2 from '../PlpScreen/images/love1.png';
+import calender from '../PlpScreen/images/calendar2.png';
 import axios from 'axios';
 
 const PLPComponent = ({item, navigation}) => {
-  const {setShowActivityIndicator, wishListProductId, setWishListProductId,setCurrentProductIdOnPDP} =
-    useCartContext();
-  const {ip, token,pushToStack} = useLoginContext();
+  const {
+    setShowActivityIndicator,
+    wishListProductId,
+    setWishListProductId,
+    setCurrentProductIdOnPDP,
+    showGroceryProductOnPLP,
+setScheduledProductId
+    
+  } = useCartContext();
+  const {ip, token, pushToStack} = useLoginContext();
 
   // If the image is touched
   const onPressOfImage = productId => {
     setShowActivityIndicator(true);
     pushToStack('mainPDP');
     setCurrentProductIdOnPDP(productId);
-    navigation.navigate('mainPDP'); // Pass productId only
+    navigation.navigate('mainPDP');
   };
 
   // Function to handle button click based on title (WISHLIST or CART)
@@ -61,6 +69,13 @@ const PLPComponent = ({item, navigation}) => {
     }
   };
 
+  //onPress of schedule Subscription
+  const onPressOfScheduleBtn=(productId)=>{
+    setCurrentProductIdOnPDP(productId);
+    pushToStack('scheduleSubscription');
+    navigation.navigate('scheduleSubscription');
+  }
+
   return (
     <View style={styles.container}>
       <View style={styles.productContainer}>
@@ -87,7 +102,7 @@ const PLPComponent = ({item, navigation}) => {
           </TouchableOpacity>
           <View style={styles.ratingContainer}>
             <Text style={styles.ratingText}>
-              {(item?.productRating.toFixed(1))}
+              {item?.productRating.toFixed(1)}
             </Text>
           </View>
         </View>
@@ -118,6 +133,18 @@ const PLPComponent = ({item, navigation}) => {
               ({item.discountPercent}% OFF)
             </Text>
           )}
+          {
+            showGroceryProductOnPLP && (
+              <>
+              
+              <TouchableOpacity
+              onPress={() => {onPressOfScheduleBtn(item.id)}}>
+              <Image source={calender} style={{height: 25, width: 25,marginTop:'4%'}} />
+            </TouchableOpacity> 
+
+            </> 
+            )
+          }
         </View>
       </View>
     </View>
@@ -128,10 +155,11 @@ export default PLPComponent;
 
 const styles = StyleSheet.create({
   container: {
+
     flex: 1,
     margin: '1%',
     width: 450,
-    height: 300,
+    height: 350,
     marginBottom: '8%',
   },
   productContainer: {
@@ -179,5 +207,6 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 70,
     marginTop: '3%',
+
   },
 });

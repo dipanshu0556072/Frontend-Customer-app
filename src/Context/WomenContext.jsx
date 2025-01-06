@@ -10,6 +10,19 @@ export function useCartContext() {
   return useContext(WomenContext);
 }
 export default function WomenCartProvider({children}) {
+  const [date, setDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
+  const [totalDaysOfSubscription, setTotalDaysOfSubscription] = useState(false);
+  const [targetDaysOfSubscription,setTargetDaysOfSubscription]=useState([]);
+  const [checkedDays, setCheckedDays] = useState({
+    Sunday: false,
+    Monday: false,
+    Tuesday: false,
+    Wednesday: false,
+    Thursday: false,
+    Friday: false,
+    Saturday: false,
+  });
   const [selectedBagItem, setSelectedBagItem] = useState([]);
   const [selectedWishListItem, setSelectedWishListItem] = useState([]);
   const [dataArray, setDataArray] = useState([]);
@@ -37,7 +50,7 @@ export default function WomenCartProvider({children}) {
   //isLoyalty coupon applied 
   const [isLoyaltyCouponApplied, setIsLoyaltyCouponApplied] = useState(false);
 
-
+  const [LeaveMessage,setLeaveMessage]=useState(""); 
 
   //show loading buffering
   const [showActivityIndicator, setShowActivityIndicator] = useState(false);
@@ -233,6 +246,11 @@ export default function WomenCartProvider({children}) {
 
   //if the see more (Recoommended for you) is pressed then 
   const [recommenedSeeMoreBtn,setRecommendedSeeMoreBtn]=useState(false);
+  //if show dairy product on PLP
+  const [showGroceryProductOnPLP,setShowGroceryProductOnPLP]=useState(false);
+
+
+
 
   const DeleteWishItem = (itemId, itemCategory) => {
     console.log('here ' + itemId + ' ' + itemCategory);
@@ -263,6 +281,10 @@ export default function WomenCartProvider({children}) {
 
   
   const contextvalue = {
+    date, setDate,
+    endDate, setEndDate,
+    checkedDays, setCheckedDays,
+    targetDaysOfSubscription,setTargetDaysOfSubscription,
     //selected bag items
     selectedBagItem,
     setSelectedBagItem,
@@ -489,7 +511,10 @@ export default function WomenCartProvider({children}) {
     searchData, setSearchData,
     isAppliedFilterFromSearch,setIsAppliedFilterFromSearch,
     recommenedSeeMoreBtn,setRecommendedSeeMoreBtn,
-    flag, setFlag
+    flag, setFlag,
+    showGroceryProductOnPLP,setShowGroceryProductOnPLP,
+    LeaveMessage,setLeaveMessage,
+    totalDaysOfSubscription, setTotalDaysOfSubscription
     
   };
   return (

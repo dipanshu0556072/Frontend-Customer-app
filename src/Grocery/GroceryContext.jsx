@@ -5,12 +5,13 @@ export function useGroceryContext(){
 }
 export default function GroceryProvider ({children})
 {
+  const [selectQuantity, setSelectQuantity] = useState(1);
   const[groceryAllProduct,setGroceryAllProduct]=useState([]);  
   const[grocerySubscribedDate,setGrocerySubscribedDate]=useState("");
   const[grocerySubscribedDate1,setGrocerySubscribedDate1]=useState("");
   const[grocerySubscribedTime,setGrocerySubscribedTime]=useState("");
   const[subscribedGroceryProductId,setSubscribedGroceryProductId]=useState();
-  const [LeaveMessage,setLeaveMessage]=useState(""); 
+  const[currentSubscriptionId,setCurrentSubscriptionId]=useState(0);
   const[getLastSubscribedId,setGetLastSubscribedId]=useState("");
   const [subscribedSelectedDays,setSubscribedSelectedDays]=useState([]);
   const [subscribedSelectedDates,setSubscribedSelectedDates]=useState([]);
@@ -26,13 +27,14 @@ export default function GroceryProvider ({children})
   const [houseNumber, setHouseNumber] = useState('');
   const [state, setState] = useState("");
   const [city, setCity] = useState(""); 
-  const [selectedAddress,setSelectedAddress]=useState(-1);
+  const [selectedAddress,setSelectedAddress]=useState(null);
   const[currentSelectedSubscribedProduct,setCurrentSelectedSubscribedProduct]=useState();
   const[selectedTime,setSelectedTime]=useState("");
   const[isRequestedForSubscriptionExtend,setIsRequestedForSubscriptionExtend]=useState(false);
   const[isRequestedForSubscriptionExtendId,setIsRequestedForSubscriptionExtendId]=useState(0);
   const[selectedDatesAsString,setSelectedDatesAsString]=useState("");
   const[subsribedSelectedDatesCount,setSubscribedSelectedDatesCount]=useState(0);
+  const[isSubscriptionModifyRequest,setIsSubcriptionModifyRequest]=useState(false);
 
  //update Qty of product
  const[qtyValue,setQtyValue]=useState(1);
@@ -50,7 +52,7 @@ const[isResumeCustomSubscription,setIsResumeCustomSubscription]=useState(false);
     grocerySubscribedTime,setGrocerySubscribedTime,
     grocerySubscribedDate1,setGrocerySubscribedDate1,
     subscribedGroceryProductId,setSubscribedGroceryProductId,
-    LeaveMessage,setLeaveMessage,
+
     getLastSubscribedId,setGetLastSubscribedId,
     subscribedSelectedDays,setSubscribedSelectedDays,
     subscribedSelectedDates,setSubscribedSelectedDates,
@@ -75,7 +77,10 @@ const[isResumeCustomSubscription,setIsResumeCustomSubscription]=useState(false);
     subsribedSelectedDatesCount,setSubscribedSelectedDatesCount,
     qtyValue,setQtyValue,
     count, setCount,
-    isResumeCustomSubscription,setIsResumeCustomSubscription
+    isResumeCustomSubscription,setIsResumeCustomSubscription,
+    currentSubscriptionId,setCurrentSubscriptionId,
+    isSubscriptionModifyRequest,setIsSubcriptionModifyRequest,
+    selectQuantity, setSelectQuantity
     
   }
   return (

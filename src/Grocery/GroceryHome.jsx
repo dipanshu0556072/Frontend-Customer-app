@@ -21,7 +21,8 @@ import frame17 from '../Grocery/Images/frame17.png';
 import frame18 from '../Grocery/Images/frame18.png';
 
 import { useLoginContext } from '../Login/LoginCartProvider';
-
+import { useCartContext } from '../Context/WomenContext';
+import axios from 'axios';
 
 const GroceryHome = ({navigation}) => {
 
@@ -29,7 +30,8 @@ const GroceryHome = ({navigation}) => {
     currentPage, setCurrentPage,
     currentPageIndex,setCurrentPageIndex,
     currentPageIndexCategory,setCurrentPageIndexCategory,
-    currentPageIndexCategory1,setCurrentPageIndexCategory1}=useLoginContext();  
+    currentPageIndexCategory1,setCurrentPageIndexCategory1}=useLoginContext();
+  const {showGroceryProductOnPLP,setShowGroceryProductOnPLP,PLPData,setPLPData}=useCartContext();    
 
 
     const forNavigate=(page)=>{
@@ -71,6 +73,39 @@ const data1 = [
     { id: '3', source: frame18,},
     // Add more images as needed
   ];
+
+  //filtered the product by third level category
+  const filterProductData = async category => {
+    let response;
+    try {
+      if (category) {
+        response = await axios.get(
+          `http://${ip}:5454/api/admin/products/getProductByThirdCategory?category=${category}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          },
+        );
+
+        // Alert.alert(JSON.stringify(response.data));
+      } 
+      setPLPData(response.data);
+      console.log(JSON.stringify(PLPData));
+    } catch (error) {
+      console.log(
+        'getting error in the homeBar.jsx in filterProductData' + error,
+      );
+    }
+  };
+
+  //onPress of DairyBtn
+  const onPressOfDairyBtn=()=>{
+    filterProductData('dairyProducts');
+    setShowGroceryProductOnPLP(true);
+    forNavigate('mainPlp');
+  }
+
 
 
   return (
@@ -142,7 +177,7 @@ const data1 = [
             renderItem={({ item }) => (
             <View style={{padding:8}}>  
              <TouchableOpacity
-               onPress={()=>forNavigate('dairyProduct')}
+               onPress={()=>{onPressOfDairyBtn()}}
                >
                <Image source={item.source} style={{}} />
              </TouchableOpacity> 

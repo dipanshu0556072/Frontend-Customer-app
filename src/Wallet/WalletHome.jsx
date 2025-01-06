@@ -531,21 +531,7 @@ const WalletHome = ({navigation}) => {
                     }}>
                     <View style={{marginLeft: '8%', marginTop: '7%'}}>
                       <Text style={{color: 'black'}}>
-                        {item.transactionType === 'ADD_MONEY'
-                          ? 'Add to wallet'
-                          : item.transactionType === 'FREEZE_AMOUNT'
-                          ? 'Freeze Amount'
-                          : item.transactionType === 'CANCELLATION_FEE'
-                          ? 'Cancellation Fee'
-                          : item.transactionType === 'ORDER_PAYMENT'
-                          ? 'Order Payment'
-                          : item.transactionType ===
-                            'REFUND_AGAINST_ORDER_CANCELLATION'
-                          ? 'Cancellation Refund'
-                          : item.transactionType ===
-                            'REFUND_AGAINST_ORDER_RETURNED'
-                          ? 'Returned Order Refund'
-                          : ''}
+                        {item.transactionType}
                       </Text>
 
                       <Text style={{fontSize: 13}}>Payment Method: Wallet</Text>
